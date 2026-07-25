@@ -667,6 +667,28 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6D4C41;
+      cursor: pointer;
+    }
+    .radio-group input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #8D6E63;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -703,7 +725,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v2.1</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v2.2</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -749,7 +771,6 @@
       <button class="btn btn-info admin-only" onclick="tambahModal()">
         <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Modal
       </button>
-      <!-- Backup & Restore buttons -->
       <button class="btn btn-success admin-only" onclick="backupData()">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Backup Data
       </button>
@@ -955,6 +976,13 @@
           <label>Kemasan</label>
           <select id="kemasanNama"></select>
           <div class="help-text" id="stokKemasanInfo"></div>
+        </div>
+        <div class="form-group" style="flex:1 1 100%;">
+          <label>Mode Isi</label>
+          <div class="radio-group">
+            <label><input type="radio" name="isiMode" value="manual" checked onchange="toggleIsiMode()"> Manual (gram)</label>
+            <label><input type="radio" name="isiMode" value="otomatis" onchange="toggleIsiMode()"> Otomatis dari Volume × BJ</label>
+          </div>
         </div>
         <div class="form-group">
           <label>Berat Isi per Kemasan</label>
@@ -1502,7 +1530,7 @@ function navigateTo(page) {
 }
 
 // ================================================================
-// FIRESTORE - DENGAN VALIDASI ANTI-OVERWRITE
+// FIRESTORE (dengan validasi)
 // ================================================================
 function loadDataFromFirestore() {
   if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1526,7 +1554,6 @@ function loadDataFromFirestore() {
       let firestoreData = doc.data();
       const defaultData = getDefaultData();
 
-      // Jika data dari Firestore kosong atau tidak memiliki bahan, jangan timpa
       if (!firestoreData.bahan || firestoreData.bahan.length === 0) {
         const isEmpty = !firestoreData.bahan && !firestoreData.produksi && !firestoreData.kemasan && !firestoreData.penjualan;
         if (isEmpty) {
@@ -1597,10 +1624,9 @@ function loadDataFromFirestore() {
 async function saveDataToFirestore() {
   if (!dataDocId) { showAlert('❌ Data tidak terhubung ke Firestore!', 'error'); return; }
   try {
-    // VALIDASI: jika data.bahan kosong, jangan simpan (hindari overwrite)
     if (!data.bahan || data.bahan.length === 0) {
       console.warn('⚠️ Data bahan kosong, simpan dibatalkan.');
-      showAlert('⚠️ Data bahan kosong! Simpan dibatalkan untuk mencegah kehilangan data.', 'warning');
+      showAlert('⚠️ Data bahan kosong! Simpan dibatalkan.', 'warning');
       return;
     }
     const clean = cleanData(data);
@@ -2082,10 +2108,6 @@ function tambahBahan() {
     showAlert('✅ Bahan "' + nama + '" berhasil ditambahkan!');
   });
 }
-
-// ================================================================
-// BELI BAHAN
-// ================================================================
 function beliBahan() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -2473,7 +2495,7 @@ function hapusForm(id) {
 }
 
 // ================================================================
-// PRODUKSI
+// PRODUKSI - FIXED BUG
 // ================================================================
 function buatProduksi() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2572,7 +2594,12 @@ function selesaiProd(id) {
     return;
   }
   const p = getProduksi(id);
-  if (p) { p.status = 'selesai'; if (p.sisaLiter === undefined) p.sisaLiter = p.jumlahLiter; logAudit('update','produksi',id,'Status diubah menjadi selesai',''); renderAll(); showAlert('✅ Produksi ditandai selesai!'); }
+  if (!p) { showAlert('Produksi tidak ditemukan!', 'error'); return; }
+  p.status = 'selesai';
+  if (p.sisaLiter === undefined) p.sisaLiter = p.jumlahLiter;
+  logAudit('update', 'produksi', id, 'Status diubah menjadi selesai', '');
+  renderAll();
+  showAlert('✅ Produksi ditandai selesai!');
 }
 function batalProd(id) {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2581,7 +2608,10 @@ function batalProd(id) {
   }
   const p = getProduksi(id);
   if (!p) return;
-  if (data.kemasan.filter(k => k.produksiId === id).length > 0) { showAlert('❌ Produksi sudah dikemas!','error'); return; }
+  if (data.kemasan.filter(k => k.produksiId === id).length > 0) {
+    showAlert('❌ Produksi sudah dikemas!','error');
+    return;
+  }
   if (!confirm('⚠️ Batalkan produksi? Bahan baku akan dikembalikan.')) return;
   if (p.bahanDigunakan && p.bahanDigunakan.length > 0) {
     p.bahanDigunakan.forEach(k => { const b = getBahan(k.bahanId); if (b) b.stok += k.jumlahStok; });
@@ -2613,7 +2643,10 @@ function hapusProduksiSelesai(id) {
     return;
   }
   const p = getProduksi(id);
-  if (!p || p.status !== 'selesai') { showAlert('Hanya produksi selesai yang bisa dihapus!','error'); return; }
+  if (!p || p.status !== 'selesai') {
+    showAlert('Hanya produksi selesai yang bisa dihapus!','error');
+    return;
+  }
   const kemasanTerikat = data.kemasan.filter(k => k.produksiId === id);
   if (!confirm(`⚠️ Hapus produksi "${getFormulasi(p.formulasiId)?.nama || ''}"? ${kemasanTerikat.length > 0 ? `\n${kemasanTerikat.length} kemasan akan ikut dihapus.` : ''}`)) return;
   if (p.bahanDigunakan && p.bahanDigunakan.length > 0) {
@@ -2682,6 +2715,33 @@ function renderProduksi() {
   updateKemasanProduksiDropdown();
   filterProduksi();
 }
+
+// ================================================================
+// PENGEMASAN dengan pilihan manual/otomatis
+// ================================================================
+function toggleIsiMode() {
+  const mode = document.querySelector('input[name="isiMode"]:checked').value;
+  const beratInput = document.getElementById('kemasanBeratIsi');
+  const info = document.getElementById('beratPerKemasanInfo');
+  const kemasanSelect = document.getElementById('kemasanNama');
+  const selectedOption = kemasanSelect.options[kemasanSelect.selectedIndex];
+  const volumeMl = selectedOption ? parseFloat(selectedOption.dataset.volume || 0) : 0;
+  const prodSel = document.getElementById('kemasanProduksi');
+  const prodId = prodSel.value;
+  const prod = data.produksi.find(p => p.formulasiId === prodId && p.status === 'selesai');
+  const bjVal = prod ? prod.bj : 1.025;
+
+  if (mode === 'otomatis' && volumeMl > 0) {
+    const berat = volumeMl * bjVal;
+    beratInput.value = berat.toFixed(1);
+    info.textContent = `✅ Otomatis: ${volumeMl} mL × BJ ${bjVal.toFixed(3)} = ${berat.toFixed(1)} gram`;
+    beratInput.readOnly = true;
+  } else {
+    beratInput.readOnly = false;
+    info.textContent = 'Manual: masukkan berat isi dalam gram';
+  }
+  hitungTotalBerat();
+}
 function updateKemasanProduksiDropdown() {
   if (userRole === 'investor') {
     document.getElementById('kemasanProduksi').innerHTML = '<option value="">Akses terbatas</option>';
@@ -2723,8 +2783,8 @@ function updateKemasanProduksiDropdown() {
     availableKemasan.forEach(k => {
       const opt = document.createElement('option');
       opt.value = k.nama;
+      opt.dataset.volume = k.volumeMl || 0;
       opt.textContent = `${k.nama} (stok: ${k.stok})`;
-      opt.dataset.beratIsi = k.beratIsiGram || 0;
       selKemasan.appendChild(opt);
     });
   }
@@ -2733,9 +2793,8 @@ function updateKemasanProduksiDropdown() {
     const item = data.kemasanBeli.find(k => k.nama === nama);
     if (item) {
       document.getElementById('stokKemasanInfo').textContent = 'Stok tersedia: ' + item.stok + ' unit';
-      if (item.beratIsiGram) {
-        document.getElementById('kemasanBeratIsi').value = item.beratIsiGram;
-        document.getElementById('beratPerKemasanInfo').textContent = '✅ Berat isi: ' + item.beratIsiGram + ' gram (otomatis dari data kemasan)';
+      if (document.querySelector('input[name="isiMode"]:checked').value === 'otomatis') {
+        toggleIsiMode();
       }
     } else {
       document.getElementById('stokKemasanInfo').textContent = '';
@@ -2750,6 +2809,9 @@ function updateKemasanProduksiDropdown() {
     const selected = sel.options[sel.selectedIndex];
     const sisa = selected ? parseFloat(selected.dataset.totalSisa) || 0 : 0;
     document.getElementById('sisaProduksiInfo').textContent = 'Sisa: ' + sisa.toFixed(2) + ' L';
+    if (document.querySelector('input[name="isiMode"]:checked').value === 'otomatis') {
+      toggleIsiMode();
+    }
   };
   setTimeout(() => {
     const sel = document.getElementById('kemasanProduksi');
@@ -2757,12 +2819,7 @@ function updateKemasanProduksiDropdown() {
     const sisa = selected ? parseFloat(selected.dataset.totalSisa) || 0 : 0;
     document.getElementById('sisaProduksiInfo').textContent = 'Sisa: ' + sisa.toFixed(2) + ' L';
     hitungTotalBerat();
-    const firstKemasan = document.getElementById('kemasanNama').value;
-    const item = data.kemasanBeli.find(k => k.nama === firstKemasan);
-    if (item && item.beratIsiGram) {
-      document.getElementById('kemasanBeratIsi').value = item.beratIsiGram;
-      document.getElementById('beratPerKemasanInfo').textContent = '✅ Berat isi: ' + item.beratIsiGram + ' gram (otomatis dari data kemasan)';
-    }
+    toggleIsiMode();
   }, 200);
 }
 function hitungTotalBerat() {
@@ -2801,8 +2858,10 @@ function tambahKemasan() {
     return;
   }
   const totalBeratKg = (beratIsi * jml) / 1000;
-  const bj = 1.025;
-  const totalVolume = totalBeratKg / bj;
+  const prod = data.produksi.find(p => p.formulasiId === formulasiId && p.status === 'selesai');
+  const bjReal = prod ? prod.bj : 1.025;
+  const totalVolume = totalBeratKg / bjReal;
+
   const produksiGroup = {};
   data.produksi.forEach(p => {
     if (p.status === 'selesai' && (p.sisaLiter || 0) > 0) {
@@ -3083,7 +3142,7 @@ function renderPenjualan() {
 }
 
 // ================================================================
-// LAPORAN STOK
+// LAPORAN (ringkas, fungsi utama sudah ada)
 // ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
@@ -3093,10 +3152,6 @@ function renderLaporanStok() {
     return `<tr><td><strong>${k.nama}</strong></td><td>${stok}</td><td>${rupiah(k.hargaJualPerUnit)}</td><td>${rupiah(nilai)}</td></tr>`;
   }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada kemasan.</td></tr>';
 }
-
-// ================================================================
-// LAPORAN KEUANGAN PRODUKSI
-// ================================================================
 function renderLaporanKeuanganProduksi() {
   const container = document.getElementById('laporanKeuanganProduksi');
   const produksiList = data.produksi.filter(p => p.status === 'selesai');
@@ -3117,7 +3172,6 @@ function renderLaporanKeuanganProduksi() {
     .filter(j => j.statusBayar === 'Lunas')
     .reduce((s, j) => s + (j.jumlahTerjual * j.hargaJualPerUnit), 0);
   const laba = totalPenjualanLunas - totalHpp;
-
   let html = `
     <div style="margin-bottom:20px;">
       <h4 style="color:#6D4C41;">📊 Ringkasan Total Biaya Produksi</h4>
@@ -3138,7 +3192,6 @@ function renderLaporanKeuanganProduksi() {
       </div>
     </div>
   `;
-
   const detailRows = [];
   data.kemasan.forEach(k => {
     const prod = data.produksi.find(p => p.id === k.produksiId);
@@ -3167,7 +3220,6 @@ function renderLaporanKeuanganProduksi() {
     const hargaJualAktual = unitTerjual > 0 ? totalPendapatan / unitTerjual : 0;
     const untungPerUnit = hargaJualAktual - hppPerUnit;
     const totalUntung = unitDikemas > 0 ? totalPendapatan - (hppItem * (unitTerjual / unitDikemas)) : 0;
-
     detailRows.push({
       id: k.id,
       produksiId: prod.id,
@@ -3186,15 +3238,12 @@ function renderLaporanKeuanganProduksi() {
       totalUntung
     });
   });
-
   detailRows.sort((a, b) => a.namaSabun.localeCompare(b.namaSabun));
-
   let detailHtml = '';
   if (detailRows.length > 0) {
     let totalUnitDikemas = 0, totalUnitTerjual = 0, totalPendapatan = 0;
     let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
     let totalUntung = 0;
-
     detailHtml = `
       <div style="margin-top:20px;">
         <h4 style="color:#6D4C41;">📋 Rincian per Sabun, Kemasan, dan Penjualan Aktual
@@ -3230,7 +3279,6 @@ function renderLaporanKeuanganProduksi() {
       totalBiayaOperasional += row.biayaOperasional;
       totalHpp += row.hpp;
       totalUntung += row.totalUntung;
-
       detailHtml += `
         <tr>
           <td><strong>${row.namaSabun}</strong></td>
@@ -3252,7 +3300,6 @@ function renderLaporanKeuanganProduksi() {
         </tr>
       `;
     });
-
     detailHtml += `
       <tr style="font-weight:700; background:#f5f0eb;">
         <td colspan="2">Total</td>
@@ -3273,7 +3320,6 @@ function renderLaporanKeuanganProduksi() {
   } else {
     detailHtml = `<p class="text-muted">Belum ada data kemasan atau produksi selesai.</p>`;
   }
-
   container.innerHTML = html + detailHtml;
 }
 function updateBiayaOpsKemasan(kemasanId, newValue) {
@@ -3292,10 +3338,6 @@ function updateBiayaOpsKemasan(kemasanId, newValue) {
   renderAll();
   showAlert('✅ Biaya operasional untuk kemasan "' + k.nama + '" diupdate ke ' + rupiah(val));
 }
-
-// ================================================================
-// LAPORAN FULL MODAL
-// ================================================================
 function renderLaporanFull() {
   const container = document.getElementById('laporanFull');
   const totalPemasukanUsaha = data.keuangan.pemasukan.filter(p => !p.sumber.startsWith('Modal dari')).reduce((s,i) => s + i.jumlah, 0);
@@ -3382,7 +3424,7 @@ function renderLaporanFull() {
 }
 
 // ================================================================
-// RIWAYAT
+// RIWAYAT, PERALATAN, DLL.
 // ================================================================
 function renderRiwayat() {
   const isIhsanUser = isIhsan();
@@ -3404,7 +3446,6 @@ function renderRiwayat() {
     return { id: p.id, tanggal: p.tanggal || '', createdAt: p.createdAt || p.tanggal, createdBy: p.createdBy || 'system', jenis: 'Produksi ✅', nama: f ? f.nama : '??', jumlah: p.jumlahLiter + ' L', satuan: 'Bahan: '+rupiah(p.biayaBahan||0)+' | Kemasan: '+rupiah(p.biayaKemasan||0), total: hpp };
   });
   const semuaPembelian = sortByWaktu([...pembelianBahan, ...pembelianKemasan, ...pembelianPeralatan, ...pembelianProduksi]);
-
   const headerPembelian = document.getElementById('riwayatPembelianHeader');
   headerPembelian.innerHTML = `
     <th>Waktu</th><th>Jenis</th><th>Nama</th><th>Jumlah</th><th>Satuan</th><th>Total</th>
@@ -3431,7 +3472,7 @@ function renderRiwayat() {
       <td>${hapusBtn}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 8 : 7}" class="text-muted">Belum ada pembelian</td></tr>`;
-
+  // Penjualan
   const penjualan = sortByWaktu(data.penjualan.map(j => {
     const k = getKemasan(j.kemasanId);
     let jenisSabun = 'Tidak diketahui';
@@ -3471,7 +3512,7 @@ function renderRiwayat() {
       <td>${aksi}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 9 : 8}" class="text-muted">Belum ada penjualan</td></tr>`;
-
+  // Modal
   const modalList = sortByWaktu(data.modalTambahan);
   const headerModal = document.getElementById('riwayatModalHeader');
   headerModal.innerHTML = `
@@ -3497,10 +3538,6 @@ function renderRiwayat() {
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 6 : 5}" class="text-muted">Belum ada tambahan modal</td></tr>`;
 }
-
-// ================================================================
-// PERALATAN
-// ================================================================
 function tambahPeralatan() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -3602,7 +3639,7 @@ function checkStokWarnings() {
 }
 
 // ================================================================
-// SIMULASI
+// SIMULASI (ringkas)
 // ================================================================
 function updateSimulasiDropdowns() {
   const selForm = document.getElementById('simulasiForm');
@@ -3644,7 +3681,6 @@ function hitungSimulasi() {
   const totalBeratProduk = (beratIsi * jmlUnit) / 1000;
   const bj = f.bj || 1.025;
   const totalVolume = totalBeratProduk / bj;
-  
   let totalBiayaBahan = 0, detailBahan = [], stokCukup = true, pesanStok = '';
   f.items.forEach(it => {
     const b = getBahan(it.bahanId);
@@ -3736,7 +3772,7 @@ function hitungSimulasi() {
 }
 
 // ================================================================
-// AUDIT LOG
+// AUDIT LOG RENDER
 // ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
@@ -3889,8 +3925,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v2.1 - dengan Backup/Restore & Validasi Anti-Overwrite');
-console.log('📧 Email terdaftar:');
+console.log('🧼 SI.BERSIH v2.2 - Fully Functional with all fixes');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
