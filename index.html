@@ -853,7 +853,7 @@
       <div class="search-box"><input type="text" id="searchKemasan" placeholder="🔍 Cari kemasan..." oninput="filterKemasan()"></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Nama</th><th>Stok</th><th>Volume</th><th>Berat Isi</th><th>Harga/unit</th><th>Aksi</th></tr></thead>
+          <thead><tr><th>Nama</th><th>Stok</th><th>Volume (mL)</th><th>Harga/unit</th><th>Aksi</th></tr></thead>
           <tbody id="kemasanStokTbody"></tbody>
         </table>
       </div>
@@ -980,17 +980,17 @@
         <div class="form-group" style="flex:1 1 100%;">
           <label>Mode Isi</label>
           <div class="radio-group">
-            <label><input type="radio" name="isiMode" value="manual" checked onchange="toggleIsiMode()"> Manual (gram)</label>
-            <label><input type="radio" name="isiMode" value="otomatis" onchange="toggleIsiMode()"> Otomatis dari Volume × BJ</label>
+            <label><input type="radio" name="isiMode" value="otomatis" checked onchange="toggleIsiMode()"> Otomatis (Volume × BJ)</label>
+            <label><input type="radio" name="isiMode" value="manual" onchange="toggleIsiMode()"> Manual (gram)</label>
           </div>
         </div>
         <div class="form-group">
           <label>Berat Isi per Kemasan</label>
           <div style="display:flex; gap:4px;">
-            <input type="number" id="kemasanBeratIsi" step="0.1" placeholder="240" style="flex:2;">
+            <input type="number" id="kemasanBeratIsi" step="0.1" placeholder="0" style="flex:2;">
             <span style="display:flex; align-items:center; padding:0 8px; font-size:0.8rem; color:#6D4C41; font-weight:600;">gram</span>
           </div>
-          <div class="help-text" id="beratPerKemasanInfo">Contoh: 240 gram (isi bersih)</div>
+          <div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div>
         </div>
         <div class="form-group">
           <label>Jumlah Unit</label>
@@ -1137,7 +1137,14 @@
     </div>
     <div class="form-row">
       <div class="form-group"><label>Jenis Kemasan</label><select id="simulasiKemasan"></select></div>
-      <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="simulasiBeratIsi" step="0.1" placeholder="240"></div>
+      <div class="form-group" style="flex:1 1 100%;">
+        <label>Mode Isi</label>
+        <div class="radio-group">
+          <label><input type="radio" name="simulasiIsiMode" value="otomatis" checked onchange="toggleSimulasiIsiMode()"> Otomatis (Volume × BJ)</label>
+          <label><input type="radio" name="simulasiIsiMode" value="manual" onchange="toggleSimulasiIsiMode()"> Manual (gram)</label>
+        </div>
+      </div>
+      <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="simulasiBeratIsi" step="0.1" placeholder="0"></div>
       <div class="form-group"><label>Jumlah Unit</label><input type="number" id="simulasiJmlUnit" step="1" placeholder="0"></div>
       <div class="form-group"><label>Harga Jual/Unit (Rp)</label><input type="number" id="simulasiHargaJual" step="1" placeholder="0"></div>
     </div>
@@ -2151,7 +2158,7 @@ function beliBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN
+// STOK KEMASAN (hanya volume, tanpa berat isi)
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -2170,12 +2177,10 @@ function renderKemasanStok() {
       aksi += `<button class="btn btn-danger btn-sm" onclick="hapusKemasanBeli('${k.id}')">🗑️</button>`;
     }
     const volume = k.volumeMl || '-';
-    const beratIsi = k.beratIsiGram || '-';
     return `<tr class="${isLow ? 'stok-warning' : ''}">
       <td><strong>${k.nama}</strong> ${isLow ? '⚠️' : ''}</td>
       <td>${k.stok}</td>
       <td>${volume} mL</td>
-      <td>${beratIsi} gram</td>
       <td>${rupiah(k.hargaPerUnit)}</td>
       <td>${aksi}</td>
     </tr>`;
@@ -2242,19 +2247,17 @@ function tambahKemasanStok() {
     <div class="form-row">
       <div class="form-group"><label>Nama Kemasan</label><input id="modalKemasanNama" placeholder="Botol 250 mL"></div>
       <div class="form-group"><label>Volume (mL)</label><input type="number" id="modalKemasanVolume" step="1" placeholder="250"></div>
-      <div class="form-group"><label>Berat Isi (gram)</label><input type="number" id="modalKemasanBeratIsi" step="0.1" placeholder="240"></div>
       <div class="form-group"><label>Stok Awal</label><input type="number" id="modalKemasanStok" step="1" placeholder="0"></div>
       <div class="form-group"><label>Harga per unit (Rp)</label><input type="number" id="modalKemasanHarga" step="1" placeholder="0"></div>
     </div>
-    <p class="text-muted">Volume = ukuran wadah (mL), Berat Isi = berat sabun aktual per kemasan (gram).</p>
+    <p class="text-muted">Volume = ukuran wadah (mL). Berat isi akan dihitung otomatis saat pengemasan berdasarkan BJ.</p>
   `, () => {
     const nama = document.getElementById('modalKemasanNama').value.trim();
     const volumeMl = parseFloat(document.getElementById('modalKemasanVolume').value) || 0;
-    const beratIsiGram = parseFloat(document.getElementById('modalKemasanBeratIsi').value) || 0;
     const stok = parseInt(document.getElementById('modalKemasanStok').value) || 0;
     const harga = parseFloat(document.getElementById('modalKemasanHarga').value) || 0;
-    if (!nama || volumeMl <= 0 || beratIsiGram <= 0 || stok <= 0 || harga <= 0) {
-      showAlert('Isi semua field dengan benar! Volume, Berat Isi, Stok, dan Harga harus > 0.', 'error');
+    if (!nama || volumeMl <= 0 || stok <= 0 || harga <= 0) {
+      showAlert('Isi semua field dengan benar! Volume, Stok, dan Harga harus > 0.', 'error');
       return;
     }
     if (data.kemasanBeli.find(k => k.nama.toLowerCase() === nama.toLowerCase())) {
@@ -2262,10 +2265,10 @@ function tambahKemasanStok() {
       return;
     }
     const id = genId();
-    data.kemasanBeli.push({ id, nama, stok, hargaPerUnit: harga, volumeMl, beratIsiGram });
+    data.kemasanBeli.push({ id, nama, stok, hargaPerUnit: harga, volumeMl });
     data.riwayatKemasan.push({ id: genId(), nama, jumlah: stok, hargaPerUnit: harga, tanggal: todayStr(), createdBy: getAuditUser(), createdAt: getAuditTime() });
     data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + nama, jumlah: stok * harga, tanggal: todayStr() });
-    logAudit('create', 'kemasanBeli', id, `Kemasan ${nama} ditambahkan dengan stok ${stok}, volume ${volumeMl}mL, berat isi ${beratIsiGram}g, harga ${rupiah(harga)}`, '');
+    logAudit('create', 'kemasanBeli', id, `Kemasan ${nama} ditambahkan dengan stok ${stok}, volume ${volumeMl}mL, harga ${rupiah(harga)}`, '');
     renderAll();
     showAlert('✅ Kemasan "' + nama + '" berhasil ditambahkan!');
   });
@@ -2495,7 +2498,7 @@ function hapusForm(id) {
 }
 
 // ================================================================
-// PRODUKSI - FIXED BUG
+// PRODUKSI
 // ================================================================
 function buatProduksi() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2717,7 +2720,7 @@ function renderProduksi() {
 }
 
 // ================================================================
-// PENGEMASAN dengan pilihan manual/otomatis
+// PENGEMASAN dengan otomatis/manual berat isi
 // ================================================================
 function toggleIsiMode() {
   const mode = document.querySelector('input[name="isiMode"]:checked').value;
@@ -2784,7 +2787,7 @@ function updateKemasanProduksiDropdown() {
       const opt = document.createElement('option');
       opt.value = k.nama;
       opt.dataset.volume = k.volumeMl || 0;
-      opt.textContent = `${k.nama} (stok: ${k.stok})`;
+      opt.textContent = `${k.nama} (${k.volumeMl || 0} mL, stok: ${k.stok})`;
       selKemasan.appendChild(opt);
     });
   }
@@ -2921,7 +2924,7 @@ function tambahKemasan() {
   document.getElementById('kemasanJumlah').value = '';
   document.getElementById('kemasanHarga').value = '';
   document.getElementById('totalBeratInfo').textContent = 'Total Berat: 0 g (0 kg)';
-  document.getElementById('beratPerKemasanInfo').textContent = 'Contoh: 240 gram (isi bersih)';
+  document.getElementById('beratPerKemasanInfo').textContent = 'Otomatis: volume × BJ';
   renderAll();
   showAlert('✅ Pengemasan berhasil! ' + jml + ' unit ' + namaKemasan + ' dengan berat isi ' + beratIsi + 'g');
 }
@@ -3142,7 +3145,167 @@ function renderPenjualan() {
 }
 
 // ================================================================
-// LAPORAN (ringkas, fungsi utama sudah ada)
+// SIMULASI dengan otomatis/manual
+// ================================================================
+function toggleSimulasiIsiMode() {
+  const mode = document.querySelector('input[name="simulasiIsiMode"]:checked').value;
+  const beratInput = document.getElementById('simulasiBeratIsi');
+  const kemasanSelect = document.getElementById('simulasiKemasan');
+  const selectedOption = kemasanSelect.options[kemasanSelect.selectedIndex];
+  const volumeMl = selectedOption ? parseFloat(selectedOption.dataset.volume || 0) : 0;
+  const formSelect = document.getElementById('simulasiForm');
+  const formId = formSelect.value;
+  const f = getFormulasi(formId);
+  const bjVal = f ? f.bj : 1.025;
+
+  if (mode === 'otomatis' && volumeMl > 0) {
+    const berat = volumeMl * bjVal;
+    beratInput.value = berat.toFixed(1);
+    beratInput.readOnly = true;
+  } else {
+    beratInput.readOnly = false;
+  }
+}
+function updateSimulasiDropdowns() {
+  const selForm = document.getElementById('simulasiForm');
+  if (userRole === 'operasional' || userRole === 'adm') {
+    selForm.innerHTML = '<option value="">Tidak ada akses</option>';
+    return;
+  }
+  selForm.innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama} (BJ ${f.bj || 1.025})</option>`).join('');
+  const selKem = document.getElementById('simulasiKemasan');
+  selKem.innerHTML = data.kemasanBeli.map(k => `<option value="${k.id}" data-volume="${k.volumeMl || 0}">${k.nama} (${k.volumeMl || 0} mL, stok: ${k.stok})</option>`).join('');
+  if (data.kemasanBeli.length === 0) selKem.innerHTML = '<option value="">Tidak ada kemasan</option>';
+  selKem.onchange = function() {
+    if (document.querySelector('input[name="simulasiIsiMode"]:checked').value === 'otomatis') {
+      toggleSimulasiIsiMode();
+    }
+  };
+  selForm.onchange = function() {
+    if (document.querySelector('input[name="simulasiIsiMode"]:checked').value === 'otomatis') {
+      toggleSimulasiIsiMode();
+    }
+  };
+  // Init
+  setTimeout(() => {
+    toggleSimulasiIsiMode();
+  }, 100);
+}
+function hitungSimulasi() {
+  if (userRole === 'operasional' || userRole === 'adm') {
+    showAlert('Anda tidak memiliki akses ke simulasi!','error');
+    return;
+  }
+  const fid = document.getElementById('simulasiForm').value;
+  const liter = parseFloat(document.getElementById('simulasiLiter').value);
+  const kid = document.getElementById('simulasiKemasan').value;
+  const beratIsi = parseFloat(document.getElementById('simulasiBeratIsi').value) || 0;
+  const jmlUnit = parseInt(document.getElementById('simulasiJmlUnit').value);
+  const hargaJual = parseFloat(document.getElementById('simulasiHargaJual').value);
+  if (!fid || !liter || liter <= 0 || !kid || !beratIsi || beratIsi <= 0 || !jmlUnit || jmlUnit <= 0 || !hargaJual || hargaJual <= 0) {
+    showAlert('⚠️ Isi semua field dengan benar!', 'error');
+    return;
+  }
+  const f = getFormulasi(fid);
+  if (!f) { showAlert('Formulasi tidak ditemukan!','error'); return; }
+  const k = getKemasanBeli(kid);
+  if (!k) { showAlert('Kemasan tidak ditemukan!','error'); return; }
+  const totalBeratProduk = (beratIsi * jmlUnit) / 1000;
+  const bj = f.bj || 1.025;
+  const totalVolume = totalBeratProduk / bj;
+  
+  let totalBiayaBahan = 0, detailBahan = [], stokCukup = true, pesanStok = '';
+  f.items.forEach(it => {
+    const b = getBahan(it.bahanId);
+    if (!b) return;
+    const persen = it.persen || 0;
+    const butuhLarutan = (persen / 100) * totalBeratProduk;
+    let butuhStok = butuhLarutan;
+    if (it.isLarutan && it.konsentrasiLarutan > 0) {
+      butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
+    }
+    const hargaRata = getHargaRataRataBahan(b.id);
+    const biaya = butuhStok * hargaRata;
+    totalBiayaBahan += biaya;
+    if (b.stok < butuhStok) { stokCukup = false; pesanStok += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
+    if (userRole === 'admin-full') detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya });
+  });
+  const biayaKemasan = jmlUnit * k.hargaPerUnit;
+  const totalBiayaLangsung = totalBiayaBahan + biayaKemasan;
+  const opsMode = document.getElementById('simulasiOpsMode').value;
+  const opsManual = parseFloat(document.getElementById('simulasiOpsManual').value) || 0;
+  let biayaOperasional = 0, hpp = 0;
+  if (opsMode === 'manual') { biayaOperasional = opsManual; hpp = totalBiayaLangsung + biayaOperasional; }
+  else { const persen = parseFloat(opsMode)/100; hpp = totalBiayaLangsung / (1 - persen); biayaOperasional = hpp - totalBiayaLangsung; }
+  const hppPerUnit = jmlUnit > 0 ? hpp / jmlUnit : 0;
+  const labaPerUnit = hargaJual - hppPerUnit;
+  const totalLaba = labaPerUnit * jmlUnit;
+  const margin = hargaJual > 0 ? (labaPerUnit / hargaJual) * 100 : 0;
+  const stokKemasanCukup = k.stok >= jmlUnit;
+  if (!stokKemasanCukup) { stokCukup = false; pesanStok += `Kemasan ${k.nama} butuh ${jmlUnit} unit, stok ${k.stok}`; }
+  const hasilDiv = document.getElementById('simulasiHasil');
+  const labaStr = labaPerUnit >= 0 ? 'LABA' : 'RUGI';
+  const labaColor = labaPerUnit >= 0 ? '#2E7D32' : '#C62828';
+  const opsLabel = (opsMode === 'manual') ? 'Manual' : opsMode + '% dari HPP';
+  let html = `
+    <div class="simulasi-card">
+      <h4>📋 HASIL SIMULASI</h4>
+      <div style="margin-top:8px;">
+        <div class="simulasi-hasil-item"><span class="label">Kemasan</span><span class="value">${k.nama} (${k.volumeMl || 0} mL)</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Berat Isi per Kemasan</span><span class="value">${beratIsi} gram</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Jumlah Unit</span><span class="value">${jmlUnit} unit</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Total Berat Produk</span><span class="value">${totalBeratProduk.toFixed(2)} kg</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Total Volume (Liter)</span><span class="value">${totalVolume.toFixed(2)} L (BJ ${bj})</span></div>
+        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
+        <div class="simulasi-hasil-item"><span class="label">Total Biaya Bahan</span><span class="value">${rupiah(totalBiayaBahan)}</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Total Biaya Kemasan</span><span class="value">${rupiah(biayaKemasan)}</span></div>
+        <div class="simulasi-hasil-item" style="background:#fff3e0;padding:6px 10px;border-radius:8px;">
+          <span class="label" style="font-weight:700;">Biaya Operasional (${opsLabel})</span>
+          <span class="value" style="font-weight:700;">${rupiah(biayaOperasional)}</span>
+        </div>
+        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
+        <div class="simulasi-hasil-item"><span class="label">Total Biaya Langsung</span><span class="value">${rupiah(totalBiayaLangsung)}</span></div>
+        <div style="border-top:2px solid #8D6E63;margin:6px 0;"></div>
+        <div class="simulasi-hasil-item total"><span class="label">TOTAL HPP</span><span class="value">${rupiah(hpp)}</span></div>
+        <div class="simulasi-hasil-item"><span class="label">HPP per Unit</span><span class="value">${rupiah(hppPerUnit)}</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Harga Jual per Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
+        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
+        <div class="simulasi-hasil-item laba" style="color:${labaColor};">
+          <span class="label">💰 LABA per Unit</span>
+          <span class="value">${rupiah(labaPerUnit)} (${labaStr})</span>
+        </div>
+        <div class="simulasi-hasil-item laba" style="color:${totalLaba >= 0 ? '#2E7D32' : '#C62828'};">
+          <span class="label">💰 TOTAL LABA</span>
+          <span class="value">${rupiah(totalLaba)}</span>
+        </div>
+        <div class="simulasi-hasil-item"><span class="label">📈 Margin</span><span class="value" style="color:${margin >= 0 ? '#2E7D32' : '#C62828'};">${margin.toFixed(1)}%</span></div>
+      </div>
+    </div>
+  `;
+  if (userRole === 'admin-full' && detailBahan.length > 0) {
+    html += `
+      <div class="simulasi-card" style="margin-top:12px;">
+        <h4>🧪 Rincian Bahan</h4>
+        ${detailBahan.map(d => `
+          <div class="simulasi-hasil-item">
+            <span class="label">${d.nama}</span>
+            <span class="value">${d.butuh.toFixed(3)} ${d.satuan} = ${rupiah(d.biaya)}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  html += `
+    <div style="margin-top:12px;padding:12px 16px;border-radius:12px;background:${stokCukup ? '#e8f5e9' : '#fce4e4'};border:1px solid ${stokCukup ? '#2E7D32' : '#C62828'};">
+      ${stokCukup ? '✅ Semua stok cukup.' : '⚠️ Stok tidak cukup!<br><pre style="font-size:0.75rem;margin-top:4px;white-space:pre-wrap;">' + pesanStok + '</pre>'}
+    </div>
+  `;
+  hasilDiv.innerHTML = html;
+  hasilDiv.style.display = 'block';
+}
+
+// ================================================================
+// LAPORAN (ringkas)
 // ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
@@ -3639,140 +3802,7 @@ function checkStokWarnings() {
 }
 
 // ================================================================
-// SIMULASI (ringkas)
-// ================================================================
-function updateSimulasiDropdowns() {
-  const selForm = document.getElementById('simulasiForm');
-  if (userRole === 'operasional' || userRole === 'adm') {
-    selForm.innerHTML = '<option value="">Tidak ada akses</option>';
-    return;
-  }
-  selForm.innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama} (BJ ${f.bj || 1.025})</option>`).join('');
-  const selKem = document.getElementById('simulasiKemasan');
-  selKem.innerHTML = data.kemasanBeli.map(k => `<option value="${k.id}">${k.nama} (${k.beratIsiGram || 0}g, stok: ${k.stok})</option>`).join('');
-  if (data.kemasanBeli.length === 0) selKem.innerHTML = '<option value="">Tidak ada kemasan</option>';
-  selKem.onchange = function() {
-    const id = this.value;
-    const item = data.kemasanBeli.find(k => k.id === id);
-    if (item && item.beratIsiGram) {
-      document.getElementById('simulasiBeratIsi').value = item.beratIsiGram;
-    }
-  };
-}
-function hitungSimulasi() {
-  if (userRole === 'operasional' || userRole === 'adm') {
-    showAlert('Anda tidak memiliki akses ke simulasi!','error');
-    return;
-  }
-  const fid = document.getElementById('simulasiForm').value;
-  const liter = parseFloat(document.getElementById('simulasiLiter').value);
-  const kid = document.getElementById('simulasiKemasan').value;
-  const beratIsi = parseFloat(document.getElementById('simulasiBeratIsi').value) || 0;
-  const jmlUnit = parseInt(document.getElementById('simulasiJmlUnit').value);
-  const hargaJual = parseFloat(document.getElementById('simulasiHargaJual').value);
-  if (!fid || !liter || liter <= 0 || !kid || !beratIsi || beratIsi <= 0 || !jmlUnit || jmlUnit <= 0 || !hargaJual || hargaJual <= 0) {
-    showAlert('⚠️ Isi semua field dengan benar!', 'error');
-    return;
-  }
-  const f = getFormulasi(fid);
-  if (!f) { showAlert('Formulasi tidak ditemukan!','error'); return; }
-  const k = getKemasanBeli(kid);
-  if (!k) { showAlert('Kemasan tidak ditemukan!','error'); return; }
-  const totalBeratProduk = (beratIsi * jmlUnit) / 1000;
-  const bj = f.bj || 1.025;
-  const totalVolume = totalBeratProduk / bj;
-  let totalBiayaBahan = 0, detailBahan = [], stokCukup = true, pesanStok = '';
-  f.items.forEach(it => {
-    const b = getBahan(it.bahanId);
-    if (!b) return;
-    const persen = it.persen || 0;
-    const butuhLarutan = (persen / 100) * totalBeratProduk;
-    let butuhStok = butuhLarutan;
-    if (it.isLarutan && it.konsentrasiLarutan > 0) {
-      butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
-    }
-    const hargaRata = getHargaRataRataBahan(b.id);
-    const biaya = butuhStok * hargaRata;
-    totalBiayaBahan += biaya;
-    if (b.stok < butuhStok) { stokCukup = false; pesanStok += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
-    if (userRole === 'admin-full') detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya });
-  });
-  const biayaKemasan = jmlUnit * k.hargaPerUnit;
-  const totalBiayaLangsung = totalBiayaBahan + biayaKemasan;
-  const opsMode = document.getElementById('simulasiOpsMode').value;
-  const opsManual = parseFloat(document.getElementById('simulasiOpsManual').value) || 0;
-  let biayaOperasional = 0, hpp = 0;
-  if (opsMode === 'manual') { biayaOperasional = opsManual; hpp = totalBiayaLangsung + biayaOperasional; }
-  else { const persen = parseFloat(opsMode)/100; hpp = totalBiayaLangsung / (1 - persen); biayaOperasional = hpp - totalBiayaLangsung; }
-  const hppPerUnit = jmlUnit > 0 ? hpp / jmlUnit : 0;
-  const labaPerUnit = hargaJual - hppPerUnit;
-  const totalLaba = labaPerUnit * jmlUnit;
-  const margin = hargaJual > 0 ? (labaPerUnit / hargaJual) * 100 : 0;
-  const stokKemasanCukup = k.stok >= jmlUnit;
-  if (!stokKemasanCukup) { stokCukup = false; pesanStok += `Kemasan ${k.nama} butuh ${jmlUnit} unit, stok ${k.stok}`; }
-  const hasilDiv = document.getElementById('simulasiHasil');
-  const labaStr = labaPerUnit >= 0 ? 'LABA' : 'RUGI';
-  const labaColor = labaPerUnit >= 0 ? '#2E7D32' : '#C62828';
-  const opsLabel = (opsMode === 'manual') ? 'Manual' : opsMode + '% dari HPP';
-  let html = `
-    <div class="simulasi-card">
-      <h4>📋 HASIL SIMULASI</h4>
-      <div style="margin-top:8px;">
-        <div class="simulasi-hasil-item"><span class="label">Kemasan</span><span class="value">${k.nama}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Berat Isi per Kemasan</span><span class="value">${beratIsi} gram</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Jumlah Unit</span><span class="value">${jmlUnit} unit</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Berat Produk</span><span class="value">${totalBeratProduk.toFixed(2)} kg</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Volume (Liter)</span><span class="value">${totalVolume.toFixed(2)} L (BJ ${bj})</span></div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Bahan</span><span class="value">${rupiah(totalBiayaBahan)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Kemasan</span><span class="value">${rupiah(biayaKemasan)}</span></div>
-        <div class="simulasi-hasil-item" style="background:#fff3e0;padding:6px 10px;border-radius:8px;">
-          <span class="label" style="font-weight:700;">Biaya Operasional (${opsLabel})</span>
-          <span class="value" style="font-weight:700;">${rupiah(biayaOperasional)}</span>
-        </div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Langsung</span><span class="value">${rupiah(totalBiayaLangsung)}</span></div>
-        <div style="border-top:2px solid #8D6E63;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item total"><span class="label">TOTAL HPP</span><span class="value">${rupiah(hpp)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">HPP per Unit</span><span class="value">${rupiah(hppPerUnit)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Harga Jual per Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item laba" style="color:${labaColor};">
-          <span class="label">💰 LABA per Unit</span>
-          <span class="value">${rupiah(labaPerUnit)} (${labaStr})</span>
-        </div>
-        <div class="simulasi-hasil-item laba" style="color:${totalLaba >= 0 ? '#2E7D32' : '#C62828'};">
-          <span class="label">💰 TOTAL LABA</span>
-          <span class="value">${rupiah(totalLaba)}</span>
-        </div>
-        <div class="simulasi-hasil-item"><span class="label">📈 Margin</span><span class="value" style="color:${margin >= 0 ? '#2E7D32' : '#C62828'};">${margin.toFixed(1)}%</span></div>
-      </div>
-    </div>
-  `;
-  if (userRole === 'admin-full' && detailBahan.length > 0) {
-    html += `
-      <div class="simulasi-card" style="margin-top:12px;">
-        <h4>🧪 Rincian Bahan</h4>
-        ${detailBahan.map(d => `
-          <div class="simulasi-hasil-item">
-            <span class="label">${d.nama}</span>
-            <span class="value">${d.butuh.toFixed(3)} ${d.satuan} = ${rupiah(d.biaya)}</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-  html += `
-    <div style="margin-top:12px;padding:12px 16px;border-radius:12px;background:${stokCukup ? '#e8f5e9' : '#fce4e4'};border:1px solid ${stokCukup ? '#2E7D32' : '#C62828'};">
-      ${stokCukup ? '✅ Semua stok cukup.' : '⚠️ Stok tidak cukup!<br><pre style="font-size:0.75rem;margin-top:4px;white-space:pre-wrap;">' + pesanStok + '</pre>'}
-    </div>
-  `;
-  hasilDiv.innerHTML = html;
-  hasilDiv.style.display = 'block';
-}
-
-// ================================================================
-// AUDIT LOG RENDER
+// AUDIT LOG
 // ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
@@ -3925,7 +3955,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v2.2 - Fully Functional with all fixes');
+console.log('🧼 SI.BERSIH v2.2 - Otomatis Berat Isi dari Volume × BJ');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
