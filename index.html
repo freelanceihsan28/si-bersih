@@ -17,6 +17,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
+    /* --- semua style sama seperti sebelumnya --- */
     * { box-sizing: border-box; margin:0; padding:0; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -739,7 +740,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v2.5</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v2.6</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -850,7 +851,7 @@
       <div class="search-box"><input type="text" id="searchBahan" placeholder="🔍 Cari bahan..." oninput="filterBahan()"></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Nama</th><th>Stok (kg/L)</th><th>Harga Rata-rata</th><th>Aksi</th></tr></thead>
+          <thead><tr><th>Nama</th><th>Stok (kg/L)</th><th>Harga</th><th>Aksi</th></tr></thead>
           <tbody id="bahanTbody"></tbody>
         </table>
       </div>
@@ -1193,7 +1194,7 @@
       Harga Simulasi
     </h2>
     <p class="text-muted" style="margin-bottom:16px;">
-      Atur harga bahan yang digunakan khusus untuk perhitungan simulasi.
+      Atur harga bahan yang digunakan khusus untuk perhitungan simulasi dan untuk tampilan di halaman Stok Bahan (bagi non-admin).
       <strong>Harga ini tidak mempengaruhi harga rata-rata pembelian</strong> dan hanya terlihat oleh admin penuh.
     </p>
     <div id="hargaSimulasiContainer"></div>
@@ -1345,7 +1346,7 @@ function getDefaultData() {
     modalTambahan: [],
     keuangan: { pemasukan: [], pengeluaran: [], saldoAwal: 0 },
     auditLogs: [],
-    hargaSimulasi: {} // <-- tambahan untuk harga simulasi
+    hargaSimulasi: {}
   };
 }
 
@@ -1457,6 +1458,21 @@ function migrateHargaRataRata() {
     }
   });
   return updated;
+}
+
+// ================================================================
+// HARGA UNTUK ROLE
+// ================================================================
+function getHargaBahanForRole(bahanId) {
+  // Jika admin-full, tampilkan harga rata-rata aktual
+  if (userRole === 'admin-full') {
+    return getHargaRataRataBahan(bahanId);
+  }
+  // Selain admin-full, gunakan harga simulasi jika ada, fallback ke 0
+  if (data.hargaSimulasi && data.hargaSimulasi[bahanId] !== undefined && data.hargaSimulasi[bahanId] !== null) {
+    return data.hargaSimulasi[bahanId];
+  }
+  return 0; // atau null untuk menandakan tidak ada
 }
 
 // ================================================================
@@ -1839,7 +1855,7 @@ function closeModal() {
 }
 
 // ================================================================
-// TAMBAH & EDIT MODAL
+// TAMBAH & EDIT MODAL (sama seperti sebelumnya, tidak diubah)
 // ================================================================
 function tambahModal() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
@@ -1947,7 +1963,7 @@ function renderAll() {
 }
 
 // ================================================================
-// DASHBOARD
+// DASHBOARD (sama)
 // ================================================================
 function renderDashboard() {
   let htmlStok = '';
@@ -2024,13 +2040,16 @@ function renderDashboard() {
 }
 
 // ================================================================
-// STOK BAHAN
+// STOK BAHAN (dengan harga sesuai role)
 // ================================================================
 function renderBahan() {
   const tbody = document.getElementById('bahanTbody');
   tbody.innerHTML = data.bahan.map(b => {
-    const hargaRata = b.hargaRataRata || 0;
-    const hargaTxt = hargaRata > 0 ? rupiah(hargaRata) + '/' + b.satuanDasar : '-';
+    const harga = getHargaBahanForRole(b.id);
+    const isAdmin = userRole === 'admin-full';
+    const hargaTxt = (isAdmin && harga > 0) ? rupiah(harga) + '/' + b.satuanDasar :
+                    (!isAdmin && harga > 0) ? rupiah(harga) + '/' + b.satuanDasar :
+                    (isAdmin && harga === 0) ? '-' : (harga === 0 ? 'Belum diatur' : '-');
     const isLow = b.stok <= (b.threshold || 1);
     let aksi = '';
     if (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan') {
@@ -2060,12 +2079,12 @@ function editHargaBahan(id) {
   }
   const b = getBahan(id);
   if (!b) return;
-  modal('💰 Edit Harga Bahan', `
+  modal('💰 Edit Harga Bahan (Rata-rata)', `
     <div class="form-row">
       <div class="form-group"><label>Nama Bahan</label><input value="${b.nama}" disabled style="background:#f5f0eb;"></div>
       <div class="form-group"><label>Harga Rata-rata (per ${b.satuanDasar})</label><input type="number" id="modalHargaBaru" step="0.01" value="${b.hargaRataRata || 0}"></div>
     </div>
-    <p class="text-muted">Harga rata-rata akan mempengaruhi nilai stok dan biaya produksi.</p>
+    <p class="text-muted">Harga rata-rata aktual dari pembelian. Hanya admin yang bisa melihat.</p>
   `, () => {
     const hargaBaru = parseFloat(document.getElementById('modalHargaBaru').value);
     if (isNaN(hargaBaru) || hargaBaru < 0) { showAlert('Masukkan harga valid.', 'error'); return; }
@@ -2199,7 +2218,7 @@ function beliBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN
+// STOK KEMASAN (sama seperti sebelumnya, tidak berubah)
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -2341,7 +2360,7 @@ function beliKemasan() {
 }
 
 // ================================================================
-// FORMULASI
+// FORMULASI (sama)
 // ================================================================
 function renderFormulasi() {
   const tbody = document.getElementById('formTbody');
@@ -2539,7 +2558,9 @@ function hapusForm(id) {
 }
 
 // ================================================================
-// PRODUKSI
+// PRODUKSI (sama, tapi biaya bahan dihitung dengan harga rata-rata aktual untuk semua? 
+// Biaya produksi seharusnya menggunakan harga aktual, karena transaksi nyata.
+// Di sini tetap pakai harga rata-rata aktual, tidak terpengaruh role.
 // ================================================================
 function buatProduksi() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2571,6 +2592,7 @@ function buatProduksi() {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
     if (b.stok < butuhStok) { cukup = false; pesan += `${b.nama} kurang (butuh ${butuhStok.toFixed(4)} ${b.satuanDasar})\n`; }
+    // Biaya produksi selalu menggunakan harga rata-rata aktual
     const hargaRata = getHargaRataRataBahan(b.id);
     totalBiaya += butuhStok * hargaRata;
     kebutuhan.push({ nama: b.nama, butuhLarutan, butuhStok, satuan: b.satuanDasar, persen, step: it.step||99, isLarutan: it.isLarutan, konsentrasi: it.konsentrasiLarutan||0, bahanId: b.id });
@@ -2761,7 +2783,7 @@ function renderProduksi() {
 }
 
 // ================================================================
-// PENGEMASAN - PERBAIKAN TOLERANSI
+// PENGEMASAN (sama)
 // ================================================================
 function toggleIsiMode() {
   const mode = document.querySelector('input[name="isiMode"]:checked').value;
@@ -3058,7 +3080,7 @@ function hapusKemasanWithReturn(id) {
 }
 
 // ================================================================
-// PENJUALAN, LAPORAN, DLL. (sama seperti sebelumnya)
+// PENJUALAN, LAPORAN, DLL. (sama seperti sebelumnya, tidak diubah)
 // ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
@@ -3192,7 +3214,7 @@ function renderPenjualan() {
 }
 
 // ================================================================
-// LAPORAN STOK, KEUANGAN, DLL.
+// LAPORAN STOK, KEUANGAN, DLL. (sama)
 // ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
@@ -3474,7 +3496,7 @@ function renderLaporanFull() {
 }
 
 // ================================================================
-// RIWAYAT, PERALATAN, DLL.
+// RIWAYAT, PERALATAN, DLL. (sama)
 // ================================================================
 function renderRiwayat() {
   const isIhsanUser = isIhsan();
@@ -3689,7 +3711,7 @@ function checkStokWarnings() {
 }
 
 // ================================================================
-// SIMULASI (dengan harga simulasi)
+// SIMULASI (dengan harga sesuai role)
 // ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked').value;
@@ -3767,17 +3789,30 @@ function hitungSimulasi() {
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    // ========== PERUBAHAN: gunakan harga simulasi jika ada ==========
+    // Gunakan harga sesuai role
     let hargaPakai;
-    if (data.hargaSimulasi && data.hargaSimulasi[b.id] !== undefined && data.hargaSimulasi[b.id] !== null) {
-      hargaPakai = data.hargaSimulasi[b.id];
-    } else {
+    if (userRole === 'admin-full') {
+      // Admin pakai harga rata-rata aktual
       hargaPakai = getHargaRataRataBahan(b.id);
+    } else {
+      // Non-admin pakai harga simulasi
+      if (data.hargaSimulasi && data.hargaSimulasi[b.id] !== undefined && data.hargaSimulasi[b.id] !== null) {
+        hargaPakai = data.hargaSimulasi[b.id];
+      } else {
+        hargaPakai = 0; // tidak ada harga
+      }
     }
     const biaya = butuhStok * hargaPakai;
     totalBiayaBahan += biaya;
     if (b.stok < butuhStok) { stokCukup = false; pesanStok += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
-    if (userRole === 'admin-full') detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya, hargaPakai });
+    if (userRole === 'admin-full') {
+      detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya, hargaPakai });
+    } else {
+      // Untuk non-admin, tampilkan rincian hanya jika ada harga simulasi
+      if (hargaPakai > 0) {
+        detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya, hargaPakai });
+      }
+    }
   });
   const biayaKemasan = jmlUnit * k.hargaPerUnit;
   const totalBiayaLangsung = totalBiayaBahan + biayaKemasan;
@@ -3831,10 +3866,11 @@ function hitungSimulasi() {
       </div>
     </div>
   `;
-  if (userRole === 'admin-full' && detailBahan.length > 0) {
+  if (detailBahan.length > 0) {
+    const labelHarga = (userRole === 'admin-full') ? 'pakai harga rata-rata' : 'pakai harga simulasi';
     html += `
       <div class="simulasi-card" style="margin-top:12px;">
-        <h4>🧪 Rincian Bahan (${data.hargaSimulasi && Object.keys(data.hargaSimulasi).length > 0 ? 'pakai harga simulasi' : 'pakai harga rata-rata'})</h4>
+        <h4>🧪 Rincian Bahan (${labelHarga})</h4>
         ${detailBahan.map(d => `
           <div class="simulasi-hasil-item">
             <span class="label">${d.nama}</span>
@@ -3854,7 +3890,7 @@ function hitungSimulasi() {
 }
 
 // ================================================================
-// HARGA SIMULASI
+// HARGA SIMULASI (hanya admin-full)
 // ================================================================
 function renderHargaSimulasi() {
   const container = document.getElementById('hargaSimulasiContainer');
@@ -3903,7 +3939,7 @@ function simpanHargaSimulasi() {
 }
 
 // ================================================================
-// AUDIT LOG
+// AUDIT LOG (hanya admin-full)
 // ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
@@ -3935,7 +3971,7 @@ function renderAuditLog() {
 }
 
 // ================================================================
-// RESET DATA
+// RESET DATA (sama)
 // ================================================================
 function resetAllData() {
   if (userRole !== 'admin-full') {
@@ -4011,7 +4047,7 @@ function resetAllData() {
 }
 
 // ================================================================
-// HAPUS PEMBELIAN
+// HAPUS PEMBELIAN (sama)
 // ================================================================
 function hapusPembelian(id) {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
@@ -4056,7 +4092,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v2.5 - Harga Simulasi & Audit Log eksklusif');
+console.log('🧼 SI.BERSIH v2.6 - Harga Simulasi & role-based harga');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
