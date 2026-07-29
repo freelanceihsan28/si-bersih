@@ -703,6 +703,45 @@
       border-color: #8D6E63;
       box-shadow: 0 0 0 4px rgba(141,110,99,0.10);
     }
+    .total-auto {
+      font-weight: 700;
+      color: #6D4C41;
+      background: #fff3e0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e0d6ce;
+      display: inline-block;
+      min-width: 120px;
+      text-align: center;
+    }
+    .item-row {
+      background: white;
+      border: 1px solid #ede7e1;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .item-row .form-group { flex: 1 1 140px; min-width: 90px; margin-bottom: 0; }
+    .item-row .btn-remove-item { margin-bottom: 2px; }
+    .item-row .form-group label { font-size: 0.65rem; }
+    .item-row .form-group input, .item-row .form-group select { padding: 6px 10px; font-size: 0.8rem; }
+    #itemsContainer { margin-bottom: 12px; }
+    .purchase-summary {
+      background: #f5f0eb;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+    .purchase-summary .total-label { font-weight: 700; color: #6D4C41; }
+    .purchase-summary .total-value { font-weight: 800; color: #6D4C41; font-size: 1.2rem; }
   </style>
 </head>
 <body>
@@ -739,7 +778,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v2.7</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v3.0</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -830,7 +869,7 @@
     </div>
     <div class="tab-content active" id="tab-stok-bahanbaku">
       <div class="flex-between">
-        <span class="text-muted">Kelola stok bahan baku dan pembelian</span>
+        <span class="text-muted">Kelola stok bahan baku dan pembelian (multi-item)</span>
         <div>
           <button class="btn btn-primary btn-sm admin-only" onclick="tambahBahan()">
             <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Bahan
@@ -841,11 +880,34 @@
         </div>
       </div>
       <div class="form-row role-admin-full role-operasional role-atasan">
-        <div class="form-group"><label>Beli bahan</label><select id="bahanSelect"></select></div>
-        <div class="form-group"><label>Jumlah</label><input type="number" id="bahanJml" step="0.01" placeholder="0"></div>
-        <div class="form-group"><label>Satuan</label><select id="bahanSatuanBeli"><option value="g">gram (g)</option><option value="ml">mililiter (mL)</option><option value="kg">kg</option><option value="L">L</option></select></div>
-        <div class="form-group"><label>Total Rp</label><input type="number" id="bahanHarga" step="1" placeholder="0"></div>
-        <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="beliBahan()">Beli</button></div>
+        <div style="width:100%; margin-bottom:6px;">
+          <strong style="color:#6D4C41;">🛒 Pembelian Banyak Item</strong>
+        </div>
+        <div id="itemsContainer">
+          <div class="item-row" data-item-index="0">
+            <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
+            <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0"></div>
+            <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
+            <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" class="item-hargaUnit" step="0.01" placeholder="0"></div>
+            <div class="form-group" style="flex:0 0 36px; min-width:36px;">
+              <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+            </div>
+          </div>
+        </div>
+        <div style="width:100%; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-info btn-sm" onclick="addItem()">➕ Tambah Item</button>
+          <div style="flex:1; min-width:150px;">
+            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Ongkos Kirim Total (Rp)</label>
+            <input type="number" id="totalOngkir" step="0.01" placeholder="0" oninput="hitungTotalPembelian()">
+          </div>
+          <div style="flex:0 0 auto; display:flex; align-items:flex-end;">
+            <div class="purchase-summary" style="margin-top:0;">
+              <span class="total-label">Total Belanja:</span>
+              <span class="total-value" id="grandTotalDisplay">Rp 0</span>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="beliBahanMulti()" style="margin-left:auto;">✅ Beli Semua</button>
+        </div>
       </div>
       <div class="search-box"><input type="text" id="searchBahan" placeholder="🔍 Cari bahan..." oninput="filterBahan()"></div>
       <div class="table-wrap">
@@ -865,7 +927,9 @@
       <div class="form-row role-admin-full role-operasional role-atasan">
         <div class="form-group"><label>Pilih Kemasan</label><select id="kemasanBeliSelect"></select></div>
         <div class="form-group"><label>Jumlah</label><input type="number" id="kemasanBeliJml" step="1" placeholder="0"></div>
-        <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" id="kemasanBeliHarga" step="1" placeholder="0"></div>
+        <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" id="kemasanBeliHarga" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
+        <div class="form-group"><label>Ongkos Kirim (Rp)</label><input type="number" id="kemasanBeliOngkir" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
+        <div class="form-group" style="flex:1 1 100%;"><label>Total Biaya (otomatis)</label><div class="total-auto" id="kemasanTotalAuto">Rp 0</div></div>
         <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="beliKemasan()">Beli</button></div>
       </div>
       <div class="search-box"><input type="text" id="searchKemasan" placeholder="🔍 Cari kemasan..." oninput="filterKemasan()"></div>
@@ -1243,7 +1307,7 @@
 if ('serviceWorker' in navigator) {
   const swCode = `
     self.addEventListener('install', e => {
-      e.waitUntil(caches.open('sibersih-v2').then(c => c.addAll(['/','/index.html'])));
+      e.waitUntil(caches.open('sibersih-v3').then(c => c.addAll(['/','/index.html'])));
       self.skipWaiting();
     });
     self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
@@ -1252,7 +1316,7 @@ if ('serviceWorker' in navigator) {
         caches.match(e.request).then(r => r || fetch(e.request).then(res => {
           if (res && res.status === 200) {
             const clone = res.clone();
-            caches.open('sibersih-v2').then(c => c.put(e.request, clone));
+            caches.open('sibersih-v3').then(c => c.put(e.request, clone));
           }
           return res;
         })).catch(() => new Response('Offline', { status: 503 }))
@@ -1477,11 +1541,9 @@ function getHargaBahanForRole(bahanId) {
 // HITUNG ULANG BIAYA BAHAN PRODUKSI BERDASARKAN ROLE
 // ================================================================
 function hitungBiayaBahanProduksi(prod) {
-  // Jika admin-full, gunakan biaya yang tersimpan (sudah dihitung dengan harga rata-rata)
   if (userRole === 'admin-full') {
     return prod.biayaBahan || 0;
   }
-  // Non-admin: hitung ulang dengan harga simulasi
   const f = getFormulasi(prod.formulasiId);
   if (!f) return 0;
   const totalBerat = prod.jumlahLiter * (prod.bj || 1.025);
@@ -1823,25 +1885,152 @@ function toggleSimulasiOpsManual() {
   if (mode === 'manual') document.getElementById('simulasiOpsManual').value = '';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  ['page-stok', 'page-produksi', 'page-laporan'].forEach(id => {
-    const container = document.getElementById(id);
-    if (!container) return;
-    const tabBar = container.querySelector('.tab-bar');
-    if (!tabBar) return;
-    const buttons = tabBar.querySelectorAll('button[data-tab]');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const tab = this.dataset.tab;
-        buttons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const target = container.querySelector('#tab-' + tab);
-        if (target) target.classList.add('active');
-      });
-    });
+// ================================================================
+// FUNGSI MULTI-ITEM PEMBELIAN BAHAN
+// ================================================================
+function addItem() {
+  const container = document.getElementById('itemsContainer');
+  const index = container.children.length;
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.dataset.itemIndex = index;
+  row.innerHTML = `
+    <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
+    <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+    <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
+    <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" class="item-hargaUnit" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+    <div class="form-group" style="flex:0 0 36px; min-width:36px;">
+      <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+    </div>
+  `;
+  container.appendChild(row);
+  populateItemBahanSelects();
+  hitungTotalPembelian();
+}
+function removeItem(btn) {
+  const row = btn.closest('.item-row');
+  if (document.querySelectorAll('.item-row').length <= 1) {
+    showAlert('Minimal satu item harus ada.', 'warning');
+    return;
+  }
+  row.remove();
+  hitungTotalPembelian();
+}
+function populateItemBahanSelects() {
+  const selects = document.querySelectorAll('.item-bahan');
+  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
+  selects.forEach(sel => { sel.innerHTML = opts; });
+}
+function hitungTotalPembelian() {
+  let subtotal = 0;
+  document.querySelectorAll('.item-row').forEach(row => {
+    const jml = parseFloat(row.querySelector('.item-jumlah').value) || 0;
+    const harga = parseFloat(row.querySelector('.item-hargaUnit').value) || 0;
+    subtotal += jml * harga;
   });
-});
+  const ongkir = parseFloat(document.getElementById('totalOngkir').value) || 0;
+  const total = subtotal + ongkir;
+  document.getElementById('grandTotalDisplay').textContent = rupiah(total);
+}
+
+// ================================================================
+// BELI BAHAN MULTI-ITEM
+// ================================================================
+function beliBahanMulti() {
+  if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
+  const rows = document.querySelectorAll('.item-row');
+  const items = [];
+  let grandTotal = 0;
+  let allValid = true;
+  rows.forEach(row => {
+    const bahanId = row.querySelector('.item-bahan').value;
+    const jml = parseFloat(row.querySelector('.item-jumlah').value);
+    const satuan = row.querySelector('.item-satuan').value;
+    const hargaUnit = parseFloat(row.querySelector('.item-hargaUnit').value);
+    if (!bahanId || !jml || jml <= 0 || !hargaUnit || hargaUnit <= 0) {
+      allValid = false;
+      return;
+    }
+    items.push({ bahanId, jml, satuan, hargaUnit });
+  });
+  if (!allValid || items.length === 0) {
+    showAlert('Isi semua field dengan benar!', 'error');
+    return;
+  }
+  const totalOngkir = parseFloat(document.getElementById('totalOngkir').value) || 0;
+  // Hitung subtotal per item untuk proporsi ongkir
+  const subtotals = items.map(it => it.jml * it.hargaUnit);
+  const totalSubtotal = subtotals.reduce((a,b) => a+b, 0);
+  if (totalSubtotal === 0) { showAlert('Total belanja harus > 0', 'error'); return; }
+
+  const now = todayStr();
+  const pembelianIds = [];
+  // Proses setiap item
+  items.forEach((it, idx) => {
+    const b = getBahan(it.bahanId);
+    if (!b) return;
+    const jmlDasar = konversiKeDasar(it.jml, it.satuan, b.satuanDasar);
+    if (jmlDasar === 0) return;
+    // Proporsi ongkir untuk item ini
+    const proporsi = subtotals[idx] / totalSubtotal;
+    const ongkirItem = totalOngkir * proporsi;
+    const totalBiayaItem = (it.jml * it.hargaUnit) + ongkirItem;
+    const hargaPerSatuan = totalBiayaItem / jmlDasar;
+
+    const nilaiStokLama = b.stok * (b.hargaRataRata || 0);
+    const nilaiBaru = jmlDasar * hargaPerSatuan;
+    b.stok += jmlDasar;
+    b.hargaRataRata = (nilaiStokLama + nilaiBaru) / b.stok;
+
+    const pembelianId = genId();
+    data.pembelian.push({
+      id: pembelianId,
+      bahanId: it.bahanId,
+      jumlah: it.jml,
+      satuan: it.satuan,
+      hargaUnit: it.hargaUnit,
+      ongkir: ongkirItem,
+      hargaTotal: totalBiayaItem,
+      tanggal: now,
+      createdBy: getAuditUser(),
+      createdAt: getAuditTime()
+    });
+    pembelianIds.push(pembelianId);
+    grandTotal += totalBiayaItem;
+
+    logAudit('create', 'pembelian', pembelianId, `Beli ${b.nama} ${it.jml} ${it.satuan} total ${rupiah(totalBiayaItem)} (ongkir ${rupiah(ongkirItem)})`, '');
+  });
+
+  // Catat pengeluaran total
+  data.keuangan.pengeluaran.push({
+    id: genId(),
+    sumber: 'Pembelian bahan (multi-item)',
+    jumlah: grandTotal,
+    tanggal: now
+  });
+
+  // Reset form
+  document.querySelectorAll('.item-jumlah').forEach(inp => inp.value = '');
+  document.querySelectorAll('.item-hargaUnit').forEach(inp => inp.value = '');
+  document.getElementById('totalOngkir').value = '';
+  document.getElementById('grandTotalDisplay').textContent = 'Rp 0';
+  // Hapus semua item kecuali satu
+  const container = document.getElementById('itemsContainer');
+  while (container.children.length > 1) { container.lastChild.remove(); }
+  // Reset item pertama
+  const firstRow = container.querySelector('.item-row');
+  if (firstRow) {
+    firstRow.querySelector('.item-jumlah').value = '';
+    firstRow.querySelector('.item-hargaUnit').value = '';
+  }
+  populateItemBahanSelects();
+
+  renderAll();
+  showAlert(`✅ Pembelian ${items.length} item berhasil! Total ${rupiah(grandTotal)} (ongkir ${rupiah(totalOngkir)})`);
+}
 
 // ================================================================
 // MENU
@@ -1881,7 +2070,7 @@ function closeModal() {
 }
 
 // ================================================================
-// TAMBAH & EDIT MODAL (tidak berubah)
+// TAMBAH & EDIT MODAL
 // ================================================================
 function tambahModal() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
@@ -1985,6 +2174,7 @@ function renderAll() {
   renderHargaSimulasi();
   checkStokWarnings();
   updateSimulasiDropdowns();
+  populateItemBahanSelects(); // ensure dropdowns up-to-date
   saveDataToFirestore();
 }
 
@@ -2095,7 +2285,8 @@ function renderBahan() {
       <td>${aksi}</td>
     </tr>`;
   }).join('');
-  document.getElementById('bahanSelect').innerHTML = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
+  // Update select options for multi-item
+  populateItemBahanSelects();
   filterBahan();
 }
 function editHargaBahan(id) {
@@ -2200,47 +2391,6 @@ function tambahBahan() {
     renderAll();
     showAlert('✅ Bahan "' + nama + '" berhasil ditambahkan!');
   });
-}
-function beliBahan() {
-  if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  const id = document.getElementById('bahanSelect').value;
-  const jml = parseFloat(document.getElementById('bahanJml').value);
-  const satuan = document.getElementById('bahanSatuanBeli').value;
-  const hargaTotal = parseFloat(document.getElementById('bahanHarga').value);
-  if (!id || !jml || jml <= 0 || !hargaTotal || hargaTotal <= 0) {
-    showAlert('Isi dengan benar!', 'error');
-    return;
-  }
-  const b = getBahan(id);
-  if (!b) return;
-  const jmlDasar = konversiKeDasar(jml, satuan, b.satuanDasar);
-  if (jmlDasar === 0) { showAlert('Jumlah terlalu kecil.', 'error'); return; }
-  const hargaPerSatuan = hargaTotal / jmlDasar;
-  const nilaiStokLama = b.stok * (b.hargaRataRata || 0);
-  const nilaiBaru = jmlDasar * hargaPerSatuan;
-  const oldStok = b.stok;
-  b.stok += jmlDasar;
-  b.hargaRataRata = (nilaiStokLama + nilaiBaru) / b.stok;
-  const pembelianId = genId();
-  data.pembelian.push({
-    id: pembelianId,
-    bahanId: id,
-    jumlah: jml,
-    satuan,
-    hargaTotal,
-    tanggal: todayStr(),
-    createdBy: getAuditUser(),
-    createdAt: getAuditTime()
-  });
-  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli ' + b.nama, jumlah: hargaTotal, tanggal: todayStr() });
-  logAudit('create', 'pembelian', pembelianId, `Beli ${b.nama} ${jml} ${satuan} total ${rupiah(hargaTotal)}`, `Harga rata-rata baru: ${rupiah(b.hargaRataRata)}/${b.satuanDasar}`);
-  document.getElementById('bahanJml').value = '';
-  document.getElementById('bahanHarga').value = '';
-  renderAll();
-  showAlert('✅ Pembelian bahan berhasil! Harga rata-rata baru: ' + rupiah(b.hargaRataRata) + '/' + b.satuanDasar);
 }
 
 // ================================================================
@@ -2352,7 +2502,7 @@ function tambahKemasanStok() {
     }
     const id = genId();
     data.kemasanBeli.push({ id, nama, stok, hargaPerUnit: harga, volumeMl });
-    data.riwayatKemasan.push({ id: genId(), nama, jumlah: stok, hargaPerUnit: harga, tanggal: todayStr(), createdBy: getAuditUser(), createdAt: getAuditTime() });
+    data.riwayatKemasan.push({ id: genId(), nama, jumlah: stok, hargaPerUnit: harga, ongkir: 0, tanggal: todayStr(), createdBy: getAuditUser(), createdAt: getAuditTime() });
     data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + nama, jumlah: stok * harga, tanggal: todayStr() });
     logAudit('create', 'kemasanBeli', id, `Kemasan ${nama} ditambahkan dengan stok ${stok}, volume ${volumeMl}mL, harga ${rupiah(harga)}`, '');
     renderAll();
@@ -2366,23 +2516,50 @@ function beliKemasan() {
   }
   const id = document.getElementById('kemasanBeliSelect').value;
   const jml = parseInt(document.getElementById('kemasanBeliJml').value);
-  const harga = parseFloat(document.getElementById('kemasanBeliHarga').value);
-  if (!id || !jml || jml <= 0 || !harga || harga <= 0) {
+  const hargaUnit = parseFloat(document.getElementById('kemasanBeliHarga').value) || 0;
+  const ongkir = parseFloat(document.getElementById('kemasanBeliOngkir').value) || 0;
+  const totalBiaya = (jml * hargaUnit) + ongkir;
+
+  if (!id || !jml || jml <= 0 || !hargaUnit || hargaUnit <= 0 || totalBiaya <= 0) {
     showAlert('Isi semua dengan benar!', 'error');
     return;
   }
   const k = getKemasanBeli(id);
   if (!k) return;
   const oldStok = k.stok;
-  k.stok += jml;
-  k.hargaPerUnit = harga;
-  data.riwayatKemasan.push({ id: genId(), nama: k.nama, jumlah: jml, hargaPerUnit: harga, tanggal: todayStr(), createdBy: getAuditUser(), createdAt: getAuditTime() });
-  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + k.nama, jumlah: jml * harga, tanggal: todayStr() });
-  logAudit('update', 'kemasanBeli', id, `Stok: ${oldStok} → ${k.stok}, Harga: ${harga}`, `Beli ${jml} unit ${k.nama}`);
+  const oldHarga = k.hargaPerUnit || 0;
+  const totalLama = oldStok * oldHarga;
+  const totalBaru = totalLama + totalBiaya;
+  const stokBaru = oldStok + jml;
+  k.stok = stokBaru;
+  k.hargaPerUnit = totalBaru / stokBaru;
+
+  data.riwayatKemasan.push({
+    id: genId(),
+    nama: k.nama,
+    jumlah: jml,
+    hargaPerUnit: hargaUnit,
+    ongkir: ongkir,
+    totalBiaya: totalBiaya,
+    tanggal: todayStr(),
+    createdBy: getAuditUser(),
+    createdAt: getAuditTime()
+  });
+  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + k.nama, jumlah: totalBiaya, tanggal: todayStr() });
+  logAudit('update', 'kemasanBeli', id, `Stok: ${oldStok} → ${k.stok}, Harga rata-rata: ${oldHarga} → ${k.hargaPerUnit} (ongkir ${rupiah(ongkir)})`, `Beli ${jml} unit ${k.nama}`);
   document.getElementById('kemasanBeliJml').value = '';
   document.getElementById('kemasanBeliHarga').value = '';
+  document.getElementById('kemasanBeliOngkir').value = '';
+  document.getElementById('kemasanTotalAuto').textContent = 'Rp 0';
   renderAll();
-  showAlert('✅ Pembelian kemasan berhasil!');
+  showAlert('✅ Pembelian kemasan berhasil! Harga rata-rata baru: ' + rupiah(k.hargaPerUnit) + '/unit');
+}
+function hitungTotalKemasan() {
+  const jml = parseInt(document.getElementById('kemasanBeliJml').value) || 0;
+  const hargaUnit = parseFloat(document.getElementById('kemasanBeliHarga').value) || 0;
+  const ongkir = parseFloat(document.getElementById('kemasanBeliOngkir').value) || 0;
+  const total = (jml * hargaUnit) + ongkir;
+  document.getElementById('kemasanTotalAuto').textContent = 'Rp ' + total.toLocaleString('id-ID');
 }
 
 // ================================================================
@@ -3103,7 +3280,7 @@ function hapusKemasanWithReturn(id) {
 }
 
 // ================================================================
-// PENJUALAN, LAPORAN, DLL. (dengan modifikasi laporan)
+// PENJUALAN, LAPORAN, DLL.
 // ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
@@ -3236,9 +3413,6 @@ function renderPenjualan() {
   filterPenjualan();
 }
 
-// ================================================================
-// LAPORAN STOK (sama)
-// ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
   tbody.innerHTML = data.kemasan.map(k => {
@@ -3248,15 +3422,11 @@ function renderLaporanStok() {
   }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada kemasan.</td></tr>';
 }
 
-// ================================================================
-// LAPORAN KEUANGAN PRODUKSI (dengan harga sesuai role)
-// ================================================================
 function renderLaporanKeuanganProduksi() {
   const container = document.getElementById('laporanKeuanganProduksi');
   const produksiList = data.produksi.filter(p => p.status === 'selesai');
   let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
   produksiList.forEach(p => {
-    // Gunakan biaya bahan yang sudah dihitung ulang berdasarkan role
     const biayaBahan = hitungBiayaBahanProduksi(p);
     const biayaKemasan = p.biayaKemasan || 0;
     const totalBiayaLangsung = biayaBahan + biayaKemasan;
@@ -3439,9 +3609,6 @@ function updateBiayaOpsKemasan(kemasanId, newValue) {
   showAlert('✅ Biaya operasional untuk kemasan "' + k.nama + '" diupdate ke ' + rupiah(val));
 }
 
-// ================================================================
-// LAPORAN FULL MODAL (dengan harga sesuai role)
-// ================================================================
 function renderLaporanFull() {
   const container = document.getElementById('laporanFull');
   const totalPemasukanUsaha = data.keuangan.pemasukan.filter(p => !p.sumber.startsWith('Modal dari')).reduce((s,i) => s + i.jumlah, 0);
@@ -3527,11 +3694,7 @@ function renderLaporanFull() {
   `;
 }
 
-// ================================================================
-// RIWAYAT (hanya untuk admin-full, dan tab disembunyikan)
-// ================================================================
 function renderRiwayat() {
-  // Hanya render jika admin-full (tab sudah disembunyikan untuk yang lain)
   if (userRole !== 'admin-full') return;
   const isIhsanUser = isIhsan();
   const pembelianBahan = data.pembelian.map(p => {
@@ -3645,9 +3808,6 @@ function renderRiwayat() {
   }).join('') || `<tr><td colspan="${isIhsanUser ? 6 : 5}" class="text-muted">Belum ada tambahan modal</td></tr>`;
 }
 
-// ================================================================
-// PERALATAN (sama)
-// ================================================================
 function tambahPeralatan() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -3713,9 +3873,6 @@ function renderPeralatan() {
   }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada peralatan.</td></tr>';
 }
 
-// ================================================================
-// STOK WARNINGS (sama)
-// ================================================================
 function checkStokWarnings() {
   const warnings = [];
   data.bahan.forEach(b => {
@@ -3748,9 +3905,6 @@ function checkStokWarnings() {
   } else container.innerHTML = '';
 }
 
-// ================================================================
-// SIMULASI (dengan harga sesuai role)
-// ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked').value;
   const beratInput = document.getElementById('simulasiBeratIsi');
@@ -3919,9 +4073,6 @@ function hitungSimulasi() {
   hasilDiv.style.display = 'block';
 }
 
-// ================================================================
-// HARGA SIMULASI (hanya admin-full)
-// ================================================================
 function renderHargaSimulasi() {
   const container = document.getElementById('hargaSimulasiContainer');
   if (!container) return;
@@ -3946,7 +4097,6 @@ function renderHargaSimulasi() {
     <p class="text-muted">Jika dibiarkan kosong, simulasi akan menggunakan harga rata-rata pembelian.</p>`;
   container.innerHTML = html;
 }
-
 function simpanHargaSimulasi() {
   if (userRole !== 'admin-full') {
     showAlert('❌ Hanya admin penuh!', 'error');
@@ -3968,9 +4118,6 @@ function simpanHargaSimulasi() {
   showAlert('✅ Harga simulasi berhasil disimpan!');
 }
 
-// ================================================================
-// AUDIT LOG (hanya admin-full)
-// ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
   if (userRole !== 'admin-full') {
@@ -4000,9 +4147,6 @@ function renderAuditLog() {
   container.innerHTML = html + (logs.length > 200 ? `<div class="text-muted">... dan ${logs.length - 200} entri lainnya.</div>` : '');
 }
 
-// ================================================================
-// RESET DATA (sama)
-// ================================================================
 function resetAllData() {
   if (userRole !== 'admin-full') {
     showAlert('❌ Hanya admin full yang bisa mereset data!','error');
@@ -4076,9 +4220,6 @@ function resetAllData() {
   }, 100);
 }
 
-// ================================================================
-// HAPUS PEMBELIAN (sama)
-// ================================================================
 function hapusPembelian(id) {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -4122,7 +4263,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v2.7 - Laporan pakai harga simulasi untuk non-admin, tab riwayat disembunyikan');
+console.log('🧼 SI.BERSIH v3.0 - Multi-item purchase dengan ongkir proporsional');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
