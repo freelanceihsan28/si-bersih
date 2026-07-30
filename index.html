@@ -11,7 +11,6 @@
   <meta name="apple-mobile-web-app-title" content="SI.BERSIH">
   <meta name="theme-color" content="#8D6E63">
 
-  <!-- Firebase compat 10.7.1 -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -808,7 +807,6 @@
       <a data-page="simulasi" class="role-admin-full role-atasan role-investor">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/><path d="M12 7v5l3 3"/></svg></span> Simulasi
       </a>
-      <!-- HARGA SIMULASI (hanya admin-full) -->
       <a data-page="hargasimulasi" class="admin-only" style="display:none;">
         <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span> Harga Simulasi
       </a>
@@ -1252,7 +1250,7 @@
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
   </div>
 
-  <!-- HARGA SIMULASI (hanya admin-full) -->
+  <!-- HARGA SIMULASI -->
   <div class="page" id="page-hargasimulasi">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -1269,7 +1267,7 @@
     </button>
   </div>
 
-  <!-- AUDIT LOG (hanya admin-full) -->
+  <!-- AUDIT LOG -->
   <div class="page" id="page-audit">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
@@ -1457,7 +1455,10 @@ function getAuditUser() { return currentUser ? currentUser.email : 'system'; }
 function getAuditTime() { return new Date().toISOString(); }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
-function rupiah(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+function rupiah(n) { 
+  if (n === undefined || n === null || isNaN(n)) return 'Rp 0';
+  return 'Rp ' + Number(n).toLocaleString('id-ID'); 
+}
 function formatTanggal(tgl) {
   if (!tgl) return '-';
   const d = new Date(tgl);
@@ -1501,6 +1502,7 @@ function getHargaRataRataBahan(bahanId) {
   return b ? b.hargaRataRata : 0;
 }
 function getBiayaOperasionalFromProduksi(prod, hppProd) {
+  if (!prod) return 0;
   const mode = prod.opsiBiayaOperasional || '15';
   if (mode === 'manual') return prod.nilaiManualOps || 0;
   return (parseFloat(mode) / 100) * hppProd;
@@ -1538,9 +1540,6 @@ function getHargaBahanForRole(bahanId) {
   return 0;
 }
 
-// ================================================================
-// HITUNG ULANG BIAYA BAHAN PRODUKSI BERDASARKAN ROLE
-// ================================================================
 function hitungBiayaBahanProduksi(prod) {
   if (userRole === 'admin-full') {
     return prod.biayaBahan || 0;
@@ -1887,14 +1886,13 @@ function toggleSimulasiOpsManual() {
 }
 
 // ================================================================
-// FUNGSI MULTI-ITEM PEMBELIAN BAHAN
+// MULTI-ITEM PEMBELIAN BAHAN
 // ================================================================
 function addItem() {
   const container = document.getElementById('itemsContainer');
-  const index = container.children.length;
   const row = document.createElement('div');
   row.className = 'item-row';
-  row.dataset.itemIndex = index;
+  row.dataset.itemIndex = container.children.length;
   row.innerHTML = `
     <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
     <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
@@ -1933,9 +1931,6 @@ function hitungTotalPembelian() {
   document.getElementById('grandTotalDisplay').textContent = rupiah(total);
 }
 
-// ================================================================
-// BELI BAHAN MULTI-ITEM (dengan harga total per item)
-// ================================================================
 function beliBahanMulti() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -1943,7 +1938,6 @@ function beliBahanMulti() {
   }
   const rows = document.querySelectorAll('.item-row');
   const items = [];
-  let grandTotal = 0;
   let allValid = true;
   rows.forEach(row => {
     const bahanId = row.querySelector('.item-bahan').value;
@@ -1966,13 +1960,12 @@ function beliBahanMulti() {
   if (totalSubtotal === 0) { showAlert('Total belanja harus > 0', 'error'); return; }
 
   const now = todayStr();
-  const pembelianIds = [];
+  let grandTotal = 0;
   items.forEach((it, idx) => {
     const b = getBahan(it.bahanId);
     if (!b) return;
     const jmlDasar = konversiKeDasar(it.jml, it.satuan, b.satuanDasar);
     if (jmlDasar === 0) return;
-    // Proporsi ongkir berdasarkan totalHarga masing-masing
     const proporsi = it.totalHarga / totalSubtotal;
     const ongkirItem = totalOngkir * proporsi;
     const totalBiayaItem = it.totalHarga + ongkirItem;
@@ -1989,16 +1982,15 @@ function beliBahanMulti() {
       bahanId: it.bahanId,
       jumlah: it.jml,
       satuan: it.satuan,
-      hargaTotal: totalBiayaItem, // total termasuk ongkir proporsional
+      hargaTotal: totalBiayaItem,
       ongkir: ongkirItem,
-      hargaUnit: it.totalHarga / it.jml, // untuk informasi, harga per unit sebelum ongkir
+      hargaUnit: it.totalHarga / it.jml,
       tanggal: now,
       createdBy: getAuditUser(),
       createdAt: getAuditTime()
     });
-    pembelianIds.push(pembelianId);
     grandTotal += totalBiayaItem;
-    logAudit('create', 'pembelian', pembelianId, `Beli ${b.nama} ${it.jml} ${it.satuan} total ${rupiah(totalBiayaItem)} (ongkir ${rupiah(ongkirItem)})`, '');
+    logAudit('create', 'pembelian', pembelianId, `Beli ${b.nama} ${it.jml} ${it.satuan} total ${rupiah(totalBiayaItem)}`, '');
   });
 
   data.keuangan.pengeluaran.push({
@@ -2008,12 +2000,10 @@ function beliBahanMulti() {
     tanggal: now
   });
 
-  // Reset form
   document.querySelectorAll('.item-jumlah').forEach(inp => inp.value = '');
   document.querySelectorAll('.item-totalHarga').forEach(inp => inp.value = '');
   document.getElementById('totalOngkir').value = '';
   document.getElementById('grandTotalDisplay').textContent = 'Rp 0';
-  // Hapus semua item kecuali satu
   const container = document.getElementById('itemsContainer');
   while (container.children.length > 1) { container.lastChild.remove(); }
   const firstRow = container.querySelector('.item-row');
@@ -2022,9 +2012,8 @@ function beliBahanMulti() {
     firstRow.querySelector('.item-totalHarga').value = '';
   }
   populateItemBahanSelects();
-
   renderAll();
-  showAlert(`✅ Pembelian ${items.length} item berhasil! Total ${rupiah(grandTotal)} (ongkir ${rupiah(totalOngkir)})`);
+  showAlert(`✅ Pembelian ${items.length} item berhasil! Total ${rupiah(grandTotal)}`);
 }
 
 // ================================================================
@@ -2065,7 +2054,7 @@ function closeModal() {
 }
 
 // ================================================================
-// TAMBAH & EDIT MODAL
+// TAMBAH MODAL
 // ================================================================
 function tambahModal() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
@@ -2092,7 +2081,7 @@ function tambahModal() {
     const id = genId();
     data.modalTambahan.push({ id, pemberi, jumlah, tanggal, keterangan, createdBy: getAuditUser(), createdAt: getAuditTime() });
     data.keuangan.pemasukan.push({ id: genId(), sumber: 'Modal dari ' + pemberi, jumlah, tanggal });
-    logAudit('create', 'modalTambahan', id, `Modal dari ${pemberi} sebesar ${rupiah(jumlah)}`, `Pemberi: ${pemberi}, Jumlah: ${jumlah}, Keterangan: ${keterangan}`);
+    logAudit('create', 'modalTambahan', id, `Modal dari ${pemberi} sebesar ${rupiah(jumlah)}`, '');
     renderAll();
     showAlert('✅ Modal dari ' + pemberi + ' sebesar ' + rupiah(jumlah) + ' berhasil ditambahkan!');
   });
@@ -2174,7 +2163,7 @@ function renderAll() {
 }
 
 // ================================================================
-// DASHBOARD (sama)
+// DASHBOARD
 // ================================================================
 function renderDashboard() {
   let htmlStok = '';
@@ -2251,7 +2240,7 @@ function renderDashboard() {
 }
 
 // ================================================================
-// STOK BAHAN (dengan harga sesuai role)
+// STOK BAHAN
 // ================================================================
 function renderBahan() {
   const tbody = document.getElementById('bahanTbody');
@@ -2346,7 +2335,7 @@ function editStokBahan(id) {
     const oldStok = b.stok;
     b.stok = stokBaru;
     b.hargaRataRata = hargaBaru;
-    logAudit('update', 'bahan', id, `Stok: ${oldStok} → ${stokBaru}, Harga: ${oldStok} → ${hargaBaru}`, `Bahan: ${b.nama}`);
+    logAudit('update', 'bahan', id, `Stok: ${oldStok} → ${stokBaru}`, `Bahan: ${b.nama}`);
     renderAll();
     showAlert('✅ Stok "' + b.nama + '" berhasil diupdate.');
   });
@@ -2388,7 +2377,7 @@ function tambahBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN (sama)
+// STOK KEMASAN
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -2540,7 +2529,7 @@ function beliKemasan() {
     createdAt: getAuditTime()
   });
   data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + k.nama, jumlah: totalBiaya, tanggal: todayStr() });
-  logAudit('update', 'kemasanBeli', id, `Stok: ${oldStok} → ${k.stok}, Harga rata-rata: ${oldHarga} → ${k.hargaPerUnit} (ongkir ${rupiah(ongkir)})`, `Beli ${jml} unit ${k.nama}`);
+  logAudit('update', 'kemasanBeli', id, `Stok: ${oldStok} → ${k.stok}, Harga rata-rata: ${oldHarga} → ${k.hargaPerUnit}`, `Beli ${jml} unit ${k.nama}`);
   document.getElementById('kemasanBeliJml').value = '';
   document.getElementById('kemasanBeliHarga').value = '';
   document.getElementById('kemasanBeliOngkir').value = '';
@@ -2557,7 +2546,7 @@ function hitungTotalKemasan() {
 }
 
 // ================================================================
-// FORMULASI (sama)
+// FORMULASI
 // ================================================================
 function renderFormulasi() {
   const tbody = document.getElementById('formTbody');
@@ -2755,7 +2744,7 @@ function hapusForm(id) {
 }
 
 // ================================================================
-// PRODUKSI (sama)
+// PRODUKSI
 // ================================================================
 function buatProduksi() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2977,7 +2966,7 @@ function renderProduksi() {
 }
 
 // ================================================================
-// PENGEMASAN (sama)
+// PENGEMASAN
 // ================================================================
 function toggleIsiMode() {
   const mode = document.querySelector('input[name="isiMode"]:checked').value;
@@ -3274,7 +3263,7 @@ function hapusKemasanWithReturn(id) {
 }
 
 // ================================================================
-// PENJUALAN, LAPORAN, DLL.
+// PENJUALAN
 // ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
@@ -3407,6 +3396,9 @@ function renderPenjualan() {
   filterPenjualan();
 }
 
+// ================================================================
+// LAPORAN
+// ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
   tbody.innerHTML = data.kemasan.map(k => {
@@ -3418,6 +3410,7 @@ function renderLaporanStok() {
 
 function renderLaporanKeuanganProduksi() {
   const container = document.getElementById('laporanKeuanganProduksi');
+  if (!container) return;
   const produksiList = data.produksi.filter(p => p.status === 'selesai');
   let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
   produksiList.forEach(p => {
@@ -3456,155 +3449,12 @@ function renderLaporanKeuanganProduksi() {
       </div>
     </div>
   `;
-  const detailRows = [];
-  data.kemasan.forEach(k => {
-    const prod = data.produksi.find(p => p.id === k.produksiId);
-    if (!prod) return;
-    const f = getFormulasi(prod.formulasiId);
-    if (!f) return;
-    const biayaBahanProd = hitungBiayaBahanProduksi(prod);
-    const biayaKemasanProd = prod.biayaKemasan || 0;
-    const totalBiayaLangsungProd = biayaBahanProd + biayaKemasanProd;
-    let biayaOpsItem;
-    if (k.biayaOperasionalOverride != null) {
-      biayaOpsItem = k.biayaOperasionalOverride;
-    } else {
-      const totalUnitBatch = data.kemasan.filter(k2 => k2.produksiId === prod.id).reduce((s,k2) => s + k2.jumlahUnit, 0);
-      const proporsi = totalUnitBatch > 0 ? k.jumlahUnit / totalUnitBatch : 0;
-      const biayaOpsDasar = getBiayaOperasionalFromProduksi(prod, totalBiayaLangsungProd);
-      biayaOpsItem = biayaOpsDasar * proporsi;
-    }
-    const totalBiayaLangsungItem = biayaBahanProd + biayaKemasanProd;
-    const hppItem = totalBiayaLangsungItem + biayaOpsItem;
-    const unitDikemas = k.jumlahUnit;
-    const hppPerUnit = unitDikemas > 0 ? hppItem / unitDikemas : 0;
-    const penjualan = data.penjualan.filter(j => j.kemasanId === k.id && j.statusBayar === 'Lunas');
-    const unitTerjual = penjualan.reduce((s, j) => s + j.jumlahTerjual, 0);
-    const totalPendapatan = penjualan.reduce((s, j) => s + (j.jumlahTerjual * j.hargaJualPerUnit), 0);
-    const hargaJualAktual = unitTerjual > 0 ? totalPendapatan / unitTerjual : 0;
-    const untungPerUnit = hargaJualAktual - hppPerUnit;
-    const totalUntung = unitDikemas > 0 ? totalPendapatan - (hppItem * (unitTerjual / unitDikemas)) : 0;
-    detailRows.push({
-      id: k.id,
-      produksiId: prod.id,
-      namaSabun: f.nama,
-      namaKemasan: k.nama,
-      unitDikemas,
-      unitTerjual,
-      totalPendapatan,
-      hargaJualAktual,
-      biayaBahan: biayaBahanProd,
-      biayaKemasan: biayaKemasanProd,
-      biayaOperasional: biayaOpsItem,
-      hpp: hppItem,
-      hppPerUnit,
-      untungPerUnit,
-      totalUntung
-    });
-  });
-  detailRows.sort((a, b) => a.namaSabun.localeCompare(b.namaSabun));
-  let detailHtml = '';
-  if (detailRows.length > 0) {
-    let totalUnitDikemas = 0, totalUnitTerjual = 0, totalPendapatan = 0;
-    let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
-    let totalUntung = 0;
-    detailHtml = `
-      <div style="margin-top:20px;">
-        <h4 style="color:#6D4C41;">📋 Rincian per Sabun, Kemasan, dan Penjualan Aktual
-          <span style="font-size:0.75rem; font-weight:normal; color:#8D6E63;">(Edit biaya operasional per kemasan)</span>
-        </h4>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Sabun</th>
-                <th>Kemasan</th>
-                <th>Unit Dikemas</th>
-                <th>Terjual</th>
-                <th>Total Pendapatan</th>
-                <th>Harga Jual Rata-rata</th>
-                <th>Biaya Bahan</th>
-                <th>Biaya Kemasan</th>
-                <th>Biaya Operasional</th>
-                <th>HPP</th>
-                <th>HPP/Unit</th>
-                <th>Untung/Unit</th>
-                <th>Total Untung</th>
-              </tr>
-            </thead>
-            <tbody>
-    `;
-    detailRows.forEach(row => {
-      totalUnitDikemas += row.unitDikemas;
-      totalUnitTerjual += row.unitTerjual;
-      totalPendapatan += row.totalPendapatan;
-      totalBiayaBahan += row.biayaBahan;
-      totalBiayaKemasan += row.biayaKemasan;
-      totalBiayaOperasional += row.biayaOperasional;
-      totalHpp += row.hpp;
-      totalUntung += row.totalUntung;
-      detailHtml += `
-        <tr>
-          <td><strong>${row.namaSabun}</strong></td>
-          <td>${row.namaKemasan}</td>
-          <td>${row.unitDikemas}</td>
-          <td>${row.unitTerjual}</td>
-          <td>${rupiah(row.totalPendapatan)}</td>
-          <td>${rupiah(row.hargaJualAktual)}</td>
-          <td>${rupiah(row.biayaBahan)}</td>
-          <td>${rupiah(row.biayaKemasan)}</td>
-          <td>
-            <input type="number" id="ops_edit_${row.id}" value="${row.biayaOperasional.toFixed(0)}" class="ops-input"
-              onchange="updateBiayaOpsKemasan('${row.id}', this.value)" />
-          </td>
-          <td>${rupiah(row.hpp)}</td>
-          <td>${rupiah(row.hppPerUnit)}</td>
-          <td style="color:${row.untungPerUnit>=0?'#2E7D32':'#C62828'};">${rupiah(row.untungPerUnit)}</td>
-          <td style="color:${row.totalUntung>=0?'#2E7D32':'#C62828'};">${rupiah(row.totalUntung)}</td>
-        </tr>
-      `;
-    });
-    detailHtml += `
-      <tr style="font-weight:700; background:#f5f0eb;">
-        <td colspan="2">Total</td>
-        <td>${totalUnitDikemas}</td>
-        <td>${totalUnitTerjual}</td>
-        <td>${rupiah(totalPendapatan)}</td>
-        <td></td>
-        <td>${rupiah(totalBiayaBahan)}</td>
-        <td>${rupiah(totalBiayaKemasan)}</td>
-        <td>${rupiah(totalBiayaOperasional)}</td>
-        <td>${rupiah(totalHpp)}</td>
-        <td></td>
-        <td></td>
-        <td style="color:${totalUntung>=0?'#2E7D32':'#C62828'};">${rupiah(totalUntung)}</td>
-      </tr>
-    `;
-    detailHtml += `</tbody></table></div></div>`;
-  } else {
-    detailHtml = `<p class="text-muted">Belum ada data kemasan atau produksi selesai.</p>`;
-  }
-  container.innerHTML = html + detailHtml;
-}
-function updateBiayaOpsKemasan(kemasanId, newValue) {
-  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  const val = parseFloat(newValue);
-  if (isNaN(val) || val < 0) { showAlert('Masukkan angka valid (>=0).','error'); return; }
-  const k = getKemasan(kemasanId);
-  if (!k) { showAlert('Kemasan tidak ditemukan.','error'); return; }
-  const old = k.biayaOperasionalOverride;
-  k.biayaOperasionalOverride = val;
-  logAudit('update','kemasan',kemasanId,`Biaya operasional: ${old||0} → ${val}`, `Kemasan: ${k.nama}`);
-  renderLaporanKeuanganProduksi();
-  renderAll();
-  showAlert('✅ Biaya operasional untuk kemasan "' + k.nama + '" diupdate ke ' + rupiah(val));
+  container.innerHTML = html;
 }
 
 function renderLaporanFull() {
   const container = document.getElementById('laporanFull');
+  if (!container) return;
   const totalPemasukanUsaha = data.keuangan.pemasukan.filter(p => !p.sumber.startsWith('Modal dari')).reduce((s,i) => s + i.jumlah, 0);
   const totalModalMasuk = data.modalTambahan.reduce((s,m) => s + m.jumlah, 0);
   const totalPengeluaran = data.keuangan.pengeluaran.reduce((s,i) => s + i.jumlah, 0);
@@ -3735,7 +3585,7 @@ function renderRiwayat() {
       <td>${hapusBtn}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 8 : 7}" class="text-muted">Belum ada pembelian</td></tr>`;
-  // Penjualan
+  
   const penjualan = sortByWaktu(data.penjualan.map(j => {
     const k = getKemasan(j.kemasanId);
     let jenisSabun = 'Tidak diketahui';
@@ -3775,7 +3625,7 @@ function renderRiwayat() {
       <td>${aksi}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 9 : 8}" class="text-muted">Belum ada penjualan</td></tr>`;
-  // Modal
+  
   const modalList = sortByWaktu(data.modalTambahan);
   const headerModal = document.getElementById('riwayatModalHeader');
   headerModal.innerHTML = `
@@ -3802,6 +3652,9 @@ function renderRiwayat() {
   }).join('') || `<tr><td colspan="${isIhsanUser ? 6 : 5}" class="text-muted">Belum ada tambahan modal</td></tr>`;
 }
 
+// ================================================================
+// PERALATAN
+// ================================================================
 function tambahPeralatan() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -3867,6 +3720,9 @@ function renderPeralatan() {
   }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada peralatan.</td></tr>';
 }
 
+// ================================================================
+// STOK WARNINGS
+// ================================================================
 function checkStokWarnings() {
   const warnings = [];
   data.bahan.forEach(b => {
@@ -3899,6 +3755,9 @@ function checkStokWarnings() {
   } else container.innerHTML = '';
 }
 
+// ================================================================
+// SIMULASI
+// ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked').value;
   const beratInput = document.getElementById('simulasiBeratIsi');
@@ -4067,6 +3926,9 @@ function hitungSimulasi() {
   hasilDiv.style.display = 'block';
 }
 
+// ================================================================
+// HARGA SIMULASI
+// ================================================================
 function renderHargaSimulasi() {
   const container = document.getElementById('hargaSimulasiContainer');
   if (!container) return;
@@ -4075,7 +3937,6 @@ function renderHargaSimulasi() {
     return;
   }
   if (!data.hargaSimulasi) data.hargaSimulasi = {};
-  
   let html = `<div class="table-wrap"><table>
     <thead><tr><th>Nama Bahan</th><th>Satuan Dasar</th><th>Harga Simulasi (per satuan)</th></tr></thead>
     <tbody>`;
@@ -4112,6 +3973,9 @@ function simpanHargaSimulasi() {
   showAlert('✅ Harga simulasi berhasil disimpan!');
 }
 
+// ================================================================
+// AUDIT LOG
+// ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
   if (userRole !== 'admin-full') {
@@ -4141,6 +4005,9 @@ function renderAuditLog() {
   container.innerHTML = html + (logs.length > 200 ? `<div class="text-muted">... dan ${logs.length - 200} entri lainnya.</div>` : '');
 }
 
+// ================================================================
+// RESET DATA
+// ================================================================
 function resetAllData() {
   if (userRole !== 'admin-full') {
     showAlert('❌ Hanya admin full yang bisa mereset data!','error');
@@ -4257,7 +4124,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v3.2 - Full version all features');
+console.log('🧼 SI.BERSIH v3.2 - Fixed laporan & multi-item purchase');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
