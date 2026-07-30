@@ -725,7 +725,7 @@
       gap: 8px;
       align-items: flex-end;
     }
-    .item-row .form-group { flex: 1 1 140px; min-width: 90px; margin-bottom: 0; }
+    .item-row .form-group { flex: 1 1 130px; min-width: 100px; margin-bottom: 0; }
     .item-row .btn-remove-item { margin-bottom: 2px; }
     .item-row .form-group label { font-size: 0.65rem; }
     .item-row .form-group input, .item-row .form-group select { padding: 6px 10px; font-size: 0.8rem; }
@@ -778,7 +778,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v3.0</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v3.1</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -882,13 +882,14 @@
       <div class="form-row role-admin-full role-operasional role-atasan">
         <div style="width:100%; margin-bottom:6px;">
           <strong style="color:#6D4C41;">🛒 Pembelian Banyak Item</strong>
+          <span class="text-muted" style="font-size:0.75rem; margin-left:10px;">Isi total harga per item (sudah termasuk ongkir item? tidak, ongkir total akan ditambahkan di bawah)</span>
         </div>
         <div id="itemsContainer">
           <div class="item-row" data-item-index="0">
             <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
-            <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0"></div>
+            <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
             <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
-            <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" class="item-hargaUnit" step="0.01" placeholder="0"></div>
+            <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
             <div class="form-group" style="flex:0 0 36px; min-width:36px;">
               <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
             </div>
@@ -1898,7 +1899,7 @@ function addItem() {
     <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
     <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
     <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
-    <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" class="item-hargaUnit" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+    <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
     <div class="form-group" style="flex:0 0 36px; min-width:36px;">
       <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
     </div>
@@ -1924,9 +1925,8 @@ function populateItemBahanSelects() {
 function hitungTotalPembelian() {
   let subtotal = 0;
   document.querySelectorAll('.item-row').forEach(row => {
-    const jml = parseFloat(row.querySelector('.item-jumlah').value) || 0;
-    const harga = parseFloat(row.querySelector('.item-hargaUnit').value) || 0;
-    subtotal += jml * harga;
+    const totalHarga = parseFloat(row.querySelector('.item-totalHarga').value) || 0;
+    subtotal += totalHarga;
   });
   const ongkir = parseFloat(document.getElementById('totalOngkir').value) || 0;
   const total = subtotal + ongkir;
@@ -1934,7 +1934,7 @@ function hitungTotalPembelian() {
 }
 
 // ================================================================
-// BELI BAHAN MULTI-ITEM
+// BELI BAHAN MULTI-ITEM (dengan harga total per item)
 // ================================================================
 function beliBahanMulti() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -1949,35 +1949,33 @@ function beliBahanMulti() {
     const bahanId = row.querySelector('.item-bahan').value;
     const jml = parseFloat(row.querySelector('.item-jumlah').value);
     const satuan = row.querySelector('.item-satuan').value;
-    const hargaUnit = parseFloat(row.querySelector('.item-hargaUnit').value);
-    if (!bahanId || !jml || jml <= 0 || !hargaUnit || hargaUnit <= 0) {
+    const totalHarga = parseFloat(row.querySelector('.item-totalHarga').value);
+    if (!bahanId || !jml || jml <= 0 || !totalHarga || totalHarga <= 0) {
       allValid = false;
       return;
     }
-    items.push({ bahanId, jml, satuan, hargaUnit });
+    items.push({ bahanId, jml, satuan, totalHarga });
   });
   if (!allValid || items.length === 0) {
     showAlert('Isi semua field dengan benar!', 'error');
     return;
   }
   const totalOngkir = parseFloat(document.getElementById('totalOngkir').value) || 0;
-  // Hitung subtotal per item untuk proporsi ongkir
-  const subtotals = items.map(it => it.jml * it.hargaUnit);
+  const subtotals = items.map(it => it.totalHarga);
   const totalSubtotal = subtotals.reduce((a,b) => a+b, 0);
   if (totalSubtotal === 0) { showAlert('Total belanja harus > 0', 'error'); return; }
 
   const now = todayStr();
   const pembelianIds = [];
-  // Proses setiap item
   items.forEach((it, idx) => {
     const b = getBahan(it.bahanId);
     if (!b) return;
     const jmlDasar = konversiKeDasar(it.jml, it.satuan, b.satuanDasar);
     if (jmlDasar === 0) return;
-    // Proporsi ongkir untuk item ini
-    const proporsi = subtotals[idx] / totalSubtotal;
+    // Proporsi ongkir berdasarkan totalHarga masing-masing
+    const proporsi = it.totalHarga / totalSubtotal;
     const ongkirItem = totalOngkir * proporsi;
-    const totalBiayaItem = (it.jml * it.hargaUnit) + ongkirItem;
+    const totalBiayaItem = it.totalHarga + ongkirItem;
     const hargaPerSatuan = totalBiayaItem / jmlDasar;
 
     const nilaiStokLama = b.stok * (b.hargaRataRata || 0);
@@ -1991,20 +1989,18 @@ function beliBahanMulti() {
       bahanId: it.bahanId,
       jumlah: it.jml,
       satuan: it.satuan,
-      hargaUnit: it.hargaUnit,
+      hargaTotal: totalBiayaItem, // total termasuk ongkir proporsional
       ongkir: ongkirItem,
-      hargaTotal: totalBiayaItem,
+      hargaUnit: it.totalHarga / it.jml, // untuk informasi, harga per unit sebelum ongkir
       tanggal: now,
       createdBy: getAuditUser(),
       createdAt: getAuditTime()
     });
     pembelianIds.push(pembelianId);
     grandTotal += totalBiayaItem;
-
     logAudit('create', 'pembelian', pembelianId, `Beli ${b.nama} ${it.jml} ${it.satuan} total ${rupiah(totalBiayaItem)} (ongkir ${rupiah(ongkirItem)})`, '');
   });
 
-  // Catat pengeluaran total
   data.keuangan.pengeluaran.push({
     id: genId(),
     sumber: 'Pembelian bahan (multi-item)',
@@ -2014,17 +2010,16 @@ function beliBahanMulti() {
 
   // Reset form
   document.querySelectorAll('.item-jumlah').forEach(inp => inp.value = '');
-  document.querySelectorAll('.item-hargaUnit').forEach(inp => inp.value = '');
+  document.querySelectorAll('.item-totalHarga').forEach(inp => inp.value = '');
   document.getElementById('totalOngkir').value = '';
   document.getElementById('grandTotalDisplay').textContent = 'Rp 0';
   // Hapus semua item kecuali satu
   const container = document.getElementById('itemsContainer');
   while (container.children.length > 1) { container.lastChild.remove(); }
-  // Reset item pertama
   const firstRow = container.querySelector('.item-row');
   if (firstRow) {
     firstRow.querySelector('.item-jumlah').value = '';
-    firstRow.querySelector('.item-hargaUnit').value = '';
+    firstRow.querySelector('.item-totalHarga').value = '';
   }
   populateItemBahanSelects();
 
@@ -2174,7 +2169,7 @@ function renderAll() {
   renderHargaSimulasi();
   checkStokWarnings();
   updateSimulasiDropdowns();
-  populateItemBahanSelects(); // ensure dropdowns up-to-date
+  populateItemBahanSelects();
   saveDataToFirestore();
 }
 
@@ -2285,7 +2280,6 @@ function renderBahan() {
       <td>${aksi}</td>
     </tr>`;
   }).join('');
-  // Update select options for multi-item
   populateItemBahanSelects();
   filterBahan();
 }
@@ -4263,7 +4257,7 @@ function hapusPembelian(id) {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v3.0 - Multi-item purchase dengan ongkir proporsional');
+console.log('🧼 SI.BERSIH v3.1 - Multi-item purchase dengan harga total per item');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
