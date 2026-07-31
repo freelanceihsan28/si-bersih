@@ -741,6 +741,21 @@
     }
     .purchase-summary .total-label { font-weight: 700; color: #6D4C41; }
     .purchase-summary .total-value { font-weight: 800; color: #6D4C41; font-size: 1.2rem; }
+    .rnd-item-row {
+      background: white;
+      border: 1px solid #ede7e1;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .rnd-item-row .form-group { flex: 1 1 140px; min-width: 100px; margin-bottom: 0; }
+    .rnd-item-row .form-group label { font-size: 0.65rem; }
+    .rnd-item-row .form-group input, .rnd-item-row .form-group select { padding: 6px 10px; font-size: 0.8rem; }
+    #rndItemsContainer { margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -777,7 +792,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v3.7</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v3.8</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -806,6 +821,9 @@
       </a>
       <a data-page="simulasi" class="role-admin-full role-atasan role-investor">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/><path d="M12 7v5l3 3"/></svg></span> Simulasi
+      </a>
+      <a data-page="simulasi-rnd" class="role-admin-full role-atasan">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg></span> Simulasi R&D
       </a>
       <a data-page="hargasimulasi" class="admin-only" style="display:none;">
         <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span> Harga Simulasi
@@ -1247,6 +1265,77 @@
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
   </div>
 
+  <!-- SIMULASI R&D -->
+  <div class="page" id="page-simulasi-rnd">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg>
+      Simulasi R&D
+    </h2>
+    <p class="text-muted" style="margin-bottom:16px;">
+      Buat formula baru dengan menentukan persentase setiap bahan. Total persentase harus 100%.
+      Harga bahan otomatis menggunakan harga rata-rata (admin) atau harga simulasi (non-admin).
+    </p>
+
+    <div class="form-row">
+      <div style="width:100%;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+          <div style="flex:1; min-width:150px;">
+            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Nama Formula</label>
+            <input type="text" id="rndFormulaNama" placeholder="Contoh: Sabun Cair Premium" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;">
+          </div>
+          <div style="flex:1; min-width:150px;">
+            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Berat Jenis (kg/L)</label>
+            <input type="number" id="rndFormulaBj" step="0.001" value="1.025" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;">
+          </div>
+          <div style="flex:0 0 150px;">
+            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Total Berat (kg)</label>
+            <input type="number" id="rndTotalBerat" step="0.1" placeholder="1" value="1" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;" oninput="hitungSimulasiRnd()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div style="width:100%;">
+        <strong style="color:#6D4C41;">🧪 Daftar Bahan</strong>
+        <span class="text-muted" style="font-size:0.75rem; margin-left:10px;">Total persentase harus 100%</span>
+        <div id="rndItemsContainer" style="margin-top:8px;">
+          <div class="rnd-item-row" data-rnd-index="0">
+            <div class="form-group"><label>Bahan</label><select class="rnd-bahan" style="width:100%;" onchange="updateRndHarga(this)"></select></div>
+            <div class="form-group"><label>Persentase (%)</label><input type="number" class="rnd-persen" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
+            <div class="form-group"><label>Harga/kg (Rp)</label><input type="number" class="rnd-harga" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
+            <div class="form-group" style="flex:0 0 36px; min-width:36px;">
+              <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeRndItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-info btn-sm" onclick="addRndItem()" style="margin-top:8px;">➕ Tambah Bahan</button>
+        <div style="margin-top:10px; display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+          <span style="font-weight:700; color:#6D4C41;">Total Persentase: <span id="rndTotalPersen" style="color:#C62828;">0%</span></span>
+          <span style="font-weight:700; color:#6D4C41;">Total Biaya Bahan: <span id="rndTotalBiaya">Rp 0</span></span>
+          <span style="font-weight:700; color:#6D4C41;">Biaya per kg: <span id="rndBiayaPerKg">Rp 0</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+      <button class="btn btn-primary" onclick="simpanRndAsResep()">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span>
+        💾 Simpan sebagai Resep
+      </button>
+      <button class="btn btn-success" onclick="produksiDariRnd()">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/></svg></span>
+        🏭 Produksi Langsung
+      </button>
+      <button class="btn btn-warning" onclick="resetRndForm()">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span>
+        Reset Form
+      </button>
+    </div>
+
+    <div id="rndDetailHasil" style="margin-top:20px; display:none; background:#faf7f4; padding:16px; border-radius:12px; border:1px solid #ede7e1;"></div>
+  </div>
+
   <!-- HARGA SIMULASI -->
   <div class="page" id="page-hargasimulasi">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
@@ -1295,6 +1384,7 @@
   <button id="fontDec" title="Perkecil font">A−</button>
   <button id="fontInc" title="Perbesar font">A+</button>
 </div>
+<!-- BAGIAN 4: JAVASCRIPT LENGKAP -->
 <script>
 // ================================================================
 // SERVICE WORKER
@@ -1650,8 +1740,8 @@ function showApp() {
   });
 
   const roleMenus = {
-    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','hargasimulasi','audit'],
-    'atasan': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi'],
+    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','simulasi-rnd','hargasimulasi','audit'],
+    'atasan': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','simulasi-rnd'],
     'investor': ['dashboard','peralatan','penjualan','laporan','simulasi'],
     'operasional': ['dashboard','stok','produksi'],
     'adm': ['dashboard','peralatan','penjualan','laporan','produksi']
@@ -2159,6 +2249,7 @@ function renderAll() {
   renderPeralatan();
   renderAuditLog();
   renderHargaSimulasi();
+  populateRndBahanSelects();
   checkStokWarnings();
   updateSimulasiDropdowns();
   populateItemBahanSelects();
@@ -2169,7 +2260,6 @@ function renderAll() {
 // DASHBOARD (DENGAN GROUPING)
 // ================================================================
 function renderDashboard() {
-  // ---- GROUPING KEMASAN ----
   const grouped = {};
   data.kemasan.forEach(k => {
     const prod = getProduksi(k.produksiId);
@@ -2197,7 +2287,6 @@ function renderDashboard() {
     </tr>`;
   }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada kemasan.</td></tr>';
 
-  // ---- MODAL SUMMARY ----
   const modalPerPemberi = {};
   data.modalTambahan.forEach(m => {
     if (!modalPerPemberi[m.pemberi]) modalPerPemberi[m.pemberi] = 0;
@@ -3404,7 +3493,6 @@ function renderPenjualan() {
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
   if (!tbody) return;
-  // Grouping untuk laporan stok juga
   const grouped = {};
   data.kemasan.forEach(k => {
     const prod = getProduksi(k.produksiId);
@@ -3471,7 +3559,6 @@ function renderLaporanKeuanganProduksi() {
     </div>
   `;
 
-  // Detail Rows dengan edit ops
   const detailRows = [];
   data.kemasan.forEach(k => {
     const prod = data.produksi.find(p => p.id === k.produksiId);
@@ -3714,7 +3801,6 @@ function renderRiwayat() {
   if (userRole !== 'admin-full') return;
   const isIhsanUser = isIhsan();
 
-  // Pembelian Bahan
   const pembelianBahan = data.pembelian.map(p => {
     const b = getBahan(p.bahanId);
     return {
@@ -3729,7 +3815,6 @@ function renderRiwayat() {
       total: p.hargaTotal
     };
   });
-  // Pembelian Kemasan
   const pembelianKemasan = data.riwayatKemasan.map(r => ({
     id: r.id,
     tanggal: r.tanggal || '',
@@ -3741,7 +3826,6 @@ function renderRiwayat() {
     satuan: 'unit',
     total: r.jumlah * r.hargaPerUnit
   }));
-  // Peralatan
   const pembelianPeralatan = data.peralatan.map(p => ({
     id: p.id,
     tanggal: p.tanggal || '',
@@ -3753,7 +3837,6 @@ function renderRiwayat() {
     satuan: 'unit',
     total: p.totalHarga
   }));
-  // Produksi Selesai
   const pembelianProduksi = data.produksi.filter(p => p.status === 'selesai').map(p => {
     const f = getFormulasi(p.formulasiId);
     const totalBiayaLangsung = (p.biayaBahan || 0) + (p.biayaKemasan || 0);
@@ -3773,7 +3856,6 @@ function renderRiwayat() {
   });
   const semuaPembelian = sortByWaktu([...pembelianBahan, ...pembelianKemasan, ...pembelianPeralatan, ...pembelianProduksi]);
 
-  // Header dan Body Pembelian
   const headerPembelian = document.getElementById('riwayatPembelianHeader');
   headerPembelian.innerHTML = `
     <th>Waktu</th><th>Jenis</th><th>Nama</th><th>Jumlah</th><th>Satuan</th><th>Total</th>
@@ -3801,7 +3883,6 @@ function renderRiwayat() {
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 8 : 7}" class="text-muted">Belum ada pembelian</td></tr>`;
 
-  // Penjualan
   const penjualan = sortByWaktu(data.penjualan.map(j => {
     const k = getKemasan(j.kemasanId);
     let jenisSabun = 'Tidak diketahui';
@@ -3853,7 +3934,6 @@ function renderRiwayat() {
     </tr>`;
   }).join('') || `<tr><td colspan="${isIhsanUser ? 9 : 8}" class="text-muted">Belum ada penjualan</td></tr>`;
 
-  // Modal Tambahan
   const modalList = sortByWaktu(data.modalTambahan);
   const headerModal = document.getElementById('riwayatModalHeader');
   headerModal.innerHTML = `
@@ -4155,6 +4235,268 @@ function hitungSimulasi() {
 }
 
 // ================================================================
+// SIMULASI R&D
+// ================================================================
+function populateRndBahanSelects() {
+  const selects = document.querySelectorAll('.rnd-bahan');
+  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama} (${b.satuanDasar})</option>`).join('');
+  selects.forEach(sel => {
+    const currentVal = sel.value;
+    sel.innerHTML = opts;
+    if (currentVal) sel.value = currentVal;
+  });
+}
+
+function addRndItem() {
+  const container = document.getElementById('rndItemsContainer');
+  const row = document.createElement('div');
+  row.className = 'rnd-item-row';
+  row.dataset.rndIndex = container.children.length;
+  row.innerHTML = `
+    <div class="form-group"><label>Bahan</label><select class="rnd-bahan" style="width:100%;" onchange="updateRndHarga(this)"></select></div>
+    <div class="form-group"><label>Persentase (%)</label><input type="number" class="rnd-persen" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
+    <div class="form-group"><label>Harga/kg (Rp)</label><input type="number" class="rnd-harga" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
+    <div class="form-group" style="flex:0 0 36px; min-width:36px;">
+      <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeRndItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+    </div>
+  `;
+  container.appendChild(row);
+  populateRndBahanSelects();
+  const sel = row.querySelector('.rnd-bahan');
+  if (sel) updateRndHarga(sel);
+  hitungSimulasiRnd();
+}
+
+function removeRndItem(btn) {
+  const row = btn.closest('.rnd-item-row');
+  if (document.querySelectorAll('.rnd-item-row').length <= 1) {
+    showAlert('Minimal satu bahan harus ada.', 'warning');
+    return;
+  }
+  row.remove();
+  hitungSimulasiRnd();
+}
+
+function updateRndHarga(select) {
+  const row = select.closest('.rnd-item-row');
+  const hargaInput = row.querySelector('.rnd-harga');
+  const bahanId = select.value;
+  if (!bahanId) { hargaInput.value = ''; return; }
+  const harga = getHargaBahanForRole(bahanId);
+  hargaInput.value = harga > 0 ? harga : '';
+  hitungSimulasiRnd();
+}
+
+function hitungSimulasiRnd() {
+  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
+  let totalPersen = 0;
+  let totalBiaya = 0;
+  const totalBerat = parseFloat(document.getElementById('rndTotalBerat').value) || 0;
+  const details = [];
+
+  rows.forEach(row => {
+    const bahanId = row.querySelector('.rnd-bahan').value;
+    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
+    const harga = parseFloat(row.querySelector('.rnd-harga').value) || 0;
+    const b = getBahan(bahanId);
+    totalPersen += persen;
+    if (b && totalBerat > 0 && persen > 0) {
+      const beratItem = (persen / 100) * totalBerat;
+      const biayaItem = beratItem * harga;
+      totalBiaya += biayaItem;
+      details.push({ nama: b.nama, persen, berat: beratItem, harga, biaya: biayaItem });
+    }
+  });
+
+  document.getElementById('rndTotalPersen').textContent = totalPersen.toFixed(2) + '%';
+  document.getElementById('rndTotalPersen').style.color = Math.abs(totalPersen - 100) < 0.01 ? '#2E7D32' : '#C62828';
+  document.getElementById('rndTotalBiaya').textContent = rupiah(totalBiaya);
+  const biayaPerKg = totalBerat > 0 ? totalBiaya / totalBerat : 0;
+  document.getElementById('rndBiayaPerKg').textContent = rupiah(biayaPerKg);
+
+  const detailDiv = document.getElementById('rndDetailHasil');
+  if (details.length > 0 && totalBerat > 0) {
+    let html = `<h4 style="color:#6D4C41;">📋 Rincian Bahan (Total ${totalBerat.toFixed(2)} kg)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bahan</th><th>Persen</th><th>Berat (kg)</th><th>Harga/kg</th><th>Biaya</th></tr></thead>
+          <tbody>`;
+    details.forEach(d => {
+      html += `<tr><td>${d.nama}</td><td>${d.persen.toFixed(2)}%</td><td>${d.berat.toFixed(3)}</td><td>${rupiah(d.harga)}</td><td>${rupiah(d.biaya)}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+    html += `<div style="margin-top:10px;font-weight:700;color:#6D4C41;">Total Biaya: ${rupiah(totalBiaya)} | Biaya per kg: ${rupiah(biayaPerKg)}</div>`;
+    if (Math.abs(totalPersen - 100) < 0.01) {
+      html += `<div style="margin-top:8px;color:#2E7D32;font-weight:700;">✅ Total persentase 100%</div>`;
+    } else {
+      html += `<div style="margin-top:8px;color:#C62828;font-weight:700;">⚠️ Total persentase ${totalPersen.toFixed(2)}%, harus 100%</div>`;
+    }
+    detailDiv.innerHTML = html;
+    detailDiv.style.display = 'block';
+  } else {
+    detailDiv.style.display = 'none';
+  }
+}
+
+function resetRndForm() {
+  document.getElementById('rndFormulaNama').value = '';
+  document.getElementById('rndFormulaBj').value = '1.025';
+  document.getElementById('rndTotalBerat').value = '1';
+  const container = document.getElementById('rndItemsContainer');
+  while (container.children.length > 1) container.lastChild.remove();
+  const firstRow = container.querySelector('.rnd-item-row');
+  if (firstRow) {
+    firstRow.querySelector('.rnd-bahan').value = '';
+    firstRow.querySelector('.rnd-persen').value = '';
+    firstRow.querySelector('.rnd-harga').value = '';
+  }
+  populateRndBahanSelects();
+  hitungSimulasiRnd();
+  document.getElementById('rndDetailHasil').style.display = 'none';
+  showAlert('Form R&D direset', 'success');
+}
+
+function simpanRndAsResep() {
+  if (userRole !== 'admin-full') {
+    showAlert('Hanya admin full yang bisa menyimpan resep!', 'error');
+    return;
+  }
+  const nama = document.getElementById('rndFormulaNama').value.trim();
+  const bj = parseFloat(document.getElementById('rndFormulaBj').value) || 1.025;
+  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
+  const items = [];
+  let totalPersen = 0;
+  rows.forEach(row => {
+    const bahanId = row.querySelector('.rnd-bahan').value;
+    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
+    if (bahanId && persen > 0) {
+      items.push({ bahanId, persen, step: items.length + 1, isLarutan: false, konsentrasiLarutan: 0 });
+      totalPersen += persen;
+    }
+  });
+  if (!nama) { showAlert('Masukkan nama formula!', 'error'); return; }
+  if (items.length === 0) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
+  if (Math.abs(totalPersen - 100) > 0.01) {
+    showAlert('Total persentase harus 100%! Saat ini ' + totalPersen.toFixed(2) + '%', 'error');
+    return;
+  }
+  if (data.formulasi.find(f => f.nama.toLowerCase() === nama.toLowerCase())) {
+    if (!confirm('Formula dengan nama "' + nama + '" sudah ada. Timpa?')) return;
+    const existing = data.formulasi.find(f => f.nama.toLowerCase() === nama.toLowerCase());
+    existing.items = items;
+    existing.bj = bj;
+    showAlert('✅ Formula "' + nama + '" berhasil diupdate!');
+  } else {
+    const id = genId();
+    data.formulasi.push({
+      id,
+      nama,
+      bj,
+      caraPembuatan: `Formula dari R&D\nTotal bahan: ${items.length}\nDibuat: ${new Date().toLocaleString()}`,
+      items
+    });
+    logAudit('create', 'formulasi', id, `Formula ${nama} dibuat dari R&D`, '');
+    showAlert('✅ Formula "' + nama + '" berhasil disimpan sebagai resep!');
+  }
+  renderAll();
+}
+
+function produksiDariRnd() {
+  if (userRole !== 'admin-full' && userRole !== 'atasan' && userRole !== 'operasional') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
+  const nama = document.getElementById('rndFormulaNama').value.trim();
+  const bj = parseFloat(document.getElementById('rndFormulaBj').value) || 1.025;
+  const totalBerat = parseFloat(document.getElementById('rndTotalBerat').value) || 0;
+  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
+  const items = [];
+  let totalPersen = 0;
+  rows.forEach(row => {
+    const bahanId = row.querySelector('.rnd-bahan').value;
+    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
+    if (bahanId && persen > 0) {
+      items.push({ bahanId, persen });
+      totalPersen += persen;
+    }
+  });
+  if (items.length === 0) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
+  if (Math.abs(totalPersen - 100) > 0.01) {
+    showAlert('Total persentase harus 100%!', 'error');
+    return;
+  }
+  if (totalBerat <= 0) { showAlert('Masukkan total berat yang valid!', 'error'); return; }
+
+  let cukup = true, pesan = '';
+  const kebutuhan = [];
+  items.forEach(it => {
+    const b = getBahan(it.bahanId);
+    if (!b) return;
+    const butuhStok = (it.persen / 100) * totalBerat;
+    if (b.stok < butuhStok) { cukup = false; pesan += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
+    kebutuhan.push({ bahanId: it.bahanId, persen: it.persen, jumlahStok: butuhStok, satuanDasar: b.satuanDasar });
+  });
+  if (!cukup) { showAlert('Stok tidak cukup!\n' + pesan, 'error'); return; }
+
+  kebutuhan.forEach(k => {
+    const b = getBahan(k.bahanId);
+    if (b) b.stok -= k.jumlahStok;
+  });
+
+  let totalBiaya = 0;
+  kebutuhan.forEach(k => {
+    const b = getBahan(k.bahanId);
+    if (b) {
+      const harga = getHargaRataRataBahan(b.id);
+      totalBiaya += k.jumlahStok * harga;
+    }
+  });
+
+  const prodId = genId();
+  const liter = totalBerat / bj;
+  data.produksi.push({
+    id: prodId,
+    formulasiId: null,
+    jumlahLiter: liter,
+    tanggal: todayStr(),
+    status: 'proses',
+    biayaBahan: totalBiaya,
+    biayaKemasan: 0,
+    bj: bj,
+    beratTotal: totalBerat,
+    sisaLiter: liter,
+    bahanDigunakan: kebutuhan.map(k => ({ bahanId: k.bahanId, jumlahStok: k.jumlahStok, satuanDasar: k.satuanDasar })),
+    opsiBiayaOperasional: '15',
+    nilaiManualOps: 0,
+    createdBy: getAuditUser(),
+    createdAt: getAuditTime(),
+    rndFormula: {
+      nama: nama || 'Formula R&D',
+      items: items.map(it => ({ bahanId: it.bahanId, persen: it.persen }))
+    }
+  });
+
+  logAudit('create', 'produksi', prodId, `Produksi dari R&D ${nama || 'tanpa nama'} ${liter}L, biaya bahan ${rupiah(totalBiaya)}`, '');
+  renderAll();
+  navigateTo('produksi');
+  setTimeout(() => {
+    const tabBar = document.querySelector('#page-produksi .tab-bar');
+    if (tabBar) {
+      const btns = tabBar.querySelectorAll('button[data-tab]');
+      btns.forEach(b => b.classList.remove('active'));
+      const target = tabBar.querySelector('button[data-tab="produksi-buat"]');
+      if (target) target.classList.add('active');
+      const contents = document.querySelectorAll('#page-produksi .tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+      const content = document.getElementById('tab-produksi-buat');
+      if (content) content.classList.add('active');
+    }
+    document.getElementById('produksiLiter').value = liter.toFixed(2);
+  }, 200);
+  showAlert(`✅ Produksi ${liter.toFixed(2)} L berhasil dibuat dari R&D!`);
+}
+
+// ================================================================
 // HARGA SIMULASI
 // ================================================================
 function renderHargaSimulasi() {
@@ -4381,7 +4723,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v3.7 - FULL FIXED: Grouping stok, semua fitur berfungsi');
+console.log('🧼 SI.BERSIH v3.8 - FULL FIXED: Grouping stok + R&D Simulation');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
