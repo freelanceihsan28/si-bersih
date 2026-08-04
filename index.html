@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>SI.BERSIH - Manajemen Usaha Sabun</title>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNJLkJFUlNJSCAtIE1hbmFqZW1lbiBVc2FoYSBTYWJ1biIsCiAgInNob3J0X25hbWUiOiAiU0kuQkVSU0lIIiwKICAiZGVzY3JpcHRpb24iOiAiQXBsaWthc2kgbWFuYWplbWVuIHVzYWhhIHNhYnVuIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM4RDZFNjMiLAogICJ0aGVtZV9jb2xvciI6ICIjOEQ2RTYzIiwKICAic2NvcGUiOiAiLiIsCiAgImljb25zIjogWwogICAgeyAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDUxMiA1MTInPjxyZWN0IHdpZHRoPSc1MTInIGhlaWdodD0nNTEyJyByeD0nNjAnIGZpbGw9JyM4RDZFNjMnLz48dGV4dCB4PScyNTYnIHk9JzM0MCcgZm9udC1zaXplPScyODAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyNmZmYnIGZvbnQtZmFtaWx5PSdzYW5zLXNlcmlmJz7wn4+8PC90ZXh0Pjwvc3ZnPiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAic2l6ZXMiOiAiNTEyeDUxMiIgfQogIF0KfQ==" />
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNJLkJFUlNJSCAtIE1hbmFqZW1lbiBVc2FoYSBTYWJ1biIsCiAgInNob3J0X25hbWUiOiAiU0kuQkVSU0lIIiwKICAiZGVzY3JpcHRpb24iOiAiQXBsaWthc2kgbWFuYWplbWVuIHVzYWhhIHNhYnVuIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM4RDZFNjMiLAogICJ0aGVtZV9jb2xvciI6ICI4RDZFNjMiLAogICJzY29wZSI6ICIuIiwKICAiaWNvbnMiOiBbCiAgICB7ICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIHJ4PSc2MCcgZmlsbD0nIzhENkU2MycvPjx0ZXh0IHg9JzI1NicgeT0nMzQwJyBmb250LXNpemU9JzI4MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nI2ZmZicgZm9udC1mYW1pbHk9J3NhbnMtc2VyaWYnPvCfи8vPC90ZXh0Pjwvc3ZnPiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAic2l6ZXMiOiAiNTEyeDUxMiIgfQogIF0KfQ==" />
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='60' fill='%238D6E63'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E%F0%9F%A7%BC%3C/text%3E%3C/svg%3E" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -741,27 +741,9 @@
     }
     .purchase-summary .total-label { font-weight: 700; color: #6D4C41; }
     .purchase-summary .total-value { font-weight: 800; color: #6D4C41; font-size: 1.2rem; }
-    .rnd-item-row {
-      background: white;
-      border: 1px solid #ede7e1;
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: flex-end;
-    }
-    .rnd-item-row .form-group { flex: 1 1 140px; min-width: 100px; margin-bottom: 0; }
-    .rnd-item-row .form-group label { font-size: 0.65rem; }
-    .rnd-item-row .form-group input, .rnd-item-row .form-group select { padding: 6px 10px; font-size: 0.8rem; }
-    #rndItemsContainer { margin-bottom: 12px; }
-    .rnd-konsentrasi-group { display: none; }
-    .rnd-konsentrasi-group.show { display: block; }
   </style>
 </head>
 <body>
-
 <!-- LOGIN -->
 <div id="loginOverlay">
   <div id="loginBox">
@@ -794,7 +776,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v3.9</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v3.6</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -824,9 +806,6 @@
       <a data-page="simulasi" class="role-admin-full role-atasan role-investor">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/><path d="M12 7v5l3 3"/></svg></span> Simulasi
       </a>
-      <a data-page="simulasi-rnd" class="role-admin-full role-atasan">
-        <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg></span> Simulasi R&D
-      </a>
       <a data-page="hargasimulasi" class="admin-only" style="display:none;">
         <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span> Harga Simulasi
       </a>
@@ -835,8 +814,7 @@
       </a>
     </div>
   </nav>
-
-  <!-- DASHBOARD -->
+    <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -870,7 +848,8 @@
       </div>
     </div>
   </div>
-    <!-- STOK BAHAN -->
+
+  <!-- STOK BAHAN -->
   <div class="page" id="page-stok">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="19" cy="12" r="2"/></svg>
@@ -959,8 +938,7 @@
       </div>
     </div>
   </div>
-
-  <!-- PERALATAN -->
+    <!-- PERALATAN -->
   <div class="page" id="page-peralatan">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -982,7 +960,8 @@
       </table>
     </div>
   </div>
-    <!-- PRODUKSI -->
+
+  <!-- PRODUKSI -->
   <div class="page" id="page-produksi">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
@@ -1151,8 +1130,7 @@
       </table>
     </div>
   </div>
-
-  <!-- LAPORAN -->
+    <!-- LAPORAN -->
   <div class="page" id="page-laporan">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M21 12v4a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h7"/><path d="M15 6h6"/><path d="M18 3v6"/><path d="M8 11l3 3 6-6"/></svg>
@@ -1265,86 +1243,6 @@
       Hitung Simulasi
     </button>
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
-  </div>
-
-  <!-- SIMULASI R&D -->
-  <div class="page" id="page-simulasi-rnd">
-    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><circle cx="12" cy="12" r="3"/></svg>
-      Simulasi R&D
-    </h2>
-    <p class="text-muted" style="margin-bottom:16px;">
-      Buat formula baru dengan menentukan persentase setiap bahan. Total persentase harus 100%.
-      Harga bahan otomatis menggunakan harga rata-rata (admin) atau harga simulasi (non-admin).
-      <strong>Ceklis "Larutan" jika bahan berupa larutan dengan konsentrasi tertentu.</strong>
-    </p>
-
-    <div class="form-row">
-      <div style="width:100%;">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-          <div style="flex:1; min-width:150px;">
-            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Nama Formula</label>
-            <input type="text" id="rndFormulaNama" placeholder="Contoh: Sabun Cair Premium" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;">
-          </div>
-          <div style="flex:1; min-width:150px;">
-            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Berat Jenis (kg/L)</label>
-            <input type="number" id="rndFormulaBj" step="0.001" value="1.025" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;">
-          </div>
-          <div style="flex:0 0 150px;">
-            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Total Berat (kg)</label>
-            <input type="number" id="rndTotalBerat" step="0.1" placeholder="1" value="1" style="width:100%; padding:8px 12px; border:1.5px solid #e0d6ce; border-radius:8px;" oninput="hitungSimulasiRnd()">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div style="width:100%;">
-        <strong style="color:#6D4C41;">🧪 Daftar Bahan</strong>
-        <span class="text-muted" style="font-size:0.75rem; margin-left:10px;">Total persentase harus 100%</span>
-        <div id="rndItemsContainer" style="margin-top:8px;">
-          <div class="rnd-item-row" data-rnd-index="0">
-            <div class="form-group"><label>Bahan</label><select class="rnd-bahan" style="width:100%;" onchange="updateRndHarga(this)"></select></div>
-            <div class="form-group"><label>Persentase (%)</label><input type="number" class="rnd-persen" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
-            <div class="form-group"><label>Harga/kg (Rp)</label><input type="number" class="rnd-harga" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
-            <div class="form-group" style="flex:0 0 70px;">
-              <label style="font-size:0.65rem;">Larutan</label>
-              <input type="checkbox" class="rnd-larutan" onchange="toggleRndLarutan(this)" style="width:18px;height:18px;margin-top:4px;accent-color:#8D6E63;">
-            </div>
-            <div class="form-group rnd-konsentrasi-group" style="display:none; flex:0 0 100px;">
-              <label style="font-size:0.65rem;">Konsentrasi (%)</label>
-              <input type="number" class="rnd-konsentrasi" step="0.1" placeholder="20" value="20" oninput="hitungSimulasiRnd()" style="width:100%; padding:6px 10px; border:1.5px solid #e0d6ce; border-radius:8px;">
-            </div>
-            <div class="form-group" style="flex:0 0 36px; min-width:36px;">
-              <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeRndItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-info btn-sm" onclick="addRndItem()" style="margin-top:8px;">➕ Tambah Bahan</button>
-        <div style="margin-top:10px; display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
-          <span style="font-weight:700; color:#6D4C41;">Total Persentase: <span id="rndTotalPersen" style="color:#C62828;">0%</span></span>
-          <span style="font-weight:700; color:#6D4C41;">Total Biaya Bahan: <span id="rndTotalBiaya">Rp 0</span></span>
-          <span style="font-weight:700; color:#6D4C41;">Biaya per kg: <span id="rndBiayaPerKg">Rp 0</span></span>
-        </div>
-      </div>
-    </div>
-
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-      <button class="btn btn-primary" onclick="simpanRndAsResep()">
-        <span class="icon"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span>
-        💾 Simpan sebagai Resep
-      </button>
-      <button class="btn btn-success" onclick="produksiDariRnd()">
-        <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/></svg></span>
-        🏭 Produksi Langsung
-      </button>
-      <button class="btn btn-warning" onclick="resetRndForm()">
-        <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span>
-        Reset Form
-      </button>
-    </div>
-
-    <div id="rndDetailHasil" style="margin-top:20px; display:none; background:#faf7f4; padding:16px; border-radius:12px; border:1px solid #ede7e1;"></div>
   </div>
 
   <!-- HARGA SIMULASI -->
@@ -1750,8 +1648,8 @@ function showApp() {
   });
 
   const roleMenus = {
-    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','simulasi-rnd','hargasimulasi','audit'],
-    'atasan': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','simulasi-rnd'],
+    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','hargasimulasi','audit'],
+    'atasan': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi'],
     'investor': ['dashboard','peralatan','penjualan','laporan','simulasi'],
     'operasional': ['dashboard','stok','produksi'],
     'adm': ['dashboard','peralatan','penjualan','laporan','produksi']
@@ -1763,7 +1661,6 @@ function showApp() {
   });
   document.querySelector('.menu-dropdown a[data-page="audit"]').style.display = (userRole === 'admin-full') ? 'flex' : 'none';
   document.querySelector('.menu-dropdown a[data-page="hargasimulasi"]').style.display = (userRole === 'admin-full') ? 'flex' : 'none';
-  document.querySelector('.menu-dropdown a[data-page="simulasi-rnd"]').style.display = (userRole === 'admin-full' || userRole === 'atasan') ? 'flex' : 'none';
   navigateTo('dashboard');
 }
 function navigateTo(page) {
@@ -2004,7 +1901,6 @@ function addItem() {
   row.querySelector('.item-bahan').innerHTML = opts;
   hitungTotalPembelian();
 }
-
 function populateItemBahanSelects() {
   const selects = document.querySelectorAll('.item-bahan');
   const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
@@ -2014,7 +1910,6 @@ function populateItemBahanSelects() {
     if (currentVal) sel.value = currentVal;
   });
 }
-
 function removeItem(btn) {
   const row = btn.closest('.item-row');
   if (document.querySelectorAll('.item-row').length <= 1) {
@@ -2034,7 +1929,6 @@ function hitungTotalPembelian() {
   const total = subtotal + ongkir;
   document.getElementById('grandTotalDisplay').textContent = rupiah(total);
 }
-
 function beliBahanMulti() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -2241,8 +2135,7 @@ function hapusModal(id) {
   renderAll();
   showAlert('✅ Catatan modal berhasil dihapus.');
 }
-
-// ================================================================
+  // ================================================================
 // RENDER ALL
 // ================================================================
 function renderAll() {
@@ -2263,15 +2156,13 @@ function renderAll() {
   checkStokWarnings();
   updateSimulasiDropdowns();
   populateItemBahanSelects();
-  populateRndBahanSelects();
   saveDataToFirestore();
 }
 
 // ================================================================
-// DASHBOARD (DENGAN GROUPING)
+// DASHBOARD
 // ================================================================
 function renderDashboard() {
-  // ---- GROUPING KEMASAN ----
   const grouped = {};
   data.kemasan.forEach(k => {
     const prod = getProduksi(k.produksiId);
@@ -2299,7 +2190,6 @@ function renderDashboard() {
     </tr>`;
   }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada kemasan.</td></tr>';
 
-  // ---- MODAL SUMMARY ----
   const modalPerPemberi = {};
   data.modalTambahan.forEach(m => {
     if (!modalPerPemberi[m.pemberi]) modalPerPemberi[m.pemberi] = 0;
@@ -2481,7 +2371,7 @@ function tambahBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN (sama seperti sebelumnya, tidak diubah)
+// STOK KEMASAN
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -2650,562 +2540,208 @@ function hitungTotalKemasan() {
 }
 
 // ================================================================
-// FORMULASI, PRODUKSI, PENGEMASAN, PENJUALAN, LAPORAN, DLL.
-// ================================================================
-// (Semua fungsi lainnya di sini - sama seperti sebelumnya, tidak diubah)
-
-// ================================================================
-// SIMULASI R&D - DENGAN LARUTAN
-// ================================================================
-function toggleRndLarutan(checkbox) {
-  const row = checkbox.closest('.rnd-item-row');
-  const konsentrasiGroup = row.querySelector('.rnd-konsentrasi-group');
-  if (checkbox.checked) {
-    konsentrasiGroup.classList.add('show');
-    konsentrasiGroup.style.display = 'block';
-  } else {
-    konsentrasiGroup.classList.remove('show');
-    konsentrasiGroup.style.display = 'none';
-  }
-  hitungSimulasiRnd();
-}
-
-function populateRndBahanSelects() {
-  const selects = document.querySelectorAll('.rnd-bahan');
-  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama} (${b.satuanDasar})</option>`).join('');
-  selects.forEach(sel => {
-    const currentVal = sel.value;
-    sel.innerHTML = opts;
-    if (currentVal) sel.value = currentVal;
-  });
-}
-
-function addRndItem() {
-  const container = document.getElementById('rndItemsContainer');
-  const row = document.createElement('div');
-  row.className = 'rnd-item-row';
-  row.dataset.rndIndex = container.children.length;
-  row.innerHTML = `
-    <div class="form-group"><label>Bahan</label><select class="rnd-bahan" style="width:100%;" onchange="updateRndHarga(this)"></select></div>
-    <div class="form-group"><label>Persentase (%)</label><input type="number" class="rnd-persen" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
-    <div class="form-group"><label>Harga/kg (Rp)</label><input type="number" class="rnd-harga" step="0.01" placeholder="0" oninput="hitungSimulasiRnd()"></div>
-    <div class="form-group" style="flex:0 0 70px;">
-      <label style="font-size:0.65rem;">Larutan</label>
-      <input type="checkbox" class="rnd-larutan" onchange="toggleRndLarutan(this)" style="width:18px;height:18px;margin-top:4px;accent-color:#8D6E63;">
-    </div>
-    <div class="form-group rnd-konsentrasi-group" style="display:none; flex:0 0 100px;">
-      <label style="font-size:0.65rem;">Konsentrasi (%)</label>
-      <input type="number" class="rnd-konsentrasi" step="0.1" placeholder="20" value="20" oninput="hitungSimulasiRnd()" style="width:100%; padding:6px 10px; border:1.5px solid #e0d6ce; border-radius:8px;">
-    </div>
-    <div class="form-group" style="flex:0 0 36px; min-width:36px;">
-      <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeRndItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
-    </div>
-  `;
-  container.appendChild(row);
-  populateRndBahanSelects();
-  const sel = row.querySelector('.rnd-bahan');
-  if (sel) updateRndHarga(sel);
-  hitungSimulasiRnd();
-}
-
-function removeRndItem(btn) {
-  const row = btn.closest('.rnd-item-row');
-  if (document.querySelectorAll('.rnd-item-row').length <= 1) {
-    showAlert('Minimal satu bahan harus ada.', 'warning');
-    return;
-  }
-  row.remove();
-  hitungSimulasiRnd();
-}
-
-function updateRndHarga(select) {
-  const row = select.closest('.rnd-item-row');
-  const hargaInput = row.querySelector('.rnd-harga');
-  const bahanId = select.value;
-  if (!bahanId) { hargaInput.value = ''; return; }
-  const harga = getHargaBahanForRole(bahanId);
-  hargaInput.value = harga > 0 ? harga : '';
-  hitungSimulasiRnd();
-}
-
-function hitungSimulasiRnd() {
-  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
-  let totalPersen = 0;
-  let totalBiaya = 0;
-  const totalBerat = parseFloat(document.getElementById('rndTotalBerat').value) || 0;
-  const details = [];
-
-  rows.forEach(row => {
-    const bahanId = row.querySelector('.rnd-bahan').value;
-    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
-    const harga = parseFloat(row.querySelector('.rnd-harga').value) || 0;
-    const isLarutan = row.querySelector('.rnd-larutan').checked;
-    const konsentrasi = parseFloat(row.querySelector('.rnd-konsentrasi').value) || 0;
-    const b = getBahan(bahanId);
-    totalPersen += persen;
-    if (b && totalBerat > 0 && persen > 0) {
-      let butuhAktif = (persen / 100) * totalBerat;
-      let beratItem = butuhAktif;
-      if (isLarutan && konsentrasi > 0) {
-        beratItem = butuhAktif / (konsentrasi / 100);
-      }
-      const biayaItem = beratItem * harga;
-      totalBiaya += biayaItem;
-      details.push({ 
-        nama: b.nama, 
-        persen, 
-        berat: beratItem, 
-        harga, 
-        biaya: biayaItem,
-        isLarutan,
-        konsentrasi,
-        butuhAktif
-      });
-    }
-  });
-
-  document.getElementById('rndTotalPersen').textContent = totalPersen.toFixed(2) + '%';
-  document.getElementById('rndTotalPersen').style.color = Math.abs(totalPersen - 100) < 0.01 ? '#2E7D32' : '#C62828';
-  document.getElementById('rndTotalBiaya').textContent = rupiah(totalBiaya);
-  const biayaPerKg = totalBerat > 0 ? totalBiaya / totalBerat : 0;
-  document.getElementById('rndBiayaPerKg').textContent = rupiah(biayaPerKg);
-
-  const detailDiv = document.getElementById('rndDetailHasil');
-  if (details.length > 0 && totalBerat > 0) {
-    let html = `<h4 style="color:#6D4C41;">📋 Rincian Bahan (Total ${totalBerat.toFixed(2)} kg)</h4>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Bahan</th><th>Persen</th><th>Berat (kg)</th><th>Harga/kg</th><th>Biaya</th><th>Keterangan</th></tr></thead>
-          <tbody>`;
-    details.forEach(d => {
-      let ket = '';
-      if (d.isLarutan) ket = `Larutan ${d.konsentrasi}% (Aktif ${d.butuhAktif.toFixed(3)} kg)`;
-      html += `<tr>
-        <td>${d.nama}</td>
-        <td>${d.persen.toFixed(2)}%</td>
-        <td>${d.berat.toFixed(3)}</td>
-        <td>${rupiah(d.harga)}</td>
-        <td>${rupiah(d.biaya)}</td>
-        <td style="font-size:0.7rem;color:#8D6E63;">${ket}</td>
-      </tr>`;
-    });
-    html += `</tbody></table></div>`;
-    html += `<div style="margin-top:10px;font-weight:700;color:#6D4C41;">Total Biaya: ${rupiah(totalBiaya)} | Biaya per kg: ${rupiah(biayaPerKg)}</div>`;
-    if (Math.abs(totalPersen - 100) < 0.01) {
-      html += `<div style="margin-top:8px;color:#2E7D32;font-weight:700;">✅ Total persentase 100%</div>`;
-    } else {
-      html += `<div style="margin-top:8px;color:#C62828;font-weight:700;">⚠️ Total persentase ${totalPersen.toFixed(2)}%, harus 100%</div>`;
-    }
-    detailDiv.innerHTML = html;
-    detailDiv.style.display = 'block';
-  } else {
-    detailDiv.style.display = 'none';
-  }
-}
-
-function resetRndForm() {
-  document.getElementById('rndFormulaNama').value = '';
-  document.getElementById('rndFormulaBj').value = '1.025';
-  document.getElementById('rndTotalBerat').value = '1';
-  const container = document.getElementById('rndItemsContainer');
-  while (container.children.length > 1) container.lastChild.remove();
-  const firstRow = container.querySelector('.rnd-item-row');
-  if (firstRow) {
-    firstRow.querySelector('.rnd-bahan').value = '';
-    firstRow.querySelector('.rnd-persen').value = '';
-    firstRow.querySelector('.rnd-harga').value = '';
-    const konsGroup = firstRow.querySelector('.rnd-konsentrasi-group');
-    konsGroup.classList.remove('show');
-    konsGroup.style.display = 'none';
-    firstRow.querySelector('.rnd-larutan').checked = false;
-  }
-  populateRndBahanSelects();
-  hitungSimulasiRnd();
-  document.getElementById('rndDetailHasil').style.display = 'none';
-  showAlert('Form R&D direset', 'success');
-}
-
-function simpanRndAsResep() {
-  if (userRole !== 'admin-full') {
-    showAlert('Hanya admin full yang bisa menyimpan resep!', 'error');
-    return;
-  }
-  const nama = document.getElementById('rndFormulaNama').value.trim();
-  const bj = parseFloat(document.getElementById('rndFormulaBj').value) || 1.025;
-  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
-  const items = [];
-  let totalPersen = 0;
-  rows.forEach(row => {
-    const bahanId = row.querySelector('.rnd-bahan').value;
-    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
-    const isLarutan = row.querySelector('.rnd-larutan').checked;
-    const konsentrasiLarutan = parseFloat(row.querySelector('.rnd-konsentrasi').value) || 0;
-    if (bahanId && persen > 0) {
-      items.push({ bahanId, persen, step: items.length + 1, isLarutan, konsentrasiLarutan });
-      totalPersen += persen;
-    }
-  });
-  if (!nama) { showAlert('Masukkan nama formula!', 'error'); return; }
-  if (items.length === 0) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
-  if (Math.abs(totalPersen - 100) > 0.01) {
-    showAlert('Total persentase harus 100%! Saat ini ' + totalPersen.toFixed(2) + '%', 'error');
-    return;
-  }
-  if (data.formulasi.find(f => f.nama.toLowerCase() === nama.toLowerCase())) {
-    if (!confirm('Formula dengan nama "' + nama + '" sudah ada. Timpa?')) return;
-    const existing = data.formulasi.find(f => f.nama.toLowerCase() === nama.toLowerCase());
-    existing.items = items;
-    existing.bj = bj;
-    showAlert('✅ Formula "' + nama + '" berhasil diupdate!');
-  } else {
-    const id = genId();
-    data.formulasi.push({
-      id,
-      nama,
-      bj,
-      caraPembuatan: `Formula dari R&D\nTotal bahan: ${items.length}\nDibuat: ${new Date().toLocaleString()}`,
-      items
-    });
-    logAudit('create', 'formulasi', id, `Formula ${nama} dibuat dari R&D`, '');
-    showAlert('✅ Formula "' + nama + '" berhasil disimpan sebagai resep!');
-  }
-  renderAll();
-}
-
-function produksiDariRnd() {
-  if (userRole !== 'admin-full' && userRole !== 'atasan' && userRole !== 'operasional') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  const nama = document.getElementById('rndFormulaNama').value.trim();
-  const bj = parseFloat(document.getElementById('rndFormulaBj').value) || 1.025;
-  const totalBerat = parseFloat(document.getElementById('rndTotalBerat').value) || 0;
-  const rows = document.querySelectorAll('#rndItemsContainer .rnd-item-row');
-  const items = [];
-  let totalPersen = 0;
-  const kebutuhan = [];
-  let cukup = true, pesan = '';
-  let totalBiaya = 0;
-
-  rows.forEach(row => {
-    const bahanId = row.querySelector('.rnd-bahan').value;
-    const persen = parseFloat(row.querySelector('.rnd-persen').value) || 0;
-    const harga = parseFloat(row.querySelector('.rnd-harga').value) || 0;
-    const isLarutan = row.querySelector('.rnd-larutan').checked;
-    const konsentrasi = parseFloat(row.querySelector('.rnd-konsentrasi').value) || 0;
-    if (bahanId && persen > 0) {
-      items.push({ bahanId, persen, isLarutan, konsentrasi });
-      totalPersen += persen;
-    }
-  });
-  if (items.length === 0) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
-  if (Math.abs(totalPersen - 100) > 0.01) {
-    showAlert('Total persentase harus 100%!', 'error');
-    return;
-  }
-  if (totalBerat <= 0) { showAlert('Masukkan total berat yang valid!', 'error'); return; }
-
-  items.forEach(it => {
-    const b = getBahan(it.bahanId);
-    if (!b) return;
-    const butuhAktif = (it.persen / 100) * totalBerat;
-    let butuhStok = butuhAktif;
-    if (it.isLarutan && it.konsentrasi > 0) {
-      butuhStok = butuhAktif / (it.konsentrasi / 100);
-    }
-    if (b.stok < butuhStok) { cukup = false; pesan += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
-    const hargaRata = getHargaRataRataBahan(b.id);
-    totalBiaya += butuhStok * hargaRata;
-    kebutuhan.push({ bahanId: it.bahanId, persen: it.persen, jumlahStok: butuhStok, satuanDasar: b.satuanDasar, isLarutan: it.isLarutan, konsentrasi: it.konsentrasi });
-  });
-  if (!cukup) { showAlert('Stok tidak cukup!\n' + pesan, 'error'); return; }
-
-  kebutuhan.forEach(k => {
-    const b = getBahan(k.bahanId);
-    if (b) b.stok -= k.jumlahStok;
-  });
-
-  const prodId = genId();
-  const liter = totalBerat / bj;
-  data.produksi.push({
-    id: prodId,
-    formulasiId: null,
-    jumlahLiter: liter,
-    tanggal: todayStr(),
-    status: 'proses',
-    biayaBahan: totalBiaya,
-    biayaKemasan: 0,
-    bj: bj,
-    beratTotal: totalBerat,
-    sisaLiter: liter,
-    bahanDigunakan: kebutuhan.map(k => ({ bahanId: k.bahanId, jumlahStok: k.jumlahStok, satuanDasar: k.satuanDasar })),
-    opsiBiayaOperasional: '15',
-    nilaiManualOps: 0,
-    createdBy: getAuditUser(),
-    createdAt: getAuditTime(),
-    rndFormula: {
-      nama: nama || 'Formula R&D',
-      items: items.map(it => ({ bahanId: it.bahanId, persen: it.persen, isLarutan: it.isLarutan, konsentrasiLarutan: it.konsentrasi }))
-    }
-  });
-
-  logAudit('create', 'produksi', prodId, `Produksi dari R&D ${nama || 'tanpa nama'} ${liter}L, biaya bahan ${rupiah(totalBiaya)}`, '');
-  renderAll();
-  navigateTo('produksi');
-  setTimeout(() => {
-    const tabBar = document.querySelector('#page-produksi .tab-bar');
-    if (tabBar) {
-      const btns = tabBar.querySelectorAll('button[data-tab]');
-      btns.forEach(b => b.classList.remove('active'));
-      const target = tabBar.querySelector('button[data-tab="produksi-buat"]');
-      if (target) target.classList.add('active');
-      const contents = document.querySelectorAll('#page-produksi .tab-content');
-      contents.forEach(c => c.classList.remove('active'));
-      const content = document.getElementById('tab-produksi-buat');
-      if (content) content.classList.add('active');
-    }
-    document.getElementById('produksiLiter').value = liter.toFixed(2);
-  }, 200);
-  showAlert(`✅ Produksi ${liter.toFixed(2)} L berhasil dibuat dari R&D!`);
-}
-
-// ================================================================
-// TAB SWITCHING
-// ================================================================
-document.addEventListener('DOMContentLoaded', function() {
-  function initTabs(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const tabBar = container.querySelector('.tab-bar');
-    if (!tabBar) return;
-    const buttons = tabBar.querySelectorAll('button[data-tab]');
-    const contents = container.querySelectorAll('.tab-content');
-    
-    buttons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const tab = this.dataset.tab;
-        buttons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        contents.forEach(c => c.classList.remove('active'));
-        const target = container.querySelector('#tab-' + tab);
-        if (target) target.classList.add('active');
-      });
-    });
-  }
-
-  initTabs('page-stok');
-  initTabs('page-produksi');
-  initTabs('page-laporan');
-});
-
-// ================================================================
-// FUNGSI LAINNYA (renderRiwayat, renderLaporan, dll.) 
-// ================================================================
-// (Semua fungsi lainnya sama seperti sebelumnya, tidak diubah)
-// Untuk menghemat karakter, saya asumsikan Anda sudah memiliki fungsi-fungsi ini dari file sebelumnya.
-// Jika ada yang kurang, beri tahu saya.
-
-// ================================================================
-// INIT
-// ================================================================
-console.log('🧼 SI.BERSIH v3.9 - R&D dengan Larutan');
-Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
-// ================================================================
 // FORMULASI
 // ================================================================
 function renderFormulasi() {
   const tbody = document.getElementById('formTbody');
-  if (userRole === 'investor') {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-muted">🔒 Anda tidak memiliki akses untuk melihat formula.</td></tr>`;
-    document.getElementById('produksiForm').innerHTML = '<option value="">Tidak ada akses</option>';
-    return;
-  }
-  const canEdit = (userRole === 'admin-full');
-  const canView = (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan' || userRole === 'adm');
-  if (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan' || userRole === 'adm') {
-    document.getElementById('produksiForm').innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama} (BJ ${f.bj || 1.025})</option>`).join('');
-  } else {
-    document.getElementById('produksiForm').innerHTML = '<option value="">Tidak ada akses</option>';
-  }
+  if (!tbody) return;
   tbody.innerHTML = data.formulasi.map(f => {
-    const caraPreview = f.caraPembuatan ? f.caraPembuatan.substring(0,40)+'...' : '-';
     let aksi = '';
-    if (canEdit) {
-      aksi = `
-        <button class="btn btn-warning btn-sm" onclick="editFormulasi('${f.id}')">✏️</button>
-        <button class="btn btn-info btn-sm" onclick="duplikatFormulasi('${f.id}')">📋</button>
-        <button class="btn btn-danger btn-sm" onclick="hapusForm('${f.id}')">🗑️</button>
-      `;
-    } else if (canView) {
-      aksi = '<span class="text-muted">🔒 Lihat saja</span>';
-    } else {
-      aksi = '🔒';
+    if (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan') {
+      aksi += `<button class="btn btn-warning btn-sm" onclick="editFormulasi('${f.id}')">✏️</button>`;
     }
-    return `<tr><td><strong>${f.nama}</strong></td><td>${f.bj || 1.025}</td><td class="text-muted">${caraPreview}</td><td>${aksi}</td></tr>`;
-  }).join('');
+    if (userRole === 'admin-full') {
+      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusFormulasi('${f.id}')">🗑️</button>`;
+    }
+    return `<tr>
+      <td><strong>${f.nama}</strong></td>
+      <td>${f.bj || 1.025}</td>
+      <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+        <span title="${f.caraPembuatan || ''}">${(f.caraPembuatan || '').substring(0, 30)}${(f.caraPembuatan || '').length > 30 ? '…' : ''}</span>
+      </td>
+      <td>${aksi}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada formulasi.</td></tr>';
   filterFormula();
-}
-function duplikatFormulasi(id) {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  const f = getFormulasi(id);
-  if (!f) return;
-  const newId = genId();
-  data.formulasi.push({ id: newId, nama: f.nama + ' (copy)', bj: f.bj, caraPembuatan: f.caraPembuatan, items: f.items.map(it => ({...it})) });
-  logAudit('create', 'formulasi', newId, `Duplikat dari ${f.nama}`, '');
-  renderAll();
-  setTimeout(() => editFormulasi(data.formulasi[data.formulasi.length-1].id), 100);
-  showAlert('✅ Formulasi berhasil diduplikat');
-}
-function resetFormulasiKeDefault() {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  if (!confirm('⚠️ Reset semua formulasi ke default?')) return;
-  data.formulasi = getDefaultData().formulasi;
-  logAudit('update', 'formulasi', 'all', 'Reset ke default', '');
-  renderAll();
-  showAlert('✅ Formulasi direset ke default!');
 }
 function tambahFormulasi() {
   if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
-  if (!opts) { showAlert('Belum ada bahan.', 'error'); return; }
-  modal('Buat Formulasi', `
+  const bahanOpts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
+  modal('🧪 Tambah Formulasi', `
     <div class="form-row">
-      <div class="form-group"><label>Nama Formulasi</label><input id="modalFormNama" placeholder="Sabun Cair"></div>
-      <div class="form-group"><label>Berat Jenis (kg/L)</label><input type="number" id="modalFormBj" step="0.001" placeholder="1.025" value="1.025"></div>
+      <div class="form-group"><label>Nama Formulasi</label><input id="fNama" placeholder="Sabun Cair"></div>
+      <div class="form-group"><label>BJ (kg/L)</label><input id="fBj" type="number" step="0.001" value="1.025"></div>
     </div>
-    <div id="formItems">
-      <div class="form-row">
-        <div class="form-group"><label>Bahan</label><select class="fbahan">${opts}</select></div>
-        <div class="form-group"><label>Persentase (%)</label><input type="number" class="fpersen" placeholder="15" step="0.1"></div>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" class="flarutan" onchange="toggleLarutanField(this)">
-            <label>Larutan</label>
-          </div>
-          <div class="larutan-field"><input type="number" class="fkonsentrasiLarutan" placeholder="Konsentrasi %" step="0.1" value="20"></div>
-        </div>
-        <div class="form-group"><label>Urutan Step</label><input type="number" class="fstep" placeholder="1" value="1" step="1"></div>
-        <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
+    <div class="form-row">
+      <div class="form-group" style="flex:1 1 100%;"><label>Cara Pembuatan (resep)</label>
+        <textarea id="fCara" rows="6" placeholder="Tulis langkah-langkah..."></textarea>
       </div>
     </div>
-    <button class="btn btn-primary btn-sm" onclick="tambahItemForm()">+ Tambah bahan</button>
-    <div class="form-row mt-2">
-      <div class="form-group" style="flex:1 1 100%;"><label>Cara Pembuatan</label><textarea id="modalCaraPembuatan" rows="6" placeholder="Tulis langkah-langkah..."></textarea></div>
+    <div style="margin-top:10px;">
+      <h4 style="color:#6D4C41;">🧪 Komposisi Bahan</h4>
+      <div id="formulaItemsContainer">
+        <div class="item-row formula-item">
+          <div class="form-group"><label>Bahan</label><select class="f-bahan" style="width:100%;">${bahanOpts}</select></div>
+          <div class="form-group"><label>Persen (%)</label><input type="number" class="f-persen" step="0.1" placeholder="0" style="width:80px;"></div>
+          <div class="form-group" style="flex:0 0 120px;">
+            <label>Larutan?</label>
+            <div class="checkbox-group"><input type="checkbox" class="f-larutan" onchange="toggleLarutanField(this)"> <label>Ya</label></div>
+          </div>
+          <div class="form-group f-konsentrasi" style="display:none; flex:0 0 100px;">
+            <label>Konsentrasi (%)</label><input type="number" class="f-konsentrasi-input" step="0.1" placeholder="20" style="width:80px;">
+          </div>
+          <div class="form-group" style="flex:0 0 36px;">
+            <button class="btn btn-danger btn-sm" onclick="removeFormulaItem(this)" style="margin-top:18px;">✕</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-info btn-sm" onclick="addFormulaItem()">➕ Tambah Bahan</button>
     </div>
-    <div class="text-muted mt-2">* Persentase = % dari total berat produk.</div>
+    <p class="text-muted" style="margin-top:10px;">Persen dari total berat produksi (liter × BJ). Untuk larutan, masukkan konsentrasi larutan (misal 20 untuk NaOH 20%).</p>
   `, () => {
-    const nama = document.getElementById('modalFormNama').value.trim();
-    const bj = parseFloat(document.getElementById('modalFormBj').value) || 1.025;
-    const caraPembuatan = document.getElementById('modalCaraPembuatan').value.trim();
-    if (!nama) { showAlert('Nama wajib diisi!', 'error'); return; }
+    const nama = document.getElementById('fNama').value.trim();
+    const bj = parseFloat(document.getElementById('fBj').value) || 1.025;
+    const cara = document.getElementById('fCara').value.trim();
+    if (!nama) { showAlert('Nama formulasi wajib diisi!', 'error'); return; }
+
     const items = [];
-    document.querySelectorAll('#formItems .form-row').forEach(row => {
-      const bahanId = row.querySelector('.fbahan').value;
-      const persen = parseFloat(row.querySelector('.fpersen').value);
-      const step = parseInt(row.querySelector('.fstep').value) || 99;
-      const isLarutan = row.querySelector('.flarutan').checked;
-      const konsentrasiLarutan = parseFloat(row.querySelector('.fkonsentrasiLarutan').value) || 0;
-      if (bahanId && persen > 0) items.push({ bahanId, persen, step, isLarutan, konsentrasiLarutan });
+    const rows = document.querySelectorAll('#formulaItemsContainer .formula-item');
+    let valid = true;
+    rows.forEach(row => {
+      const bahanId = row.querySelector('.f-bahan').value;
+      const persen = parseFloat(row.querySelector('.f-persen').value);
+      const isLarutan = row.querySelector('.f-larutan').checked;
+      const konsentrasi = parseFloat(row.querySelector('.f-konsentrasi-input').value) || 0;
+      if (!bahanId || isNaN(persen) || persen <= 0) { valid = false; return; }
+      items.push({ bahanId, persen, step: items.length + 1, isLarutan, konsentrasiLarutan: isLarutan ? konsentrasi : 0 });
     });
-    if (!items.length) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
+    if (!valid || items.length === 0) { showAlert('Tambahkan minimal satu bahan dengan persen > 0!', 'error'); return; }
+
     const id = genId();
-    data.formulasi.push({ id, nama, bj, caraPembuatan, items });
-    logAudit('create', 'formulasi', id, `Formulasi ${nama} dibuat dengan ${items.length} item`, '');
+    data.formulasi.push({ id, nama, bj, caraPembuatan: cara, items });
+    logAudit('create', 'formulasi', id, `Formulasi ${nama} ditambahkan`, '');
     renderAll();
-    showAlert('✅ Formulasi "' + nama + '" berhasil dibuat!');
+    showAlert('✅ Formulasi "' + nama + '" berhasil ditambahkan!');
   });
 }
-function tambahItemForm() {
-  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
-  const container = document.getElementById('formItems');
-  const row = document.createElement('div');
-  row.className = 'form-row';
-  row.innerHTML = `
-    <div class="form-group"><select class="fbahan">${opts}</select></div>
-    <div class="form-group"><input type="number" class="fpersen" placeholder="Persentase" step="0.1"></div>
-    <div class="form-group">
-      <div class="checkbox-group">
-        <input type="checkbox" class="flarutan" onchange="toggleLarutanField(this)">
-        <label>Larutan</label>
-      </div>
-      <div class="larutan-field"><input type="number" class="fkonsentrasiLarutan" placeholder="Konsentrasi %" step="0.1" value="20"></div>
-    </div>
-    <div class="form-group"><input type="number" class="fstep" placeholder="1" value="1" step="1"></div>
-    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
-  `;
-  container.appendChild(row);
+function toggleLarutanField(chk) {
+  const row = chk.closest('.formula-item');
+  const konsentrasiDiv = row.querySelector('.f-konsentrasi');
+  if (chk.checked) {
+    konsentrasiDiv.style.display = 'block';
+  } else {
+    konsentrasiDiv.style.display = 'none';
+    row.querySelector('.f-konsentrasi-input').value = '';
+  }
 }
-function toggleLarutanField(checkbox) {
-  const row = checkbox.closest('.form-row');
-  const field = row.querySelector('.larutan-field');
-  if (checkbox.checked) field.classList.add('show');
-  else field.classList.remove('show');
+function addFormulaItem() {
+  const container = document.getElementById('formulaItemsContainer');
+  const row = container.querySelector('.formula-item').cloneNode(true);
+  row.querySelectorAll('input').forEach(inp => inp.value = '');
+  row.querySelector('.f-larutan').checked = false;
+  row.querySelector('.f-konsentrasi').style.display = 'none';
+  container.appendChild(row);
+  const bahanOpts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
+  row.querySelector('.f-bahan').innerHTML = bahanOpts;
+}
+function removeFormulaItem(btn) {
+  const container = document.getElementById('formulaItemsContainer');
+  if (container.querySelectorAll('.formula-item').length <= 1) {
+    showAlert('Minimal satu item bahan.', 'warning');
+    return;
+  }
+  btn.closest('.formula-item').remove();
 }
 function editFormulasi(id) {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
+  if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
   const f = getFormulasi(id);
   if (!f) return;
-  const opts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
-  let itemsHtml = '';
-  f.items.forEach(it => {
-    const checked = it.isLarutan ? 'checked' : '';
-    const showLarutan = it.isLarutan ? 'show' : '';
-    const konsentrasi = it.konsentrasiLarutan || 20;
-    itemsHtml += `
-      <div class="form-row">
-        <div class="form-group"><select class="fbahan">${opts.replace(`value="${it.bahanId}"`, `value="${it.bahanId}" selected`)}</select></div>
-        <div class="form-group"><input type="number" class="fpersen" value="${it.persen||0}" step="0.1"></div>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" class="flarutan" ${checked} onchange="toggleLarutanField(this)">
-            <label>Larutan</label>
-          </div>
-          <div class="larutan-field ${showLarutan}"><input type="number" class="fkonsentrasiLarutan" placeholder="Konsentrasi %" step="0.1" value="${konsentrasi}"></div>
-        </div>
-        <div class="form-group"><input type="number" class="fstep" value="${it.step||1}" step="1"></div>
-        <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
+  const bahanOpts = data.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('');
+  let itemsHtml = f.items.map((it, idx) => {
+    const isLarutan = it.isLarutan || false;
+    return `<div class="item-row formula-item">
+      <div class="form-group"><label>Bahan</label><select class="f-bahan" style="width:100%;">${bahanOpts.replace(`value="${it.bahanId}"`, `value="${it.bahanId}" selected`)}</select></div>
+      <div class="form-group"><label>Persen (%)</label><input type="number" class="f-persen" step="0.1" value="${it.persen}" style="width:80px;"></div>
+      <div class="form-group" style="flex:0 0 120px;">
+        <label>Larutan?</label>
+        <div class="checkbox-group"><input type="checkbox" class="f-larutan" ${isLarutan ? 'checked' : ''} onchange="toggleLarutanField(this)"> <label>Ya</label></div>
       </div>
-    `;
-  });
-  modal('Edit Formulasi', `
+      <div class="form-group f-konsentrasi" style="${isLarutan ? 'display:block;' : 'display:none;'} flex:0 0 100px;">
+        <label>Konsentrasi (%)</label><input type="number" class="f-konsentrasi-input" step="0.1" value="${it.konsentrasiLarutan || 0}" style="width:80px;">
+      </div>
+      <div class="form-group" style="flex:0 0 36px;">
+        <button class="btn btn-danger btn-sm" onclick="removeFormulaItem(this)" style="margin-top:18px;">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  modal('✏️ Edit Formulasi', `
     <div class="form-row">
-      <div class="form-group"><label>Nama Formulasi</label><input id="modalFormNama" value="${f.nama}"></div>
-      <div class="form-group"><label>Berat Jenis (kg/L)</label><input type="number" id="modalFormBj" step="0.001" value="${f.bj || 1.025}"></div>
+      <div class="form-group"><label>Nama Formulasi</label><input id="fNama" value="${f.nama}"></div>
+      <div class="form-group"><label>BJ (kg/L)</label><input id="fBj" type="number" step="0.001" value="${f.bj || 1.025}"></div>
     </div>
-    <div id="formItems">${itemsHtml}</div>
-    <button class="btn btn-primary btn-sm" onclick="tambahItemForm()">+ Tambah bahan</button>
-    <div class="form-row mt-2">
-      <div class="form-group" style="flex:1 1 100%;"><label>Cara Pembuatan</label><textarea id="modalCaraPembuatan" rows="6">${f.caraPembuatan || ''}</textarea></div>
+    <div class="form-row">
+      <div class="form-group" style="flex:1 1 100%;"><label>Cara Pembuatan</label>
+        <textarea id="fCara" rows="6">${f.caraPembuatan || ''}</textarea>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <h4 style="color:#6D4C41;">🧪 Komposisi Bahan</h4>
+      <div id="formulaItemsContainer">${itemsHtml}</div>
+      <button class="btn btn-info btn-sm" onclick="addFormulaItem()">➕ Tambah Bahan</button>
     </div>
   `, () => {
-    const nama = document.getElementById('modalFormNama').value.trim();
-    const bj = parseFloat(document.getElementById('modalFormBj').value) || 1.025;
-    const caraPembuatan = document.getElementById('modalCaraPembuatan').value.trim();
+    const nama = document.getElementById('fNama').value.trim();
+    const bj = parseFloat(document.getElementById('fBj').value) || 1.025;
+    const cara = document.getElementById('fCara').value.trim();
     if (!nama) { showAlert('Nama wajib diisi!', 'error'); return; }
+
     const items = [];
-    document.querySelectorAll('#formItems .form-row').forEach(row => {
-      const bahanId = row.querySelector('.fbahan').value;
-      const persen = parseFloat(row.querySelector('.fpersen').value);
-      const step = parseInt(row.querySelector('.fstep').value) || 99;
-      const isLarutan = row.querySelector('.flarutan').checked;
-      const konsentrasiLarutan = parseFloat(row.querySelector('.fkonsentrasiLarutan').value) || 0;
-      if (bahanId && persen > 0) items.push({ bahanId, persen, step, isLarutan, konsentrasiLarutan });
+    const rows = document.querySelectorAll('#formulaItemsContainer .formula-item');
+    let valid = true;
+    rows.forEach(row => {
+      const bahanId = row.querySelector('.f-bahan').value;
+      const persen = parseFloat(row.querySelector('.f-persen').value);
+      const isLarutan = row.querySelector('.f-larutan').checked;
+      const konsentrasi = parseFloat(row.querySelector('.f-konsentrasi-input').value) || 0;
+      if (!bahanId || isNaN(persen) || persen <= 0) { valid = false; return; }
+      items.push({ bahanId, persen, step: items.length + 1, isLarutan, konsentrasiLarutan: isLarutan ? konsentrasi : 0 });
     });
-    if (!items.length) { showAlert('Tambahkan minimal satu bahan!', 'error'); return; }
-    f.nama = nama; f.bj = bj; f.caraPembuatan = caraPembuatan; f.items = items;
-    logAudit('update', 'formulasi', id, `Formulasi ${nama} diupdate`, '');
+    if (!valid || items.length === 0) { showAlert('Minimal satu bahan dengan persen > 0!', 'error'); return; }
+
+    const oldName = f.nama;
+    f.nama = nama; f.bj = bj; f.caraPembuatan = cara; f.items = items;
+    logAudit('update', 'formulasi', id, `Formulasi ${oldName} → ${nama}`, '');
     renderAll();
     showAlert('✅ Formulasi "' + nama + '" berhasil diupdate!');
   });
 }
-function hapusForm(id) {
+function hapusFormulasi(id) {
   if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  if (!confirm('⚠️ Hapus formulasi "' + getFormulasi(id)?.nama + '" ?')) return;
   const f = getFormulasi(id);
-  data.formulasi = data.formulasi.filter(f => f.id !== id);
-  logAudit('delete', 'formulasi', id, `Formulasi ${f?.nama} dihapus`, '');
+  if (!f) return;
+  const produksiTerpakai = data.produksi.filter(p => p.formulasiId === id);
+  if (produksiTerpakai.length > 0) {
+    showAlert('❌ Formulasi sedang digunakan di produksi! Hapus produksi dulu.', 'error');
+    return;
+  }
+  if (!confirm('⚠️ Hapus formulasi "' + f.nama + '"?')) return;
+  data.formulasi = data.formulasi.filter(item => item.id !== id);
+  logAudit('delete', 'formulasi', id, `Formulasi ${f.nama} dihapus`, '');
   renderAll();
-  showAlert('✅ Formulasi berhasil dihapus');
+  showAlert('✅ Formulasi dihapus.');
+}
+function resetFormulasiKeDefault() {
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
+  if (!confirm('⚠️ Reset formulasi ke default? Semua formulasi kustom akan hilang!')) return;
+  const defaultData = getDefaultData();
+  data.formulasi = defaultData.formulasi;
+  logAudit('reset', 'formulasi', 'all', 'Reset formulasi ke default', '');
+  renderAll();
+  showAlert('✅ Formulasi direset ke default.');
 }
 
 // ================================================================
@@ -3216,91 +2752,101 @@ function buatProduksi() {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  const fid = document.getElementById('produksiForm').value;
+  const formulasiId = document.getElementById('produksiForm').value;
   const liter = parseFloat(document.getElementById('produksiLiter').value);
-  if (!fid || !liter || liter <= 0) {
-    showAlert('Pilih formulasi dan masukkan liter!', 'error');
+  if (!formulasiId || !liter || liter <= 0) {
+    showAlert('Pilih formulasi dan isi liter > 0!', 'error');
     return;
   }
-  const f = getFormulasi(fid);
+  const f = getFormulasi(formulasiId);
   if (!f) { showAlert('Formulasi tidak ditemukan!', 'error'); return; }
-  const opsMode = document.getElementById('produksiOpsMode').value;
-  const opsManual = parseFloat(document.getElementById('produksiOpsManual').value) || 0;
-  const bj = f.bj || 1.025;
-  const totalBerat = liter * bj;
-  let cukup = true, pesan = '', totalBiaya = 0;
-  const sortedItems = [...f.items].sort((a,b) => (a.step||99) - (b.step||99));
-  const kebutuhan = [], bahanDigunakan = [];
-  sortedItems.forEach(it => {
+
+  const totalBerat = liter * (f.bj || 1.025);
+  let cukup = true;
+  let pesan = '';
+  f.items.forEach(it => {
     const b = getBahan(it.bahanId);
     if (!b) return;
     const persen = it.persen || 0;
-    const butuhLarutan = (persen / 100) * totalBerat;
+    let butuhLarutan = (persen / 100) * totalBerat;
     let butuhStok = butuhLarutan;
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    if (b.stok < butuhStok) { cukup = false; pesan += `${b.nama} kurang (butuh ${butuhStok.toFixed(4)} ${b.satuanDasar})\n`; }
-    const hargaRata = getHargaRataRataBahan(b.id);
-    totalBiaya += butuhStok * hargaRata;
-    kebutuhan.push({ nama: b.nama, butuhLarutan, butuhStok, satuan: b.satuanDasar, persen, step: it.step||99, isLarutan: it.isLarutan, konsentrasi: it.konsentrasiLarutan||0, bahanId: b.id });
-    bahanDigunakan.push({ bahanId: b.id, jumlahStok: butuhStok, satuanDasar: b.satuanDasar });
+    if (b.stok < butuhStok) {
+      cukup = false;
+      pesan += `\n- ${b.nama}: butuh ${butuhStok.toFixed(2)} ${b.satuanDasar}, tersisa ${b.stok.toFixed(2)}`;
+    }
   });
-  if (!cukup) { showAlert('Stok tidak cukup!\n' + pesan, 'error'); return; }
-  bahanDigunakan.forEach(k => { const b = getBahan(k.bahanId); if (b) b.stok -= k.jumlahStok; });
-  const prodId = genId();
-  data.produksi.push({
-    id: prodId,
-    formulasiId: fid,
-    jumlahLiter: liter,
-    tanggal: todayStr(),
-    status: 'proses',
-    biayaBahan: totalBiaya,
-    biayaKemasan: 0,
-    bj: bj,
-    beratTotal: totalBerat,
-    sisaLiter: liter,
-    bahanDigunakan,
-    opsiBiayaOperasional: opsMode,
-    nilaiManualOps: opsManual,
-    createdBy: getAuditUser(),
-    createdAt: getAuditTime()
-  });
-  logAudit('create', 'produksi', prodId, `Produksi ${f.nama} ${liter}L, biaya bahan ${rupiah(totalBiaya)}`, '');
-  const detailDiv = document.getElementById('produksiDetail');
-  let tabelHTML = `<div style="font-weight:700;color:#6D4C41;margin-bottom:10px;">✅ Produksi berhasil! Total Berat: ${totalBerat.toFixed(3)} kg</div>`;
-  tabelHTML += `<table class="detail-table"><thead><tr><th>Step</th><th>Bahan</th><th>Jumlah (kg/L)</th><th>Konversi (gram/mL)</th><th>Persentase</th></tr></thead><tbody>`;
-  kebutuhan.sort((a,b) => a.step - b.step).forEach(k => {
-    let jmlGram = k.butuhLarutan, satuanGram = k.satuan;
-    if (satuanGram === 'kg') { jmlGram *= 1000; satuanGram = 'gram'; } else if (satuanGram === 'L') { jmlGram *= 1000; satuanGram = 'mL'; }
-    let namaTampil = k.nama;
-    if (k.isLarutan) namaTampil += ` (Larutan ${k.konsentrasi}%)`;
-    tabelHTML += `<tr><td>${k.step}</td><td>${namaTampil}</td><td>${k.butuhLarutan.toFixed(4)} ${k.satuan}</td><td>${jmlGram.toFixed(2)} ${satuanGram}</td><td>${k.persen}%</td></tr>`;
-  });
-  tabelHTML += `</tbody></table>`;
-  if (f.caraPembuatan && f.caraPembuatan.trim() !== '') {
-    let caraText = f.caraPembuatan;
-    const nilaiUrut = [];
-    kebutuhan.sort((a,b) => a.step - b.step).forEach(k => {
-      let jml = k.butuhLarutan, sat = k.satuan;
-      if (sat === 'kg') { jml *= 1000; sat = 'gram'; } else if (sat === 'L') { jml *= 1000; sat = 'mL'; }
-      nilaiUrut.push(jml.toFixed(2) + ' ' + sat);
-    });
-    let idx = 0;
-    caraText = caraText.replace(/\.\.\.\s*(gram|mL)/g, function(match) {
-      if (idx < nilaiUrut.length) return '<strong>' + nilaiUrut[idx++] + '</strong>';
-      return match;
-    });
-    tabelHTML += `<div style="margin-top:12px;font-weight:700;color:#6D4C41;">📝 Cara Pembuatan:</div>`;
-    tabelHTML += `<div class="cara-buat">${caraText}</div>`;
-  } else {
-    tabelHTML += `<div style="margin-top:12px;padding:10px;background:#fff3e0;border-radius:8px;color:#E65100;">⚠️ Tidak ada teks "Cara Pembuatan".</div>`;
+  if (!cukup) {
+    showAlert('❌ Stok bahan tidak mencukupi:' + pesan, 'error');
+    return;
   }
-  detailDiv.innerHTML = tabelHTML;
-  detailDiv.style.display = 'block';
-  document.getElementById('produksiLiter').value = '';
+
+  f.items.forEach(it => {
+    const b = getBahan(it.bahanId);
+    if (!b) return;
+    const persen = it.persen || 0;
+    let butuhLarutan = (persen / 100) * totalBerat;
+    let butuhStok = butuhLarutan;
+    if (it.isLarutan && it.konsentrasiLarutan > 0) {
+      butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
+    }
+    const stokSebelum = b.stok;
+    b.stok -= butuhStok;
+    logAudit('update', 'bahan', b.id, `Stok ${b.nama}: ${stokSebelum} → ${b.stok} (produksi ${liter}L)`, '');
+  });
+
+  let biayaBahan = 0;
+  const isAdmin = userRole === 'admin-full';
+  f.items.forEach(it => {
+    const b = getBahan(it.bahanId);
+    if (!b) return;
+    const persen = it.persen || 0;
+    let butuhLarutan = (persen / 100) * totalBerat;
+    let butuhStok = butuhLarutan;
+    if (it.isLarutan && it.konsentrasiLarutan > 0) {
+      butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
+    }
+    const harga = isAdmin ? (b.hargaRataRata || 0) : (data.hargaSimulasi?.[it.bahanId] || 0);
+    biayaBahan += butuhStok * harga;
+  });
+
+  const opsMode = document.getElementById('produksiOpsMode').value;
+  let nilaiManualOps = 0;
+  if (opsMode === 'manual') {
+    nilaiManualOps = parseFloat(document.getElementById('produksiOpsManual').value) || 0;
+  }
+
+  const id = genId();
+  data.produksi.push({
+    id,
+    formulasiId,
+    jumlahLiter: liter,
+    bj: f.bj || 1.025,
+    status: 'proses',
+    sisaLiter: liter,
+    biayaBahan,
+    opsiBiayaOperasional: opsMode,
+    nilaiManualOps,
+    createdAt: getAuditTime(),
+    createdBy: getAuditUser()
+  });
+
+  const biayaOps = opsMode === 'manual' ? nilaiManualOps : (parseFloat(opsMode) / 100) * biayaBahan;
+  const totalBiaya = biayaBahan + biayaOps;
+  if (totalBiaya > 0) {
+    data.keuangan.pengeluaran.push({
+      id: genId(),
+      sumber: 'Produksi ' + f.nama + ' (' + liter + 'L)',
+      jumlah: totalBiaya,
+      tanggal: todayStr()
+    });
+  }
+
+  logAudit('create', 'produksi', id, `Produksi ${f.nama} ${liter}L, biaya bahan ${rupiah(biayaBahan)}`, '');
   renderAll();
-  showAlert('✅ Produksi berhasil!');
+  showAlert('✅ Produksi "' + f.nama + '" ' + liter + 'L berhasil dibuat! Biaya bahan: ' + rupiah(biayaBahan));
 }
 function selesaiProd(id) {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -3308,12 +2854,12 @@ function selesaiProd(id) {
     return;
   }
   const p = getProduksi(id);
-  if (!p) { showAlert('Produksi tidak ditemukan!', 'error'); return; }
+  if (!p) return;
+  if (p.status === 'selesai') { showAlert('Sudah selesai.', 'warning'); return; }
   p.status = 'selesai';
-  if (p.sisaLiter === undefined) p.sisaLiter = p.jumlahLiter;
-  logAudit('update', 'produksi', id, 'Status diubah menjadi selesai', '');
+  logAudit('update', 'produksi', id, `Status produksi → selesai`, '');
   renderAll();
-  showAlert('✅ Produksi ditandai selesai!');
+  showAlert('✅ Produksi selesai!');
 }
 function batalProd(id) {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -3322,407 +2868,263 @@ function batalProd(id) {
   }
   const p = getProduksi(id);
   if (!p) return;
-  if (data.kemasan.filter(k => k.produksiId === id).length > 0) {
-    showAlert('❌ Produksi sudah dikemas!','error');
-    return;
+  if (p.status === 'selesai') { showAlert('Produksi sudah selesai, tidak bisa dibatalkan.', 'warning'); return; }
+  if (!confirm('⚠️ Batalkan produksi? Stok bahan akan dikembalikan.')) return;
+
+  const f = getFormulasi(p.formulasiId);
+  if (f) {
+    const totalBerat = p.jumlahLiter * (p.bj || 1.025);
+    f.items.forEach(it => {
+      const b = getBahan(it.bahanId);
+      if (!b) return;
+      const persen = it.persen || 0;
+      let butuhLarutan = (persen / 100) * totalBerat;
+      let butuhStok = butuhLarutan;
+      if (it.isLarutan && it.konsentrasiLarutan > 0) {
+        butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
+      }
+      b.stok += butuhStok;
+    });
   }
-  if (!confirm('⚠️ Batalkan produksi? Bahan baku akan dikembalikan.')) return;
-  if (p.bahanDigunakan && p.bahanDigunakan.length > 0) {
-    p.bahanDigunakan.forEach(k => { const b = getBahan(k.bahanId); if (b) b.stok += k.jumlahStok; });
-  } else {
-    const f = getFormulasi(p.formulasiId);
-    if (f) {
-      const totalBerat = p.jumlahLiter * (p.bj || 1.025);
-      f.items.forEach(it => {
-        const b = getBahan(it.bahanId);
-        if (!b) return;
-        const persen = it.persen || 0;
-        let butuhLarutan = (persen / 100) * totalBerat;
-        if (it.isLarutan) {
-          const konsentrasi = it.konsentrasiLarutan || 0;
-          if (konsentrasi > 0) butuhLarutan = butuhLarutan * (konsentrasi / 100);
-        }
-        b.stok += butuhLarutan;
-      });
-    }
-  }
-  data.produksi = data.produksi.filter(prod => prod.id !== id);
-  logAudit('delete','produksi',id,`Produksi ${getFormulasi(p.formulasiId)?.nama} dibatalkan`,'');
+
+  data.produksi = data.produksi.filter(item => item.id !== id);
+  logAudit('delete', 'produksi', id, `Produksi dibatalkan`, '');
   renderAll();
-  showAlert('✅ Produksi dibatalkan.');
+  showAlert('✅ Produksi dibatalkan, stok dikembalikan.');
 }
 function hapusProduksiSelesai(id) {
-  if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
   const p = getProduksi(id);
-  if (!p || p.status !== 'selesai') {
-    showAlert('Hanya produksi selesai yang bisa dihapus!','error');
-    return;
+  if (!p) return;
+  if (p.status !== 'selesai') { showAlert('Hanya produksi selesai yang bisa dihapus.', 'warning'); return; }
+  if (!confirm('⚠️ Hapus produksi selesai ini? Stok kemasan yang terkait akan diperiksa.')) return;
+  const kemasanTerpakai = data.kemasan.filter(k => k.produksiId === id);
+  if (kemasanTerpakai.length > 0) {
+    if (!confirm('⚠️ Ada ' + kemasanTerpakai.length + ' jenis kemasan dari produksi ini. Hapus juga?')) return;
+    kemasanTerpakai.forEach(k => {
+      data.kemasan = data.kemasan.filter(item => item.id !== k.id);
+      const kb = getKemasanBeli(k.kemasanId);
+      if (kb) kb.stok += k.jumlahUnit;
+    });
   }
-  const kemasanTerikat = data.kemasan.filter(k => k.produksiId === id);
-  if (!confirm(`⚠️ Hapus produksi "${getFormulasi(p.formulasiId)?.nama || ''}"? ${kemasanTerikat.length > 0 ? `\n${kemasanTerikat.length} kemasan akan ikut dihapus.` : ''}`)) return;
-  if (p.bahanDigunakan && p.bahanDigunakan.length > 0) {
-    p.bahanDigunakan.forEach(k => { const b = getBahan(k.bahanId); if (b) b.stok += k.jumlahStok; });
-  } else {
-    const f = getFormulasi(p.formulasiId);
-    if (f) {
-      const totalBerat = p.jumlahLiter * (p.bj || 1.025);
-      f.items.forEach(it => {
-        const b = getBahan(it.bahanId);
-        if (!b) return;
-        const persen = it.persen || 0;
-        let butuhLarutan = (persen / 100) * totalBerat;
-        if (it.isLarutan) {
-          const konsentrasi = it.konsentrasiLarutan || 0;
-          if (konsentrasi > 0) butuhLarutan = butuhLarutan * (konsentrasi / 100);
-        }
-        b.stok += butuhLarutan;
-      });
-    }
-  }
-  kemasanTerikat.forEach(k => {
-    const kemasanItem = data.kemasanBeli.find(kb => kb.nama === k.nama);
-    if (kemasanItem) kemasanItem.stok += k.jumlahUnit;
-    data.penjualan = data.penjualan.filter(j => j.kemasanId !== k.id);
-  });
-  data.kemasan = data.kemasan.filter(k => k.produksiId !== id);
-  data.produksi = data.produksi.filter(prod => prod.id !== id);
-  logAudit('delete','produksi',id,`Produksi ${getFormulasi(p.formulasiId)?.nama} dihapus beserta ${kemasanTerikat.length} kemasan`,'');
+  data.produksi = data.produksi.filter(item => item.id !== id);
+  logAudit('delete', 'produksi', id, `Produksi selesai dihapus`, '');
   renderAll();
-  showAlert('✅ Produksi dan ' + kemasanTerikat.length + ' kemasan dihapus.');
+  showAlert('✅ Produksi selesai dihapus.');
 }
 function renderProduksi() {
-  if (userRole === 'investor') {
-    document.getElementById('produksiTbody').innerHTML = `<tr><td colspan="7" class="text-muted">🔒 Anda tidak memiliki akses ke halaman ini.</td></tr>`;
-    return;
-  }
   const tbody = document.getElementById('produksiTbody');
-  tbody.innerHTML = sortByWaktu(data.produksi).map(p => {
+  if (!tbody) return;
+  const selForm = document.getElementById('produksiForm');
+  if (selForm) {
+    selForm.innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama}</option>`).join('');
+  }
+  tbody.innerHTML = data.produksi.map(p => {
     const f = getFormulasi(p.formulasiId);
-    const sisa = p.sisaLiter !== undefined ? p.sisaLiter : p.jumlahLiter;
+    const statusBadge = p.status === 'selesai' ? 'badge-success' : 'badge-warning';
     let aksi = '';
-    if (p.status === 'proses' && (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan')) {
-      aksi = `
-        <button class="btn btn-success btn-sm" onclick="selesaiProd('${p.id}')">✅ Selesai</button>
-        <button class="btn btn-danger btn-sm" onclick="batalProd('${p.id}')">❌ Batal</button>
-      `;
-    } else if (p.status === 'selesai') {
-      const kemasanTerikat = data.kemasan.filter(k => k.produksiId === p.id);
-      const kemasanText = kemasanTerikat.length > 0 ? ` (${kemasanTerikat.length} kemasan)` : '';
-      aksi = `
-        <span class="badge badge-success">✓ Selesai${kemasanText}</span>
-        <button class="btn btn-danger btn-sm" onclick="hapusProduksiSelesai('${p.id}')" title="Hapus produksi dan kembalikan stok">🗑️</button>
-      `;
-    } else { aksi = '🔒'; }
+    if (p.status === 'proses') {
+      if (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan') {
+        aksi += `<button class="btn btn-success btn-sm" onclick="selesaiProd('${p.id}')">✅ Selesai</button>`;
+        aksi += `<button class="btn btn-danger btn-sm" onclick="batalProd('${p.id}')">✖️</button>`;
+      }
+    } else {
+      if (userRole === 'admin-full') {
+        aksi += `<button class="btn btn-danger btn-sm" onclick="hapusProduksiSelesai('${p.id}')">🗑️</button>`;
+      }
+    }
+    const biayaOps = p.opsiBiayaOperasional === 'manual' ? p.nilaiManualOps : (parseFloat(p.opsiBiayaOperasional || 15) / 100) * (p.biayaBahan || 0);
+    const totalBiaya = (p.biayaBahan || 0) + biayaOps;
     return `<tr>
-      <td>${f ? f.nama : '??'}</td>
-      <td>${p.jumlahLiter} L</td>
+      <td>${f ? f.nama : '❌'}</td>
+      <td>${p.jumlahLiter}</td>
       <td>${p.bj || 1.025}</td>
-      <td><span class="badge ${p.status === 'selesai' ? 'badge-success' : 'badge-warning'}">${p.status}</span></td>
-      <td>${sisa.toFixed(3)} L</td>
-      <td>${rupiah(p.biayaBahan || 0)}</td>
+      <td><span class="badge ${statusBadge}">${p.status}</span></td>
+      <td>${p.sisaLiter?.toFixed(2) || 0}</td>
+      <td>${rupiah(p.biayaBahan)}</td>
       <td>${aksi}</td>
     </tr>`;
-  }).join('');
-  updateKemasanProduksiDropdown();
+  }).join('') || '<tr><td colspan="7" class="text-muted">Belum ada produksi.</td></tr>';
   filterProduksi();
+  updateKemasanProduksiDropdown();
+  toggleProduksiOpsManual();
 }
 
 // ================================================================
 // PENGEMASAN
 // ================================================================
 function toggleIsiMode() {
-  const mode = document.querySelector('input[name="isiMode"]:checked').value;
-  const beratInput = document.getElementById('kemasanBeratIsi');
+  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
+  const beratIsi = document.getElementById('kemasanBeratIsi');
   const info = document.getElementById('beratPerKemasanInfo');
-  const kemasanSelect = document.getElementById('kemasanNama');
-  const selectedOption = kemasanSelect.options[kemasanSelect.selectedIndex];
-  const volumeMl = selectedOption ? parseFloat(selectedOption.dataset.volume || 0) : 0;
-  const prodSel = document.getElementById('kemasanProduksi');
-  const prodId = prodSel.value;
-  const prod = data.produksi.find(p => p.formulasiId === prodId && p.status === 'selesai');
-  const bjVal = prod ? prod.bj : 1.025;
-
-  if (mode === 'otomatis' && volumeMl > 0) {
-    const berat = volumeMl * bjVal;
-    beratInput.value = berat.toFixed(1);
-    info.textContent = `✅ Otomatis: ${volumeMl} mL × BJ ${bjVal.toFixed(3)} = ${berat.toFixed(1)} gram`;
-    beratInput.readOnly = true;
+  if (mode === 'manual') {
+    beratIsi.placeholder = 'Masukkan gram';
+    info.textContent = 'Manual: isi sesuai input';
   } else {
-    beratInput.readOnly = false;
-    if (mode === 'manual') {
-      info.textContent = 'Manual: masukkan berat isi dalam gram';
-    } else {
-      info.textContent = 'Otomatis: volume × BJ';
-    }
+    beratIsi.placeholder = 'Otomatis (vol × BJ)';
+    info.textContent = 'Otomatis: volume × BJ';
   }
   hitungTotalBerat();
 }
 function updateKemasanProduksiDropdown() {
-  if (userRole === 'investor') {
-    document.getElementById('kemasanProduksi').innerHTML = '<option value="">Akses terbatas</option>';
-    return;
-  }
-  const produksiGroup = {};
-  data.produksi.forEach(p => {
-    if (p.status === 'selesai' && (p.sisaLiter || 0) > 0) {
-      if (!produksiGroup[p.formulasiId]) produksiGroup[p.formulasiId] = [];
-      produksiGroup[p.formulasiId].push(p);
-    }
-  });
-  const selProduksi = document.getElementById('kemasanProduksi');
-  selProduksi.innerHTML = '';
-  for (const [formulasiId, batches] of Object.entries(produksiGroup)) {
-    const f = getFormulasi(formulasiId);
-    const totalSisa = batches.reduce((sum,p) => sum + (p.sisaLiter||0), 0);
-    const option = document.createElement('option');
-    option.value = formulasiId;
-    option.dataset.totalSisa = totalSisa;
-    option.textContent = `${f ? f.nama : '??'} - ${totalSisa.toFixed(2)} L`;
-    selProduksi.appendChild(option);
-  }
-  if (selProduksi.options.length === 0) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'Tidak ada produksi selesai';
-    selProduksi.appendChild(opt);
-  }
+  const selProd = document.getElementById('kemasanProduksi');
   const selKemasan = document.getElementById('kemasanNama');
-  const availableKemasan = data.kemasanBeli.filter(k => k.stok > 0);
-  selKemasan.innerHTML = '';
-  if (availableKemasan.length === 0) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'Tidak ada stok kemasan';
-    selKemasan.appendChild(opt);
-  } else {
-    availableKemasan.forEach(k => {
-      const opt = document.createElement('option');
-      opt.value = k.nama;
-      opt.dataset.volume = k.volumeMl || 0;
-      opt.textContent = `${k.nama} (${k.volumeMl || 0} mL, stok: ${k.stok})`;
-      selKemasan.appendChild(opt);
-    });
+  if (selProd) {
+    const prodSelesai = data.produksi.filter(p => p.status === 'selesai' && (p.sisaLiter || 0) > 0.001);
+    selProd.innerHTML = prodSelesai.map(p => {
+      const f = getFormulasi(p.formulasiId);
+      return `<option value="${p.id}">${f ? f.nama : '?'} - sisa ${(p.sisaLiter || 0).toFixed(2)}L</option>`;
+    }).join('');
   }
-  selKemasan.onchange = function() {
-    const nama = this.value;
-    const item = data.kemasanBeli.find(k => k.nama === nama);
-    if (item) {
-      document.getElementById('stokKemasanInfo').textContent = 'Stok tersedia: ' + item.stok + ' unit';
-      if (document.querySelector('input[name="isiMode"]:checked').value === 'otomatis') {
-        toggleIsiMode();
-      }
-    } else {
-      document.getElementById('stokKemasanInfo').textContent = '';
-    }
-    hitungTotalBerat();
-  };
-  document.getElementById('kemasanBeratIsi').oninput = function() { hitungTotalBerat(); };
-  document.getElementById('kemasanJumlah').oninput = function() { hitungTotalBerat(); };
-  document.getElementById('kemasanProduksi').onchange = function() {
-    hitungTotalBerat();
-    const sel = this;
-    const selected = sel.options[sel.selectedIndex];
-    const sisa = selected ? parseFloat(selected.dataset.totalSisa) || 0 : 0;
-    document.getElementById('sisaProduksiInfo').textContent = 'Sisa: ' + sisa.toFixed(2) + ' L';
-    if (document.querySelector('input[name="isiMode"]:checked').value === 'otomatis') {
-      toggleIsiMode();
-    }
-  };
-  setTimeout(() => {
-    const sel = document.getElementById('kemasanProduksi');
-    const selected = sel.options[sel.selectedIndex];
-    const sisa = selected ? parseFloat(selected.dataset.totalSisa) || 0 : 0;
-    document.getElementById('sisaProduksiInfo').textContent = 'Sisa: ' + sisa.toFixed(2) + ' L';
-    hitungTotalBerat();
-    toggleIsiMode();
-  }, 200);
+  if (selKemasan) {
+    const stokKemasanFisik = data.kemasanBeli.filter(k => k.stok > 0);
+    selKemasan.innerHTML = stokKemasanFisik.map(k => `<option value="${k.id}">${k.nama} (stok ${k.stok})</option>`).join('');
+  }
+  const prodId = selProd?.value;
+  const p = getProduksi(prodId);
+  const infoSisa = document.getElementById('sisaProduksiInfo');
+  if (infoSisa) infoSisa.textContent = 'Sisa: ' + (p ? (p.sisaLiter || 0).toFixed(2) : '0') + ' L';
+  updateStokKemasanInfo();
+  hitungTotalBerat();
+}
+function updateStokKemasanInfo() {
+  const selKemasan = document.getElementById('kemasanNama');
+  const info = document.getElementById('stokKemasanInfo');
+  if (!selKemasan || !info) return;
+  const id = selKemasan.value;
+  const k = getKemasanBeli(id);
+  info.textContent = k ? 'Stok: ' + k.stok + ' unit' : '';
 }
 function hitungTotalBerat() {
-  const beratIsi = parseFloat(document.getElementById('kemasanBeratIsi').value) || 0;
-  const jumlah = parseInt(document.getElementById('kemasanJumlah').value) || 0;
-  const totalGram = beratIsi * jumlah;
-  const totalKg = totalGram / 1000;
-  document.getElementById('totalBeratInfo').textContent = 'Total Berat: ' + totalGram.toFixed(1) + ' g (' + totalKg.toFixed(3) + ' kg)';
-  const sel = document.getElementById('kemasanProduksi');
-  const selected = sel.options[sel.selectedIndex];
-  const sisaLiter = selected ? parseFloat(selected.dataset.totalSisa) || 0 : 0;
-  const prodId = sel.value;
-  const prod = data.produksi.find(p => p.formulasiId === prodId && p.status === 'selesai');
-  const bj = prod ? prod.bj : 1.025;
-  const sisaKg = sisaLiter * bj;
-  const sisaGram = sisaKg * 1000;
-  const info = document.getElementById('sisaProduksiInfo');
-  if (totalGram > 0 && totalGram > sisaGram + 0.001) {
-    info.textContent = '⚠️ Melebihi sisa! Tersisa: ' + sisaGram.toFixed(1) + ' g (' + sisaLiter.toFixed(2) + ' L)';
-    info.style.color = '#D32F2F';
+  const prodId = document.getElementById('kemasanProduksi')?.value;
+  const p = getProduksi(prodId);
+  if (!p) { document.getElementById('totalBeratInfo').textContent = 'Total Berat: 0 g (0 kg)'; return; }
+  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
+  const beratIsi = parseFloat(document.getElementById('kemasanBeratIsi')?.value) || 0;
+  const jml = parseInt(document.getElementById('kemasanJumlah')?.value) || 0;
+
+  let totalBerat = 0;
+  if (mode === 'otomatis') {
+    const volMl = parseFloat(document.getElementById('kemasanNama')?.selectedOptions?.[0]?.text?.match(/\d+\.?\d*/)?.[0]) || 0;
+    totalBerat = jml * volMl * (p.bj || 1.025);
   } else {
-    info.textContent = 'Sisa: ' + sisaLiter.toFixed(2) + ' L (' + sisaGram.toFixed(1) + ' g)';
-    info.style.color = '';
+    totalBerat = jml * beratIsi;
   }
+  document.getElementById('totalBeratInfo').textContent = `Total Berat: ${totalBerat.toFixed(1)} g (${(totalBerat/1000).toFixed(3)} kg)`;
 }
 function tambahKemasan() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  const formulasiId = document.getElementById('kemasanProduksi').value;
-  const namaKemasan = document.getElementById('kemasanNama').value;
-  const beratIsi = parseFloat(document.getElementById('kemasanBeratIsi').value);
+  const prodId = document.getElementById('kemasanProduksi').value;
+  const kemasanId = document.getElementById('kemasanNama').value;
   const jml = parseInt(document.getElementById('kemasanJumlah').value);
-  const harga = parseFloat(document.getElementById('kemasanHarga').value);
-  if (!formulasiId || !namaKemasan || !beratIsi || beratIsi <= 0 || !jml || jml <= 0 || !harga || harga <= 0) {
+  const hargaJual = parseFloat(document.getElementById('kemasanHarga').value);
+
+  if (!prodId || !kemasanId || !jml || jml <= 0 || !hargaJual || hargaJual <= 0) {
     showAlert('Isi semua field dengan benar!', 'error');
     return;
   }
-  const totalBeratKg = (beratIsi * jml) / 1000;
-  const prod = data.produksi.find(p => p.formulasiId === formulasiId && p.status === 'selesai');
-  const bjReal = prod ? prod.bj : 1.025;
-  const totalVolume = totalBeratKg / bjReal;
+  const p = getProduksi(prodId);
+  if (!p) { showAlert('Produksi tidak ditemukan!', 'error'); return; }
+  if ((p.sisaLiter || 0) < 0.001) { showAlert('Sisa produksi sudah habis!', 'error'); return; }
 
-  const produksiGroup = {};
-  data.produksi.forEach(p => {
-    if (p.status === 'selesai' && (p.sisaLiter || 0) > 0) {
-      if (!produksiGroup[p.formulasiId]) produksiGroup[p.formulasiId] = [];
-      produksiGroup[p.formulasiId].push(p);
-    }
-  });
-  const batches = produksiGroup[formulasiId] || [];
-  if (batches.length === 0) { showAlert('Tidak ada produksi selesai!','error'); return; }
-  const totalSisa = batches.reduce((s,p) => s + (p.sisaLiter||0), 0);
-  if (totalVolume > totalSisa + 0.0001) {
-    showAlert('⚠️ Volume yang dikemas (' + totalVolume.toFixed(3) + ' L / ' + totalBeratKg.toFixed(2) + ' kg) melebihi sisa produksi!', 'error');
+  const k = getKemasanBeli(kemasanId);
+  if (!k) { showAlert('Kemasan tidak ditemukan!', 'error'); return; }
+  if (k.stok < jml) { showAlert('Stok kemasan tidak cukup! Tersedia: ' + k.stok, 'error'); return; }
+
+  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
+  const beratIsiInput = parseFloat(document.getElementById('kemasanBeratIsi').value) || 0;
+  let beratPerUnit = 0;
+  if (mode === 'otomatis') {
+    const volMl = k.volumeMl || 0;
+    beratPerUnit = volMl * (p.bj || 1.025);
+  } else {
+    beratPerUnit = beratIsiInput;
+  }
+  if (beratPerUnit <= 0) { showAlert('Berat isi per kemasan harus > 0!', 'error'); return; }
+
+  const totalBeratGram = beratPerUnit * jml;
+  const totalBeratKg = totalBeratGram / 1000;
+
+  if (totalBeratKg > (p.sisaLiter || 0)) {
+    showAlert(`❌ Tidak cukup sisa produksi! Butuh ${totalBeratKg.toFixed(3)}L, sisa ${(p.sisaLiter || 0).toFixed(3)}L`, 'error');
     return;
   }
-  const kemasanItem = data.kemasanBeli.find(k => k.nama === namaKemasan);
-  if (!kemasanItem) { showAlert('Kemasan tidak ditemukan!','error'); return; }
-  if (kemasanItem.stok < jml) {
-    showAlert('⚠️ Stok kemasan tidak cukup! Tersisa: ' + kemasanItem.stok + ' unit','error');
-    return;
-  }
-  let sisaVolume = totalVolume;
-  const sortedBatches = [...batches].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
-  const usage = [];
-  for (let p of sortedBatches) {
-    if (sisaVolume <= 0) break;
-    const avail = p.sisaLiter;
-    if (avail > 0) {
-      const ambil = Math.min(avail, sisaVolume);
-      p.sisaLiter -= ambil;
-      sisaVolume -= ambil;
-      usage.push({ batchId: p.id, volume: ambil });
-    }
-  }
-  kemasanItem.stok -= jml;
-  const biaya = jml * kemasanItem.hargaPerUnit;
-  const totalVolumeUsed = usage.reduce((s,u) => s + u.volume, 0);
-  usage.forEach(u => {
-    const proporsi = u.volume / totalVolumeUsed;
-    const batch = data.produksi.find(p => p.id === u.batchId);
-    if (batch) batch.biayaKemasan = (batch.biayaKemasan || 0) + (biaya * proporsi);
-  });
-  const kemasanId = genId();
+
+  p.sisaLiter -= totalBeratKg;
+  k.stok -= jml;
+
+  const id = genId();
   data.kemasan.push({
-    id: kemasanId,
-    produksiId: usage.length ? usage[0].batchId : batches[0].id,
-    nama: namaKemasan,
-    beratIsiGram: beratIsi,
+    id,
+    produksiId: prodId,
+    kemasanId: kemasanId,
+    nama: k.nama,
     jumlahUnit: jml,
-    hargaJualPerUnit: harga,
-    biayaKemasan: biaya,
-    createdBy: getAuditUser(),
-    createdAt: getAuditTime()
+    beratPerUnit: beratPerUnit,
+    hargaJualPerUnit: hargaJual,
+    biayaKemasanPerUnit: k.hargaPerUnit || 0,
+    createdAt: getAuditTime(),
+    createdBy: getAuditUser()
   });
-  logAudit('create', 'kemasan', kemasanId, `Kemasan ${namaKemasan} ${jml} unit, berat isi ${beratIsi}g, harga ${rupiah(harga)}`, '');
-  document.getElementById('kemasanNama').value = '';
-  document.getElementById('kemasanBeratIsi').value = '';
+
+  const biayaKemasan = (k.hargaPerUnit || 0) * jml;
+  if (biayaKemasan > 0) {
+    data.keuangan.pengeluaran.push({
+      id: genId(),
+      sumber: 'Kemasan ' + k.nama + ' x' + jml + ' untuk produksi',
+      jumlah: biayaKemasan,
+      tanggal: todayStr()
+    });
+  }
+
+  logAudit('create', 'kemasan', id, `Kemasan ${k.nama} x${jml} unit, berat ${beratPerUnit}g/unit, harga ${rupiah(hargaJual)}/unit`, '');
+  renderAll();
+  showAlert('✅ ' + jml + ' unit ' + k.nama + ' berhasil dikemas! Sisa produksi: ' + (p.sisaLiter || 0).toFixed(3) + 'L');
   document.getElementById('kemasanJumlah').value = '';
   document.getElementById('kemasanHarga').value = '';
-  document.getElementById('totalBeratInfo').textContent = 'Total Berat: 0 g (0 kg)';
-  document.getElementById('beratPerKemasanInfo').textContent = 'Otomatis: volume × BJ';
-  renderAll();
-  showAlert('✅ Pengemasan berhasil! ' + jml + ' unit ' + namaKemasan + ' dengan berat isi ' + beratIsi + 'g');
+  document.getElementById('kemasanBeratIsi').value = '';
 }
 function renderPengemasan() {
-  if (userRole === 'investor') {
-    document.getElementById('kemasanTbody').innerHTML = `<tr><td colspan="5" class="text-muted">🔒 Anda tidak memiliki akses ke halaman ini.</td></tr>`;
-    return;
-  }
   const tbody = document.getElementById('kemasanTbody');
+  if (!tbody) return;
   tbody.innerHTML = data.kemasan.map(k => {
+    const prod = getProduksi(k.produksiId);
+    const f = prod ? getFormulasi(prod.formulasiId) : null;
     const stok = stokKemasan(k);
-    const biayaKemasan = k.biayaKemasan || 0;
     let aksi = '';
-    if (userRole === 'admin-full' || userRole === 'atasan') {
-      aksi = `<button class="btn btn-danger btn-sm" onclick="hapusKemasanWithReturn('${k.id}')">🗑️</button>`;
-    } else if (userRole === 'operasional' || userRole === 'adm') {
-      aksi = `<span class="text-muted">🔒</span>`;
+    if (userRole === 'admin-full') {
+      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusKemasanWithReturn('${k.id}')">🗑️</button>`;
     }
     return `<tr>
-      <td><strong>${k.nama}</strong> (${k.beratIsiGram || 0}g)</td>
-      <td><span class="badge ${stok > 0 ? 'badge-success' : 'badge-danger'}">${stok}</span></td>
+      <td>${k.nama}</td>
+      <td>${stok}</td>
       <td>${rupiah(k.hargaJualPerUnit)}</td>
-      <td>${rupiah(biayaKemasan)}</td>
+      <td>${rupiah(k.biayaKemasanPerUnit || 0)}</td>
       <td>${aksi}</td>
     </tr>`;
-  }).join('');
-  const sel = document.getElementById('jualKemasan');
-  const avail = data.kemasan.filter(k => stokKemasan(k) > 0);
-  sel.innerHTML = avail.map(k => `<option value="${k.id}">${k.nama} (${k.beratIsiGram || 0}g) - stok: ${stokKemasan(k)}</option>`).join('');
-  if (avail.length) document.getElementById('jualHarga').value = avail[0].hargaJualPerUnit;
+  }).join('') || '<tr><td colspan="5" class="text-muted">Belum ada kemasan jadi.</td></tr>';
   filterKemasanJadi();
+  updateKemasanProduksiDropdown();
 }
 function hapusKemasanWithReturn(id) {
-  if (userRole !== 'admin-full' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
   const k = getKemasan(id);
-  if (!k) { showAlert('Kemasan tidak ditemukan!','error'); return; }
-  const penjualanTerikat = data.penjualan.filter(j => j.kemasanId === id);
-  if (!confirm(`⚠️ Hapus kemasan "${k.nama}"? ${penjualanTerikat.length > 0 ? `\n${penjualanTerikat.length} penjualan akan ikut dihapus.` : ''}`)) return;
-  const kemasanItem = data.kemasanBeli.find(kb => kb.nama === k.nama);
-  if (kemasanItem) kemasanItem.stok += k.jumlahUnit;
+  if (!k) return;
+  if (!confirm('⚠️ Hapus kemasan "' + k.nama + '" dan kembalikan stok ke produksi?')) return;
+
   const prod = getProduksi(k.produksiId);
   if (prod) {
-    const allKemasanProd = data.kemasan.filter(k2 => k2.produksiId === prod.id);
-    const totalUnitProd = allKemasanProd.reduce((sum,k2) => sum + k2.jumlahUnit, 0);
-    const proporsi = totalUnitProd > 0 ? k.jumlahUnit / totalUnitProd : 0;
-    if (prod.bahanDigunakan && prod.bahanDigunakan.length > 0) {
-      prod.bahanDigunakan.forEach(bahan => {
-        const b = getBahan(bahan.bahanId);
-        if (b) b.stok += bahan.jumlahStok * proporsi;
-      });
-    } else {
-      const f = getFormulasi(prod.formulasiId);
-      if (f) {
-        const totalBerat = prod.jumlahLiter * (prod.bj || 1.025);
-        f.items.forEach(it => {
-          const b = getBahan(it.bahanId);
-          if (!b) return;
-          const persen = it.persen || 0;
-          let butuhLarutan = (persen / 100) * totalBerat * proporsi;
-          if (it.isLarutan) {
-            const konsentrasi = it.konsentrasiLarutan || 0;
-            if (konsentrasi > 0) butuhLarutan = butuhLarutan * (konsentrasi / 100);
-          }
-          b.stok += butuhLarutan;
-        });
-      }
-    }
-    const biayaKemasanProporsi = (k.biayaKemasan || 0);
-    prod.biayaKemasan = (prod.biayaKemasan || 0) - biayaKemasanProporsi;
-    if (prod.biayaKemasan < 0) prod.biayaKemasan = 0;
-    const beratKembali = (k.jumlahUnit * (k.beratIsiGram || 0)) / 1000;
-    const bj = prod.bj || 1.025;
-    const volumeKembali = beratKembali / bj;
-    prod.sisaLiter = (prod.sisaLiter || 0) + volumeKembali;
+    const totalBeratKg = (k.beratPerUnit * k.jumlahUnit) / 1000;
+    prod.sisaLiter = (prod.sisaLiter || 0) + totalBeratKg;
   }
-  data.penjualan = data.penjualan.filter(j => j.kemasanId !== id);
-  data.kemasan = data.kemasan.filter(k2 => k2.id !== id);
-  logAudit('delete','kemasan',id,`Kemasan ${k.nama} dihapus`,'');
+  const kb = getKemasanBeli(k.kemasanId);
+  if (kb) kb.stok += k.jumlahUnit;
+
+  data.kemasan = data.kemasan.filter(item => item.id !== id);
+  logAudit('delete', 'kemasan', id, `Kemasan ${k.nama} dihapus, stok dikembalikan`, '');
   renderAll();
   showAlert('✅ Kemasan dihapus, stok dikembalikan.');
 }
@@ -3735,612 +3137,243 @@ function catatJual() {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  if (userRole === 'investor') { showAlert('Investor tidak bisa menambah penjualan!','error'); return; }
-  const kid = document.getElementById('jualKemasan').value;
+  const kemasanId = document.getElementById('jualKemasan').value;
   const jml = parseInt(document.getElementById('jualJumlah').value);
   const harga = parseFloat(document.getElementById('jualHarga').value);
   const status = document.getElementById('jualStatus').value;
-  if (!kid || !jml || jml <= 0 || !harga || harga <= 0) { showAlert('Isi semua!','error'); return; }
-  const k = getKemasan(kid);
-  if (!k) { showAlert('Kemasan tidak ditemukan!','error'); return; }
-  const stokTersisa = stokKemasan(k);
-  if (stokTersisa < jml) { showAlert('⚠️ Stok tidak cukup! Tersisa ' + stokTersisa + ' unit.','error'); return; }
-  const total = jml * harga;
-  const jualId = genId();
-  data.penjualan.push({
-    id: jualId,
-    kemasanId: kid,
-    jumlahTerjual: jml,
-    hargaJualPerUnit: harga,
-    tanggal: todayStr(),
-    statusBayar: status,
-    createdBy: getAuditUser(),
-    createdAt: getAuditTime()
-  });
-  if (status === 'Lunas') {
-    data.keuangan.pemasukan.push({ id: genId(), sumber: 'Penjualan ' + k.nama, jumlah: total, tanggal: todayStr() });
+
+  if (!kemasanId || !jml || jml <= 0 || !harga || harga <= 0) {
+    showAlert('Isi semua field dengan benar!', 'error');
+    return;
   }
-  logAudit('create','penjualan',jualId,`Jual ${k.nama} ${jml} unit seharga ${rupiah(harga)}/unit, status ${status}`,'');
-  document.getElementById('jualJumlah').value = '';
+  const k = getKemasan(kemasanId);
+  if (!k) { showAlert('Kemasan tidak ditemukan!', 'error'); return; }
+  const stokTersedia = stokKemasan(k);
+  if (stokTersedia < jml) {
+    showAlert('❌ Stok tidak cukup! Tersedia: ' + stokTersedia, 'error');
+    return;
+  }
+
+  const id = genId();
+  const total = jml * harga;
+  data.penjualan.push({
+    id,
+    kemasanId,
+    jenisSabun: k.nama,
+    jumlahTerjual: jml,
+    hargaPerUnit: harga,
+    total,
+    status,
+    tanggal: todayStr(),
+    createdAt: getAuditTime(),
+    createdBy: getAuditUser()
+  });
+
+  if (status === 'Lunas') {
+    data.keuangan.pemasukan.push({
+      id: genId(),
+      sumber: 'Penjualan ' + k.nama + ' x' + jml,
+      jumlah: total,
+      tanggal: todayStr()
+    });
+  }
+
+  logAudit('create', 'penjualan', id, `Jual ${k.nama} x${jml} = ${rupiah(total)} (${status})`, '');
   renderAll();
-  showAlert('✅ Penjualan tercatat! Status: ' + status);
+  showAlert('✅ Penjualan ' + k.nama + ' x' + jml + ' = ' + rupiah(total) + ' (' + status + ')');
+  document.getElementById('jualJumlah').value = '';
+  document.getElementById('jualHarga').value = '';
 }
 function hapusJual(id) {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  if (!confirm('⚠️ Hapus penjualan ini?')) return;
-  const j = data.penjualan.find(p => p.id === id);
-  if (j && j.statusBayar === 'Lunas') {
-    data.keuangan.pemasukan = data.keuangan.pemasukan.filter(i =>
-      !(i.sumber === 'Penjualan ' + (getKemasan(j.kemasanId)?.nama || '') &&
-        i.jumlah === j.jumlahTerjual * j.hargaJualPerUnit &&
-        i.tanggal === j.tanggal)
+  const jual = data.penjualan.find(j => j.id === id);
+  if (!jual) return;
+  if (!confirm('⚠️ Hapus penjualan ' + jual.jenisSabun + ' x' + jual.jumlahTerjual + '?')) return;
+  data.penjualan = data.penjualan.filter(j => j.id !== id);
+  if (jual.status === 'Lunas') {
+    data.keuangan.pemasukan = data.keuangan.pemasukan.filter(p =>
+      !(p.sumber === 'Penjualan ' + jual.jenisSabun + ' x' + jual.jumlahTerjual && p.jumlah === jual.total)
     );
   }
-  data.penjualan = data.penjualan.filter(p => p.id !== id);
-  logAudit('delete','penjualan',id,`Penjualan ${j?.jumlahTerjual} unit`,'');
+  logAudit('delete', 'penjualan', id, `Penjualan ${jual.jenisSabun} x${jual.jumlahTerjual} dihapus`, '');
   renderAll();
-  showAlert('✅ Penjualan dihapus');
+  showAlert('✅ Penjualan dihapus.');
 }
 function bayarHutang(id) {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  if (!confirm('Tandai penjualan ini sebagai LUNAS?')) return;
-  const j = data.penjualan.find(p => p.id === id);
-  if (j) {
-    j.statusBayar = 'Lunas';
-    const total = j.jumlahTerjual * j.hargaJualPerUnit;
-    data.keuangan.pemasukan.push({ id: genId(), sumber: 'Penjualan ' + (getKemasan(j.kemasanId)?.nama || ''), jumlah: total, tanggal: todayStr() });
-    logAudit('update','penjualan',id,'Status bayar diubah menjadi Lunas','');
-    renderAll();
-    showAlert('✅ Status penjualan diubah menjadi Lunas!');
-  }
+  const jual = data.penjualan.find(j => j.id === id);
+  if (!jual) return;
+  if (jual.status !== 'Hutang') { showAlert('Bukan hutang.', 'warning'); return; }
+  if (!confirm('✅ Bayar hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual + ' = ' + rupiah(jual.total) + '?')) return;
+  jual.status = 'Lunas';
+  data.keuangan.pemasukan.push({
+    id: genId(),
+    sumber: 'Pelunasan hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual,
+    jumlah: jual.total,
+    tanggal: todayStr()
+  });
+  logAudit('update', 'penjualan', id, `Status hutang → lunas (${rupiah(jual.total)})`, '');
+  renderAll();
+  showAlert('✅ Hutang lunas! ' + rupiah(jual.total));
 }
 function renderPenjualan() {
   const tbody = document.getElementById('jualTbody');
-  const isInvestor = (userRole === 'investor');
+  if (!tbody) return;
+  const selKemasan = document.getElementById('jualKemasan');
+  if (selKemasan) {
+    selKemasan.innerHTML = data.kemasan.map(k => {
+      const stok = stokKemasan(k);
+      return `<option value="${k.id}">${k.nama} (stok ${stok})</option>`;
+    }).join('');
+  }
   tbody.innerHTML = sortByWaktu(data.penjualan).map(j => {
-    const k = getKemasan(j.kemasanId);
-    let jenisSabun = 'Tidak diketahui';
-    if (k) {
-      const prod = getProduksi(k.produksiId);
-      if (prod) {
-        const f = getFormulasi(prod.formulasiId);
-        if (f) jenisSabun = f.nama;
-      }
-    }
-    const status = j.statusBayar || 'Lunas';
-    const isHutang = status === 'Hutang';
+    const sts = j.status === 'Lunas' ? 'badge-success' : 'badge-danger';
     let aksi = '';
-    if (!isInvestor && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
-      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">Hapus</button>`;
-      if (isHutang) aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">Bayar</button>`;
+    if (j.status === 'Hutang' && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
+      aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">💰 Bayar</button>`;
     }
-    if (isInvestor) aksi = `<span class="text-muted">🔒</span>`;
+    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
+      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">🗑️</button>`;
+    }
     return `<tr>
-      <td><strong>${jenisSabun}</strong></td>
-      <td>${k ? k.nama : '??'}</td>
+      <td>${j.jenisSabun}</td>
+      <td>${j.kemasanId ? (getKemasan(j.kemasanId)?.nama || '-') : '-'}</td>
       <td>${j.jumlahTerjual}</td>
-      <td>${rupiah(j.jumlahTerjual * j.hargaJualPerUnit)}</td>
-      <td><span class="badge ${status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${status}</span></td>
+      <td>${rupiah(j.total)}</td>
+      <td><span class="badge ${sts}">${j.status}</span></td>
       <td>${aksi}</td>
     </tr>`;
-  }).join('');
-  const sel = document.getElementById('jualKemasan');
-  const avail = data.kemasan.filter(k => stokKemasan(k) > 0);
-  sel.innerHTML = avail.map(k => {
-    const prod = getProduksi(k.produksiId);
-    const f = prod ? getFormulasi(prod.formulasiId) : null;
-    const jenis = f ? f.nama : 'Tidak diketahui';
-    return `<option value="${k.id}">${k.nama} (${jenis}) - stok: ${stokKemasan(k)}</option>`;
-  }).join('');
-  if (avail.length) {
-    document.getElementById('jualHarga').value = avail[0].hargaJualPerUnit;
-    const first = avail[0];
-    const prod = getProduksi(first.produksiId);
-    const f = prod ? getFormulasi(prod.formulasiId) : null;
-    document.getElementById('infoJenisSabun').textContent = f ? '🧼 Jenis Sabun: ' + f.nama : '';
-  } else {
-    document.getElementById('infoJenisSabun').textContent = '⚠️ Tidak ada stok kemasan';
-  }
-  sel.onchange = function() {
-    const selectedId = this.value;
-    const k = getKemasan(selectedId);
-    if (k) {
-      const prod = getProduksi(k.produksiId);
-      const f = prod ? getFormulasi(prod.formulasiId) : null;
-      document.getElementById('infoJenisSabun').textContent = f ? '🧼 Jenis Sabun: ' + f.nama : '';
-    } else {
-      document.getElementById('infoJenisSabun').textContent = '';
-    }
-  };
+  }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
   filterPenjualan();
 }
-  // ================================================================
-// LAPORAN STOK
+
+// ================================================================
+// LAPORAN
 // ================================================================
 function renderLaporanStok() {
   const tbody = document.getElementById('laporanStokTbody');
   if (!tbody) return;
   const grouped = {};
   data.kemasan.forEach(k => {
-    const prod = getProduksi(k.produksiId);
-    const f = prod ? getFormulasi(prod.formulasiId) : null;
-    const jenis = f ? f.nama : 'Tidak diketahui';
-    const key = k.nama + '|' + jenis;
-    if (!grouped[key]) {
-      grouped[key] = {
-        nama: k.nama,
-        jenis: jenis,
-        stok: 0,
-        hargaJual: k.hargaJualPerUnit
-      };
-    }
-    grouped[key].stok += stokKemasan(k);
+    const stok = stokKemasan(k);
+    const key = k.nama;
+    if (!grouped[key]) grouped[key] = { nama: k.nama, stok: 0, harga: k.hargaJualPerUnit };
+    grouped[key].stok += stok;
   });
   tbody.innerHTML = Object.values(grouped).map(g => {
-    const stok = g.stok;
-    const nilai = stok * g.hargaJual;
-    return `<tr><td><strong>${g.nama}</strong></td><td>${stok}</td><td>${rupiah(g.hargaJual)}</td><td>${rupiah(nilai)}</td></tr>`;
-  }).join('') || '<tr><td colspan="4" class="text-muted">Belum ada kemasan.</td></tr>';
+    const nilai = g.stok * g.harga;
+    return `<tr>
+      <td>${g.nama}</td>
+      <td>${g.stok}</td>
+      <td>${rupiah(g.harga)}</td>
+      <td>${rupiah(nilai)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-muted">Tidak ada data stok.</td></tr>';
 }
-
-// ================================================================
-// LAPORAN KEUANGAN PRODUKSI
-// ================================================================
 function renderLaporanKeuanganProduksi() {
   const container = document.getElementById('laporanKeuanganProduksi');
   if (!container) return;
-  const produksiList = data.produksi.filter(p => p.status === 'selesai');
-  let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
-  produksiList.forEach(p => {
-    const biayaBahan = hitungBiayaBahanProduksi(p);
-    const biayaKemasan = p.biayaKemasan || 0;
-    const totalBiayaLangsung = biayaBahan + biayaKemasan;
-    const hppProd = totalBiayaLangsung + getBiayaOperasionalFromProduksi(p, totalBiayaLangsung);
-    const biayaOps = getBiayaOperasionalFromProduksi(p, totalBiayaLangsung);
-    totalBiayaBahan += biayaBahan;
-    totalBiayaKemasan += biayaKemasan;
-    totalBiayaOperasional += biayaOps;
-    totalHpp += hppProd;
-  });
-  const totalBiayaLangsung = totalBiayaBahan + totalBiayaKemasan;
-  const totalPenjualanLunas = data.penjualan
-    .filter(j => j.statusBayar === 'Lunas')
-    .reduce((s, j) => s + (j.jumlahTerjual * j.hargaJualPerUnit), 0);
-  const laba = totalPenjualanLunas - totalHpp;
-  
-  let html = `
-    <div style="margin-bottom:20px;">
-      <h4 style="color:#6D4C41;">📊 Ringkasan Total Biaya Produksi</h4>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Komponen</th><th>Nilai</th></tr></thead>
-          <tbody>
-            <tr><td>Total Biaya Bahan</td><td>${rupiah(totalBiayaBahan)}</td></tr>
-            <tr><td>Total Biaya Kemasan</td><td>${rupiah(totalBiayaKemasan)}</td></tr>
-            <tr><td><strong>Total Biaya Langsung</strong></td><td><strong>${rupiah(totalBiayaLangsung)}</strong></td></tr>
-            <tr><td><strong>Total Biaya Operasional (per produksi)</strong></td><td><strong>${rupiah(totalBiayaOperasional)}</strong></td></tr>
-            <tr><td><strong>Total Biaya Produksi (HPP)</strong></td><td><strong>${rupiah(totalHpp)}</strong></td></tr>
-            <tr><td>Total Penjualan (Lunas) - Aktual</td><td>${rupiah(totalPenjualanLunas)}</td></tr>
-            <tr><td style="font-weight:700; color:${laba>=0?'#2E7D32':'#C62828'};">Laba Bersih</td>
-              <td style="font-weight:700; color:${laba>=0?'#2E7D32':'#C62828'};">${rupiah(laba)}</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  const detailRows = [];
-  data.kemasan.forEach(k => {
-    const prod = data.produksi.find(p => p.id === k.produksiId);
-    if (!prod) return;
-    const f = getFormulasi(prod.formulasiId);
-    if (!f) return;
-    const biayaBahanProd = hitungBiayaBahanProduksi(prod);
-    const biayaKemasanProd = prod.biayaKemasan || 0;
-    const totalBiayaLangsungProd = biayaBahanProd + biayaKemasanProd;
-    let biayaOpsItem;
-    if (k.biayaOperasionalOverride != null) {
-      biayaOpsItem = k.biayaOperasionalOverride;
-    } else {
-      const totalUnitBatch = data.kemasan.filter(k2 => k2.produksiId === prod.id).reduce((s,k2) => s + k2.jumlahUnit, 0);
-      const proporsi = totalUnitBatch > 0 ? k.jumlahUnit / totalUnitBatch : 0;
-      const biayaOpsDasar = getBiayaOperasionalFromProduksi(prod, totalBiayaLangsungProd);
-      biayaOpsItem = biayaOpsDasar * proporsi;
-    }
-    const totalBiayaLangsungItem = biayaBahanProd + biayaKemasanProd;
-    const hppItem = totalBiayaLangsungItem + biayaOpsItem;
-    const unitDikemas = k.jumlahUnit;
-    const hppPerUnit = unitDikemas > 0 ? hppItem / unitDikemas : 0;
-    const penjualan = data.penjualan.filter(j => j.kemasanId === k.id && j.statusBayar === 'Lunas');
-    const unitTerjual = penjualan.reduce((s, j) => s + j.jumlahTerjual, 0);
-    const totalPendapatan = penjualan.reduce((s, j) => s + (j.jumlahTerjual * j.hargaJualPerUnit), 0);
-    const hargaJualAktual = unitTerjual > 0 ? totalPendapatan / unitTerjual : 0;
-    const untungPerUnit = hargaJualAktual - hppPerUnit;
-    const totalUntung = unitDikemas > 0 ? totalPendapatan - (hppItem * (unitTerjual / unitDikemas)) : 0;
-    detailRows.push({
-      id: k.id,
-      produksiId: prod.id,
-      namaSabun: f.nama,
-      namaKemasan: k.nama,
-      unitDikemas,
-      unitTerjual,
-      totalPendapatan,
-      hargaJualAktual,
-      biayaBahan: biayaBahanProd,
-      biayaKemasan: biayaKemasanProd,
-      biayaOperasional: biayaOpsItem,
-      hpp: hppItem,
-      hppPerUnit,
-      untungPerUnit,
-      totalUntung
-    });
-  });
-  
-  detailRows.sort((a, b) => a.namaSabun.localeCompare(b.namaSabun));
-  
-  if (detailRows.length > 0) {
-    let totalUnitDikemas = 0, totalUnitTerjual = 0, totalPendapatan = 0;
-    let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
-    let totalUntung = 0;
-    html += `
-      <div style="margin-top:20px;">
-        <h4 style="color:#6D4C41;">📋 Rincian per Sabun, Kemasan, dan Penjualan Aktual
-          <span style="font-size:0.75rem; font-weight:normal; color:#8D6E63;">(Edit biaya operasional per kemasan)</span>
-        </h4>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Sabun</th>
-                <th>Kemasan</th>
-                <th>Unit Dikemas</th>
-                <th>Terjual</th>
-                <th>Total Pendapatan</th>
-                <th>Harga Jual Rata-rata</th>
-                <th>Biaya Bahan</th>
-                <th>Biaya Kemasan</th>
-                <th>Biaya Operasional</th>
-                <th>HPP</th>
-                <th>HPP/Unit</th>
-                <th>Untung/Unit</th>
-                <th>Total Untung</th>
-              </tr>
-            </thead>
-            <tbody>
-    `;
-    detailRows.forEach(row => {
-      totalUnitDikemas += row.unitDikemas;
-      totalUnitTerjual += row.unitTerjual;
-      totalPendapatan += row.totalPendapatan;
-      totalBiayaBahan += row.biayaBahan;
-      totalBiayaKemasan += row.biayaKemasan;
-      totalBiayaOperasional += row.biayaOperasional;
-      totalHpp += row.hpp;
-      totalUntung += row.totalUntung;
-      html += `
-        <tr>
-          <td><strong>${row.namaSabun}</strong></td>
-          <td>${row.namaKemasan}</td>
-          <td>${row.unitDikemas}</td>
-          <td>${row.unitTerjual}</td>
-          <td>${rupiah(row.totalPendapatan)}</td>
-          <td>${rupiah(row.hargaJualAktual)}</td>
-          <td>${rupiah(row.biayaBahan)}</td>
-          <td>${rupiah(row.biayaKemasan)}</td>
-          <td>
-            <input type="number" id="ops_edit_${row.id}" value="${row.biayaOperasional.toFixed(0)}" class="ops-input"
-              onchange="updateBiayaOpsKemasan('${row.id}', this.value)" />
-          </td>
-          <td>${rupiah(row.hpp)}</td>
-          <td>${rupiah(row.hppPerUnit)}</td>
-          <td style="color:${row.untungPerUnit>=0?'#2E7D32':'#C62828'};">${rupiah(row.untungPerUnit)}</td>
-          <td style="color:${row.totalUntung>=0?'#2E7D32':'#C62828'};">${rupiah(row.totalUntung)}</td>
-        </tr>
-      `;
-    });
-    html += `
-      <tr style="font-weight:700; background:#f5f0eb;">
-        <td colspan="2">Total</td>
-        <td>${totalUnitDikemas}</td>
-        <td>${totalUnitTerjual}</td>
-        <td>${rupiah(totalPendapatan)}</td>
-        <td></td>
-        <td>${rupiah(totalBiayaBahan)}</td>
-        <td>${rupiah(totalBiayaKemasan)}</td>
-        <td>${rupiah(totalBiayaOperasional)}</td>
-        <td>${rupiah(totalHpp)}</td>
-        <td></td>
-        <td></td>
-        <td style="color:${totalUntung>=0?'#2E7D32':'#C62828'};">${rupiah(totalUntung)}</td>
-      </tr>
-    `;
-    html += `</tbody></table></div></div>`;
-  } else {
-    html += `<p class="text-muted">Belum ada data kemasan atau produksi selesai.</p>`;
-  }
-  container.innerHTML = html;
-}
-
-function updateBiayaOpsKemasan(kemasanId, newValue) {
-  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
+  const prodSelesai = data.produksi.filter(p => p.status === 'selesai');
+  if (prodSelesai.length === 0) {
+    container.innerHTML = '<p class="text-muted">Belum ada produksi selesai.</p>';
     return;
   }
-  const val = parseFloat(newValue);
-  if (isNaN(val) || val < 0) { showAlert('Masukkan angka valid (>=0).','error'); return; }
-  const k = getKemasan(kemasanId);
-  if (!k) { showAlert('Kemasan tidak ditemukan.','error'); return; }
-  const old = k.biayaOperasionalOverride;
-  k.biayaOperasionalOverride = val;
-  logAudit('update','kemasan',kemasanId,`Biaya operasional: ${old||0} → ${val}`, `Kemasan: ${k.nama}`);
-  renderLaporanKeuanganProduksi();
-  renderAll();
-  showAlert('✅ Biaya operasional untuk kemasan "' + k.nama + '" diupdate ke ' + rupiah(val));
+  let totalBiayaBahan = 0, totalBiayaOps = 0, totalBiayaKemasan = 0;
+  prodSelesai.forEach(p => {
+    const biayaOps = p.opsiBiayaOperasional === 'manual' ? p.nilaiManualOps : (parseFloat(p.opsiBiayaOperasional || 15) / 100) * (p.biayaBahan || 0);
+    totalBiayaBahan += p.biayaBahan || 0;
+    totalBiayaOps += biayaOps;
+  });
+  data.kemasan.forEach(k => {
+    if (k.biayaKemasanPerUnit) totalBiayaKemasan += k.biayaKemasanPerUnit * k.jumlahUnit;
+  });
+  const total = totalBiayaBahan + totalBiayaOps + totalBiayaKemasan;
+  container.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${rupiah(totalBiayaBahan)}</div><div class="lbl">Biaya Bahan</div></div>
+      <div class="stat-card"><div class="num">${rupiah(totalBiayaOps)}</div><div class="lbl">Biaya Operasional</div></div>
+      <div class="stat-card"><div class="num">${rupiah(totalBiayaKemasan)}</div><div class="lbl">Biaya Kemasan</div></div>
+      <div class="stat-card green"><div class="num">${rupiah(total)}</div><div class="lbl">Total Biaya Produksi</div></div>
+    </div>
+  `;
 }
-
-// ================================================================
-// LAPORAN FULL
-// ================================================================
 function renderLaporanFull() {
   const container = document.getElementById('laporanFull');
   if (!container) return;
-  const totalPemasukanUsaha = data.keuangan.pemasukan.filter(p => !p.sumber.startsWith('Modal dari')).reduce((s,i) => s + i.jumlah, 0);
-  const totalModalMasuk = data.modalTambahan.reduce((s,m) => s + m.jumlah, 0);
-  const totalPengeluaran = data.keuangan.pengeluaran.reduce((s,i) => s + i.jumlah, 0);
-  const saldoAwal = data.keuangan.saldoAwal || 0;
-  const saldoAkhir = saldoAwal + totalModalMasuk + totalPemasukanUsaha - totalPengeluaran;
-  const labaUsaha = totalPemasukanUsaha - totalPengeluaran;
-  const produksiList = data.produksi.filter(p => p.status === 'selesai');
-  let totalBiayaBahan = 0, totalBiayaKemasan = 0, totalBiayaOperasional = 0, totalHpp = 0;
-  produksiList.forEach(p => {
-    const biayaBahan = hitungBiayaBahanProduksi(p);
-    const biayaKemasan = p.biayaKemasan || 0;
-    const totalBiayaLangsung = biayaBahan + biayaKemasan;
-    const hppProd = totalBiayaLangsung + getBiayaOperasionalFromProduksi(p, totalBiayaLangsung);
-    const biayaOps = getBiayaOperasionalFromProduksi(p, totalBiayaLangsung);
-    totalBiayaBahan += biayaBahan; totalBiayaKemasan += biayaKemasan; totalBiayaOperasional += biayaOps; totalHpp += hppProd;
-  });
-  const modalPerPemberi = {};
-  data.modalTambahan.forEach(m => {
-    if (!modalPerPemberi[m.pemberi]) modalPerPemberi[m.pemberi] = 0;
-    modalPerPemberi[m.pemberi] += m.jumlah;
-  });
-  let modalListHtml = '';
-  for (const [pemberi, total] of Object.entries(modalPerPemberi)) {
-    modalListHtml += `<div style="padding:4px 0;border-bottom:1px solid #ede7e1;display:flex;justify-content:space-between;">
-      <span>${pemberi}</span><span style="font-weight:600;">${rupiah(total)}</span>
-    </div>`;
-  }
-  if (!modalListHtml) modalListHtml = '<div class="text-muted">Belum ada modal</div>';
-  let modalTransaksiHtml = '';
-  sortByWaktu(data.modalTambahan).forEach(m => {
-    const tgl = formatTanggal(m.tanggal || m.createdAt);
-    modalTransaksiHtml += `<div style="padding:4px 0;border-bottom:1px solid #ede7e1;font-size:0.8125rem;display:flex;justify-content:space-between;">
-      <span><span style="color:#8D6E63;">${tgl}</span> • ${m.pemberi}</span>
-      <span>${rupiah(m.jumlah)} ${m.keterangan ? ' ('+m.keterangan+')' : ''}</span>
-    </div>`;
-  });
+  const totalModal = data.modalTambahan.reduce((s, m) => s + m.jumlah, 0);
+  const totalPemasukan = data.keuangan.pemasukan.reduce((s, p) => s + p.jumlah, 0);
+  const totalPengeluaran = data.keuangan.pengeluaran.reduce((s, p) => s + p.jumlah, 0);
+  const saldo = (data.keuangan.saldoAwal || 0) + totalModal + totalPemasukan - totalPengeluaran;
+
   container.innerHTML = `
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:14px; margin-bottom:18px;">
-      <div style="background:#e3f2fd; padding:14px; border-radius:12px; text-align:center;">
-        <div style="font-size:0.7rem; color:#475569;">💰 Saldo Kas</div>
-        <div style="font-size:1.5rem; font-weight:800; color:#6D4C41;">${rupiah(saldoAkhir)}</div>
-      </div>
-      <div style="background:#e8f5e9; padding:14px; border-radius:12px; text-align:center;">
-        <div style="font-size:0.7rem; color:#475569;">🏦 Total Modal Masuk</div>
-        <div style="font-size:1.5rem; font-weight:800; color:#2E7D32;">${rupiah(totalModalMasuk)}</div>
-      </div>
-      <div style="background:#fff3e0; padding:14px; border-radius:12px; text-align:center;">
-        <div style="font-size:0.7rem; color:#475569;">📈 Pendapatan Usaha</div>
-        <div style="font-size:1.5rem; font-weight:800; color:#E65100;">${rupiah(totalPemasukanUsaha)}</div>
-      </div>
-      <div style="background:#fce4e4; padding:14px; border-radius:12px; text-align:center;">
-        <div style="font-size:0.7rem; color:#475569;">📉 Total Pengeluaran</div>
-        <div style="font-size:1.5rem; font-weight:800; color:#C62828;">${rupiah(totalPengeluaran)}</div>
-      </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${rupiah(totalModal)}</div><div class="lbl">Total Modal Masuk</div></div>
+      <div class="stat-card green"><div class="num">${rupiah(totalPemasukan)}</div><div class="lbl">Pemasukan Usaha</div></div>
+      <div class="stat-card red"><div class="num">${rupiah(totalPengeluaran)}</div><div class="lbl">Pengeluaran</div></div>
+      <div class="stat-card"><div class="num" style="color:#6D4C41;">${rupiah(saldo)}</div><div class="lbl">Saldo Akhir</div></div>
     </div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:18px;">
-      <div style="background:#faf7f4; padding:14px; border-radius:12px; border:1px solid #ede7e1;">
-        <div style="font-weight:700; color:#6D4C41;">📊 Laba/Rugi Usaha</div>
-        <div style="font-size:1.2rem; font-weight:700; color:${labaUsaha>=0?'#2E7D32':'#C62828'};">${rupiah(labaUsaha)}</div>
-        <div style="font-size:0.7rem; color:#8D6E63;">${labaUsaha>=0 ? '✅ Untung' : '❌ Rugi'}</div>
-      </div>
-      <div style="background:#faf7f4; padding:14px; border-radius:12px; border:1px solid #ede7e1;">
-        <div style="font-weight:700; color:#6D4C41;">🏭 Total HPP Produksi</div>
-        <div style="font-size:1.2rem; font-weight:700; color:#6D4C41;">${rupiah(totalHpp)}</div>
-        <div style="font-size:0.7rem; color:#8D6E63;">Biaya Bahan ${rupiah(totalBiayaBahan)} + Kemasan ${rupiah(totalBiayaKemasan)} + Ops ${rupiah(totalBiayaOperasional)}</div>
-      </div>
-    </div>
-    <div style="background:#faf7f4; padding:14px 18px; border-radius:12px; border:1px solid #ede7e1; margin-bottom:12px;">
-      <div style="font-weight:700; color:#6D4C41;">👥 Modal per Pemberi</div>
-      ${modalListHtml}
-      <div style="padding:4px 0; border-top:2px solid #e0d6ce; display:flex; justify-content:space-between; font-weight:700; color:#6D4C41;">
-        <span>Total</span><span>${rupiah(totalModalMasuk)}</span>
-      </div>
-    </div>
-    <div style="background:#faf7f4; padding:14px 18px; border-radius:12px; border:1px solid #ede7e1;">
-      <div style="font-weight:700; color:#6D4C41;">📋 Riwayat Tambahan Modal</div>
-      <div style="max-height:200px; overflow-y:auto; margin-top:6px;">
-        ${modalTransaksiHtml || '<div class="text-muted">Belum ada tambahan modal</div>'}
-      </div>
+    <div style="margin-top:12px; font-size:0.8125rem; color:#6D4C41;">
+      <p><strong>Saldo Awal:</strong> ${rupiah(data.keuangan.saldoAwal || 0)}</p>
+      <p><strong>Jumlah Modal:</strong> ${rupiah(totalModal)} (dari ${data.modalTambahan.length} entri)</p>
+      <p><strong>Jumlah Penjualan:</strong> ${data.penjualan.filter(j => j.status === 'Lunas').length} transaksi lunas</p>
     </div>
   `;
 }
-
-// ================================================================
-// RIWAYAT
-// ================================================================
 function renderRiwayat() {
-  if (userRole !== 'admin-full') return;
-  const isIhsanUser = isIhsan();
-
-  const pembelianBahan = data.pembelian.map(p => {
-    const b = getBahan(p.bahanId);
-    return {
-      id: p.id,
-      tanggal: p.tanggal || '',
-      createdAt: p.createdAt || p.tanggal,
-      createdBy: p.createdBy || 'system',
-      jenis: 'Bahan',
-      nama: b ? b.nama : '??',
-      jumlah: p.jumlah,
-      satuan: p.satuan,
-      total: p.hargaTotal
-    };
-  });
-  const pembelianKemasan = data.riwayatKemasan.map(r => ({
-    id: r.id,
-    tanggal: r.tanggal || '',
-    createdAt: r.createdAt || r.tanggal,
-    createdBy: r.createdBy || 'system',
-    jenis: 'Kemasan',
-    nama: r.nama,
-    jumlah: r.jumlah,
-    satuan: 'unit',
-    total: r.jumlah * r.hargaPerUnit
-  }));
-  const pembelianPeralatan = data.peralatan.map(p => ({
-    id: p.id,
-    tanggal: p.tanggal || '',
-    createdAt: p.createdAt || p.tanggal,
-    createdBy: p.createdBy || 'system',
-    jenis: 'Peralatan',
-    nama: p.nama,
-    jumlah: p.jumlah,
-    satuan: 'unit',
-    total: p.totalHarga
-  }));
-  const pembelianProduksi = data.produksi.filter(p => p.status === 'selesai').map(p => {
-    const f = getFormulasi(p.formulasiId);
-    const totalBiayaLangsung = (p.biayaBahan || 0) + (p.biayaKemasan || 0);
-    const biayaOps = getBiayaOperasionalFromProduksi(p, totalBiayaLangsung);
-    const hpp = totalBiayaLangsung + biayaOps;
-    return {
-      id: p.id,
-      tanggal: p.tanggal || '',
-      createdAt: p.createdAt || p.tanggal,
-      createdBy: p.createdBy || 'system',
-      jenis: 'Produksi ✅',
-      nama: f ? f.nama : '??',
-      jumlah: p.jumlahLiter + ' L',
-      satuan: 'Bahan: ' + rupiah(p.biayaBahan || 0) + ' | Kemasan: ' + rupiah(p.biayaKemasan || 0),
-      total: hpp
-    };
-  });
-  const semuaPembelian = sortByWaktu([...pembelianBahan, ...pembelianKemasan, ...pembelianPeralatan, ...pembelianProduksi]);
-
-  const headerPembelian = document.getElementById('riwayatPembelianHeader');
-  headerPembelian.innerHTML = `
-    <th>Waktu</th><th>Jenis</th><th>Nama</th><th>Jumlah</th><th>Satuan</th><th>Total</th>
-    ${isIhsanUser ? '<th>Pelaku</th>' : ''}
-    <th>Aksi</th>
-  `;
-  const tbodyPembelian = document.getElementById('riwayatPembelianTbody');
-  tbodyPembelian.innerHTML = semuaPembelian.map(item => {
-    const waktu = formatTanggal(item.createdAt || item.tanggal);
-    let hapusBtn = '';
-    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
-      if (item.jenis === 'Peralatan') hapusBtn = `<button class="btn btn-danger btn-sm" onclick="hapusPeralatan('${item.id}')">🗑️</button>`;
-      else if (item.jenis === 'Produksi ✅') hapusBtn = `<button class="btn btn-danger btn-sm" onclick="hapusProduksiSelesai('${item.id}')">🗑️</button>`;
-      else hapusBtn = `<button class="btn btn-danger btn-sm" onclick="hapusPembelian('${item.id}')">🗑️</button>`;
-    }
-    return `<tr>
-      <td>${waktu}</td>
-      <td><span class="badge ${item.jenis==='Produksi ✅'?'badge-success':item.jenis==='Peralatan'?'badge-info':item.jenis==='Kemasan'?'badge-warning':'badge-success'}">${item.jenis}</span></td>
-      <td>${item.nama}</td>
-      <td>${item.jumlah}</td>
-      <td>${item.satuan}</td>
-      <td>${rupiah(item.total)}</td>
-      ${isIhsanUser ? `<td><span style="font-size:0.7rem;background:#f5f0eb;padding:2px 8px;border-radius:10px;">${item.createdBy}</span></td>` : ''}
-      <td>${hapusBtn}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="${isIhsanUser ? 8 : 7}" class="text-muted">Belum ada pembelian</td></tr>`;
-
-  const penjualan = sortByWaktu(data.penjualan.map(j => {
-    const k = getKemasan(j.kemasanId);
-    let jenisSabun = 'Tidak diketahui';
-    if (k) {
-      const prod = getProduksi(k.produksiId);
-      if (prod) {
-        const f = getFormulasi(prod.formulasiId);
-        if (f) jenisSabun = f.nama;
-      }
-    }
-    return {
-      id: j.id,
-      tanggal: j.tanggal || '',
-      createdAt: j.createdAt || j.tanggal,
-      createdBy: j.createdBy || 'system',
-      kemasan: k ? k.nama : '??',
-      jenisSabun,
-      jumlah: j.jumlahTerjual,
-      hargaPerUnit: j.hargaJualPerUnit,
-      total: j.jumlahTerjual * j.hargaJualPerUnit,
-      status: j.statusBayar || 'Lunas'
-    };
-  }));
-  const headerPenjualan = document.getElementById('riwayatPenjualanHeader');
-  headerPenjualan.innerHTML = `
-    <th>Waktu</th><th>Jenis Sabun</th><th>Kemasan</th><th>Jumlah</th><th>Harga/unit</th><th>Total</th><th>Status</th>
-    ${isIhsanUser ? '<th>Pelaku</th>' : ''}
-    <th>Aksi</th>
-  `;
-  const tbodyPenjualan = document.getElementById('riwayatPenjualanTbody');
-  tbodyPenjualan.innerHTML = penjualan.map(item => {
-    const waktu = formatTanggal(item.createdAt || item.tanggal);
-    let aksi = '';
-    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
-      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${item.id}')">🗑️</button>`;
-      if (item.status === 'Hutang') aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${item.id}')">Bayar</button>`;
-    }
-    const statusBadge = item.status === 'Lunas' ? 'badge-success' : 'badge-danger';
-    return `<tr>
-      <td>${waktu}</td>
-      <td>${item.jenisSabun}</td>
-      <td>${item.kemasan}</td>
-      <td>${item.jumlah}</td>
-      <td>${rupiah(item.hargaPerUnit)}</td>
-      <td>${rupiah(item.total)}</td>
-      <td><span class="badge ${statusBadge}">${item.status}</span></td>
-      ${isIhsanUser ? `<td><span style="font-size:0.7rem;background:#f5f0eb;padding:2px 8px;border-radius:10px;">${item.createdBy}</span></td>` : ''}
-      <td>${aksi}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="${isIhsanUser ? 9 : 8}" class="text-muted">Belum ada penjualan</td></tr>`;
-
-  const modalList = sortByWaktu(data.modalTambahan);
-  const headerModal = document.getElementById('riwayatModalHeader');
-  headerModal.innerHTML = `
-    <th>Waktu</th><th>Pemberi</th><th>Jumlah</th><th>Keterangan</th>
-    ${isIhsanUser ? '<th>Pelaku</th>' : ''}
-    <th>Aksi</th>
-  `;
+  const tbodyBeli = document.getElementById('riwayatPembelianTbody');
+  const headerBeli = document.getElementById('riwayatPembelianHeader');
+  if (tbodyBeli && headerBeli) {
+    headerBeli.innerHTML = `<tr><th>Tanggal</th><th>Bahan</th><th>Jumlah</th><th>Satuan</th><th>Total</th><th>Ongkir</th></tr>`;
+    tbodyBeli.innerHTML = sortByWaktu(data.pembelian).map(p => {
+      const b = getBahan(p.bahanId);
+      return `<tr>
+        <td>${formatTanggal(p.tanggal)}</td>
+        <td>${b ? b.nama : '❌'}</td>
+        <td>${p.jumlah}</td>
+        <td>${p.satuan}</td>
+        <td>${rupiah(p.hargaTotal)}</td>
+        <td>${rupiah(p.ongkir || 0)}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada pembelian.</td></tr>';
+  }
+  const tbodyJual = document.getElementById('riwayatPenjualanTbody');
+  const headerJual = document.getElementById('riwayatPenjualanHeader');
+  if (tbodyJual && headerJual) {
+    headerJual.innerHTML = `<tr><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Total</th><th>Status</th></tr>`;
+    tbodyJual.innerHTML = sortByWaktu(data.penjualan).map(j => {
+      const sts = j.status === 'Lunas' ? '✅ Lunas' : '❌ Hutang';
+      return `<tr>
+        <td>${formatTanggal(j.tanggal)}</td>
+        <td>${j.jenisSabun}</td>
+        <td>${j.jumlahTerjual}</td>
+        <td>${rupiah(j.total)}</td>
+        <td>${sts}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" class="text-muted">Belum ada penjualan.</td></tr>';
+  }
   const tbodyModal = document.getElementById('riwayatModalTbody');
-  tbodyModal.innerHTML = modalList.map(m => {
-    const waktu = formatTanggal(m.createdAt || m.tanggal);
-    let aksi = '';
-    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
-      aksi = `<button class="btn btn-warning btn-sm" onclick="editModal('${m.id}')">✏️</button>
-              <button class="btn btn-danger btn-sm" onclick="hapusModal('${m.id}')">🗑️</button>`;
-    }
-    return `<tr>
-      <td>${waktu}</td>
-      <td>${m.pemberi}</td>
-      <td>${rupiah(m.jumlah)}</td>
-      <td>${m.keterangan || '-'}</td>
-      ${isIhsanUser ? `<td><span style="font-size:0.7rem;background:#f5f0eb;padding:2px 8px;border-radius:10px;">${m.createdBy}</span></td>` : ''}
-      <td>${aksi}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="${isIhsanUser ? 6 : 5}" class="text-muted">Belum ada tambahan modal</td></tr>`;
+  const headerModal = document.getElementById('riwayatModalHeader');
+  if (tbodyModal && headerModal) {
+    headerModal.innerHTML = `<tr><th>Tanggal</th><th>Pemberi</th><th>Jumlah</th><th>Keterangan</th></tr>`;
+    tbodyModal.innerHTML = sortByWaktu(data.modalTambahan).map(m => `
+      <tr>
+        <td>${formatTanggal(m.tanggal)}</td>
+        <td>${m.pemberi}</td>
+        <td>${rupiah(m.jumlah)}</td>
+        <td>${m.keterangan || '-'}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="text-muted">Belum ada modal.</td></tr>';
+  }
 }
 
 // ================================================================
-// PERALATAN, HARGA SIMULASI, AUDIT LOG, DLL.
+// PERALATAN
 // ================================================================
 function tambahPeralatan() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
@@ -4348,19 +3381,19 @@ function tambahPeralatan() {
     return;
   }
   const nama = document.getElementById('peralatanNama').value.trim();
-  const jumlah = parseInt(document.getElementById('peralatanJumlah').value);
+  const jml = parseInt(document.getElementById('peralatanJumlah').value);
   const harga = parseFloat(document.getElementById('peralatanHarga').value);
   const tanggal = document.getElementById('peralatanTanggal').value || todayStr();
-  const keterangan = document.getElementById('peralatanKeterangan').value.trim();
-  if (!nama || !jumlah || jumlah <= 0 || !harga || harga <= 0) {
-    showAlert('Isi Nama, Jumlah, dan Harga dengan benar!','error');
+  const ket = document.getElementById('peralatanKeterangan').value.trim();
+
+  if (!nama || !jml || jml <= 0 || !harga || harga <= 0) {
+    showAlert('Isi semua field dengan benar!', 'error');
     return;
   }
-  const total = jumlah * harga;
   const id = genId();
-  data.peralatan.push({ id, nama, jumlah, hargaPerUnit: harga, totalHarga: total, tanggal, keterangan, createdBy: getAuditUser(), createdAt: getAuditTime() });
-  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Peralatan: ' + nama, jumlah: total, tanggal });
-  logAudit('create','peralatan',id,`Peralatan ${nama} ${jumlah} unit, total ${rupiah(total)}`,'');
+  data.peralatan.push({ id, nama, jumlah: jml, hargaPerUnit: harga, total: jml * harga, tanggal, keterangan: ket, createdBy: getAuditUser(), createdAt: getAuditTime() });
+  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli peralatan ' + nama, jumlah: jml * harga, tanggal });
+  logAudit('create', 'peralatan', id, `Peralatan ${nama} x${jml} = ${rupiah(jml*harga)}`, '');
   document.getElementById('peralatanNama').value = '';
   document.getElementById('peralatanJumlah').value = '';
   document.getElementById('peralatanHarga').value = '';
@@ -4373,431 +3406,290 @@ function hapusPeralatan(id) {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  if (!confirm('⚠️ Hapus peralatan ini? Pengeluaran akan dikembalikan.')) return;
-  const idx = data.peralatan.findIndex(p => p.id === id);
-  if (idx !== -1) {
-    const item = data.peralatan[idx];
-    data.keuangan.pengeluaran = data.keuangan.pengeluaran.filter(k =>
-      !(k.sumber === 'Peralatan: ' + item.nama && k.jumlah === item.totalHarga && k.tanggal === item.tanggal)
-    );
-    data.peralatan.splice(idx, 1);
-    logAudit('delete','peralatan',id,`Peralatan ${item.nama} dihapus`,'');
-    renderAll();
-    showAlert('✅ Peralatan berhasil dihapus.');
-  }
+  const item = data.peralatan.find(p => p.id === id);
+  if (!item) return;
+  if (!confirm('⚠️ Hapus peralatan "' + item.nama + '"?')) return;
+  data.peralatan = data.peralatan.filter(p => p.id !== id);
+  logAudit('delete', 'peralatan', id, `Peralatan ${item.nama} dihapus`, '');
+  renderAll();
+  showAlert('✅ Peralatan dihapus.');
 }
 function renderPeralatan() {
   const tbody = document.getElementById('peralatanTbody');
   if (!tbody) return;
-  const isInvestor = (userRole === 'investor');
-  tbody.innerHTML = sortByWaktu(data.peralatan).map(item => {
+  tbody.innerHTML = sortByWaktu(data.peralatan).map(p => {
     let aksi = '';
     if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
-      aksi = `<button class="btn btn-danger btn-sm" onclick="hapusPeralatan('${item.id}')">Hapus</button>`;
-    } else if (isInvestor) aksi = `<span class="text-muted">🔒</span>`;
-    const waktu = formatTanggal(item.createdAt || item.tanggal);
+      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusPeralatan('${p.id}')">🗑️</button>`;
+    }
     return `<tr>
-      <td><strong>${item.nama}</strong></td>
-      <td>${item.jumlah}</td>
-      <td>${rupiah(item.hargaPerUnit)}</td>
-      <td>${rupiah(item.totalHarga)}</td>
-      <td>${waktu}</td>
+      <td>${p.nama}</td>
+      <td>${p.jumlah}</td>
+      <td>${rupiah(p.hargaPerUnit)}</td>
+      <td>${rupiah(p.total)}</td>
+      <td>${formatTanggal(p.tanggal)}</td>
       <td>${aksi}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada peralatan.</td></tr>';
 }
 
 // ================================================================
-// STOK WARNINGS
-// ================================================================
-function checkStokWarnings() {
-  const warnings = [];
-  data.bahan.forEach(b => {
-    if (b.stok <= (b.threshold || 1)) warnings.push(`⚠️ ${b.nama} tersisa ${b.stok.toFixed(2)} ${b.satuanDasar}`);
-  });
-  data.kemasanBeli.forEach(k => {
-    if (k.stok <= 5) warnings.push(`⚠️ Kemasan ${k.nama} tersisa ${k.stok} unit`);
-  });
-  data.kemasan.forEach(k => {
-    const stok = stokKemasan(k);
-    if (stok <= 5 && stok > 0) warnings.push(`⚠️ ${k.nama} tersisa ${stok} unit`);
-    else if (stok <= 0) warnings.push(`❌ ${k.nama} habis!`);
-  });
-  const badge = document.getElementById('stokNotifBadge');
-  if (warnings.length > 0) {
-    badge.style.display = 'inline-block';
-    badge.textContent = warnings.length;
-    badge.title = warnings.join('\n');
-  } else badge.style.display = 'none';
-  const container = document.getElementById('stokWarningList');
-  if (warnings.length > 0) {
-    container.innerHTML = `
-      <div style="background:#fce4e4;border-radius:12px;padding:12px 16px;border:1px solid #f5c6c6;">
-        <strong style="color:#C62828;">⚠️ Peringatan Stok:</strong>
-        <ul style="margin:6px 0 0 20px;font-size:0.8125rem;">
-          ${warnings.map(w => `<li>${w}</li>`).join('')}
-        </ul>
-      </div>
-    `;
-  } else container.innerHTML = '';
-}
-
-// ================================================================
-// SIMULASI (yang sudah ada, tidak diubah)
+// SIMULASI
 // ================================================================
 function toggleSimulasiIsiMode() {
-  const mode = document.querySelector('input[name="simulasiIsiMode"]:checked').value;
-  const beratInput = document.getElementById('simulasiBeratIsi');
-  const kemasanSelect = document.getElementById('simulasiKemasan');
-  const selectedOption = kemasanSelect.options[kemasanSelect.selectedIndex];
-  const volumeMl = selectedOption ? parseFloat(selectedOption.dataset.volume || 0) : 0;
-  const formSelect = document.getElementById('simulasiForm');
-  const formId = formSelect.value;
-  const f = getFormulasi(formId);
-  const bjVal = f ? f.bj : 1.025;
-
-  if (mode === 'otomatis' && volumeMl > 0) {
-    const berat = volumeMl * bjVal;
-    beratInput.value = berat.toFixed(1);
-    beratInput.readOnly = true;
+  const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
+  const beratIsi = document.getElementById('simulasiBeratIsi');
+  if (mode === 'manual') {
+    beratIsi.placeholder = 'Masukkan gram';
+    beratIsi.disabled = false;
   } else {
-    beratInput.readOnly = false;
+    beratIsi.placeholder = 'Otomatis (vol × BJ)';
+    beratIsi.disabled = true;
+    beratIsi.value = '';
   }
+  hitungSimulasi();
 }
 function updateSimulasiDropdowns() {
   const selForm = document.getElementById('simulasiForm');
-  if (userRole === 'operasional' || userRole === 'adm') {
-    selForm.innerHTML = '<option value="">Tidak ada akses</option>';
-    return;
+  const selKemasan = document.getElementById('simulasiKemasan');
+  if (selForm) {
+    selForm.innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama}</option>`).join('');
   }
-  selForm.innerHTML = data.formulasi.map(f => `<option value="${f.id}">${f.nama} (BJ ${f.bj || 1.025})</option>`).join('');
-  const selKem = document.getElementById('simulasiKemasan');
-  selKem.innerHTML = data.kemasanBeli.map(k => `<option value="${k.id}" data-volume="${k.volumeMl || 0}">${k.nama} (${k.volumeMl || 0} mL, stok: ${k.stok})</option>`).join('');
-  if (data.kemasanBeli.length === 0) selKem.innerHTML = '<option value="">Tidak ada kemasan</option>';
-  selKem.onchange = function() {
-    if (document.querySelector('input[name="simulasiIsiMode"]:checked').value === 'otomatis') {
-      toggleSimulasiIsiMode();
-    }
-  };
-  selForm.onchange = function() {
-    if (document.querySelector('input[name="simulasiIsiMode"]:checked').value === 'otomatis') {
-      toggleSimulasiIsiMode();
-    }
-  };
-  setTimeout(() => {
-    toggleSimulasiIsiMode();
-  }, 100);
+  if (selKemasan) {
+    selKemasan.innerHTML = data.kemasanBeli.map(k => `<option value="${k.id}">${k.nama} (${k.volumeMl || 0}mL)</option>`).join('');
+  }
+  toggleSimulasiIsiMode();
+  hitungSimulasi();
 }
 function hitungSimulasi() {
-  if (userRole === 'operasional' || userRole === 'adm') {
-    showAlert('Anda tidak memiliki akses ke simulasi!','error');
+  const formId = document.getElementById('simulasiForm')?.value;
+  const liter = parseFloat(document.getElementById('simulasiLiter')?.value) || 0;
+  const kemasanId = document.getElementById('simulasiKemasan')?.value;
+  const jmlUnit = parseInt(document.getElementById('simulasiJmlUnit')?.value) || 0;
+  const hargaJual = parseFloat(document.getElementById('simulasiHargaJual')?.value) || 0;
+  const opsMode = document.getElementById('simulasiOpsMode')?.value || '15';
+  const opsManual = parseFloat(document.getElementById('simulasiOpsManual')?.value) || 0;
+
+  const container = document.getElementById('simulasiHasil');
+  if (!formId || !liter || liter <= 0 || !kemasanId || !jmlUnit || jmlUnit <= 0) {
+    container.style.display = 'none';
     return;
   }
-  const fid = document.getElementById('simulasiForm').value;
-  const liter = parseFloat(document.getElementById('simulasiLiter').value);
-  const kid = document.getElementById('simulasiKemasan').value;
-  const beratIsi = parseFloat(document.getElementById('simulasiBeratIsi').value) || 0;
-  const jmlUnit = parseInt(document.getElementById('simulasiJmlUnit').value);
-  const hargaJual = parseFloat(document.getElementById('simulasiHargaJual').value);
-  if (!fid || !liter || liter <= 0 || !kid || !beratIsi || beratIsi <= 0 || !jmlUnit || jmlUnit <= 0 || !hargaJual || hargaJual <= 0) {
-    showAlert('⚠️ Isi semua field dengan benar!', 'error');
-    return;
-  }
-  const f = getFormulasi(fid);
-  if (!f) { showAlert('Formulasi tidak ditemukan!','error'); return; }
-  const k = getKemasanBeli(kid);
-  if (!k) { showAlert('Kemasan tidak ditemukan!','error'); return; }
-  const totalBeratProduk = (beratIsi * jmlUnit) / 1000;
-  const bj = f.bj || 1.025;
-  const totalVolume = totalBeratProduk / bj;
-  
-  let totalBiayaBahan = 0, detailBahan = [], stokCukup = true, pesanStok = '';
+
+  const f = getFormulasi(formId);
+  const k = getKemasanBeli(kemasanId);
+  if (!f || !k) { container.style.display = 'none'; return; }
+
+  const totalBerat = liter * (f.bj || 1.025);
+  let biayaBahan = 0;
+  const isAdmin = userRole === 'admin-full';
   f.items.forEach(it => {
     const b = getBahan(it.bahanId);
     if (!b) return;
     const persen = it.persen || 0;
-    const butuhLarutan = (persen / 100) * totalBeratProduk;
+    let butuhLarutan = (persen / 100) * totalBerat;
     let butuhStok = butuhLarutan;
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    let hargaPakai;
-    if (userRole === 'admin-full') {
-      hargaPakai = getHargaRataRataBahan(b.id);
-    } else {
-      if (data.hargaSimulasi && data.hargaSimulasi[b.id] !== undefined && data.hargaSimulasi[b.id] !== null) {
-        hargaPakai = data.hargaSimulasi[b.id];
-      } else {
-        hargaPakai = 0;
-      }
-    }
-    const biaya = butuhStok * hargaPakai;
-    totalBiayaBahan += biaya;
-    if (b.stok < butuhStok) { stokCukup = false; pesanStok += `${b.nama} butuh ${butuhStok.toFixed(3)} ${b.satuanDasar}, stok ${b.stok.toFixed(3)}\n`; }
-    if (hargaPakai > 0 || userRole === 'admin-full') {
-      detailBahan.push({ nama: b.nama, butuh: butuhStok, satuan: b.satuanDasar, biaya, hargaPakai });
-    }
+    const harga = isAdmin ? (b.hargaRataRata || 0) : (data.hargaSimulasi?.[it.bahanId] || 0);
+    biayaBahan += butuhStok * harga;
   });
-  const biayaKemasan = jmlUnit * k.hargaPerUnit;
-  const totalBiayaLangsung = totalBiayaBahan + biayaKemasan;
-  const opsMode = document.getElementById('simulasiOpsMode').value;
-  const opsManual = parseFloat(document.getElementById('simulasiOpsManual').value) || 0;
-  let biayaOperasional = 0, hpp = 0;
-  if (opsMode === 'manual') { biayaOperasional = opsManual; hpp = totalBiayaLangsung + biayaOperasional; }
-  else { const persen = parseFloat(opsMode)/100; hpp = totalBiayaLangsung / (1 - persen); biayaOperasional = hpp - totalBiayaLangsung; }
-  const hppPerUnit = jmlUnit > 0 ? hpp / jmlUnit : 0;
-  const labaPerUnit = hargaJual - hppPerUnit;
-  const totalLaba = labaPerUnit * jmlUnit;
-  const margin = hargaJual > 0 ? (labaPerUnit / hargaJual) * 100 : 0;
-  const stokKemasanCukup = k.stok >= jmlUnit;
-  if (!stokKemasanCukup) { stokCukup = false; pesanStok += `Kemasan ${k.nama} butuh ${jmlUnit} unit, stok ${k.stok}`; }
-  const hasilDiv = document.getElementById('simulasiHasil');
-  const labaStr = labaPerUnit >= 0 ? 'LABA' : 'RUGI';
-  const labaColor = labaPerUnit >= 0 ? '#2E7D32' : '#C62828';
-  const opsLabel = (opsMode === 'manual') ? 'Manual' : opsMode + '% dari HPP';
-  let html = `
-    <div class="simulasi-card">
-      <h4>📋 HASIL SIMULASI</h4>
-      <div style="margin-top:8px;">
-        <div class="simulasi-hasil-item"><span class="label">Kemasan</span><span class="value">${k.nama} (${k.volumeMl || 0} mL)</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Berat Isi per Kemasan</span><span class="value">${beratIsi} gram</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Jumlah Unit</span><span class="value">${jmlUnit} unit</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Berat Produk</span><span class="value">${totalBeratProduk.toFixed(2)} kg</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Volume (Liter)</span><span class="value">${totalVolume.toFixed(2)} L (BJ ${bj})</span></div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Bahan</span><span class="value">${rupiah(totalBiayaBahan)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Kemasan</span><span class="value">${rupiah(biayaKemasan)}</span></div>
-        <div class="simulasi-hasil-item" style="background:#fff3e0;padding:6px 10px;border-radius:8px;">
-          <span class="label" style="font-weight:700;">Biaya Operasional (${opsLabel})</span>
-          <span class="value" style="font-weight:700;">${rupiah(biayaOperasional)}</span>
-        </div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item"><span class="label">Total Biaya Langsung</span><span class="value">${rupiah(totalBiayaLangsung)}</span></div>
-        <div style="border-top:2px solid #8D6E63;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item total"><span class="label">TOTAL HPP</span><span class="value">${rupiah(hpp)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">HPP per Unit</span><span class="value">${rupiah(hppPerUnit)}</span></div>
-        <div class="simulasi-hasil-item"><span class="label">Harga Jual per Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
-        <div style="border-top:1px dashed #e0d6ce;margin:6px 0;"></div>
-        <div class="simulasi-hasil-item laba" style="color:${labaColor};">
-          <span class="label">💰 LABA per Unit</span>
-          <span class="value">${rupiah(labaPerUnit)} (${labaStr})</span>
-        </div>
-        <div class="simulasi-hasil-item laba" style="color:${totalLaba >= 0 ? '#2E7D32' : '#C62828'};">
-          <span class="label">💰 TOTAL LABA</span>
-          <span class="value">${rupiah(totalLaba)}</span>
-        </div>
-        <div class="simulasi-hasil-item"><span class="label">📈 Margin</span><span class="value" style="color:${margin >= 0 ? '#2E7D32' : '#C62828'};">${margin.toFixed(1)}%</span></div>
-      </div>
-    </div>
-  `;
-  if (detailBahan.length > 0) {
-    const labelHarga = (userRole === 'admin-full') ? 'pakai harga rata-rata' : 'pakai harga simulasi';
-    html += `
-      <div class="simulasi-card" style="margin-top:12px;">
-        <h4>🧪 Rincian Bahan (${labelHarga})</h4>
-        ${detailBahan.map(d => `
-          <div class="simulasi-hasil-item">
-            <span class="label">${d.nama}</span>
-            <span class="value">${d.butuh.toFixed(3)} ${d.satuan} × ${rupiah(d.hargaPakai)} = ${rupiah(d.biaya)}</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
+
+  const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
+  let beratPerUnit = 0;
+  if (mode === 'otomatis') {
+    beratPerUnit = (k.volumeMl || 0) * (f.bj || 1.025);
+  } else {
+    beratPerUnit = parseFloat(document.getElementById('simulasiBeratIsi')?.value) || 0;
   }
-  html += `
-    <div style="margin-top:12px;padding:12px 16px;border-radius:12px;background:${stokCukup ? '#e8f5e9' : '#fce4e4'};border:1px solid ${stokCukup ? '#2E7D32' : '#C62828'};">
-      ${stokCukup ? '✅ Semua stok cukup.' : '⚠️ Stok tidak cukup!<br><pre style="font-size:0.75rem;margin-top:4px;white-space:pre-wrap;">' + pesanStok + '</pre>'}
+  if (beratPerUnit <= 0) { container.style.display = 'none'; return; }
+  const totalBeratKemasan = (beratPerUnit * jmlUnit) / 1000;
+  if (totalBeratKemasan > totalBerat) {
+    container.innerHTML = `<div class="alert-toast error" style="display:block;">❌ Total berat kemasan (${totalBeratKemasan.toFixed(3)} kg) melebihi kapasitas produksi (${totalBerat.toFixed(3)} kg)</div>`;
+    container.style.display = 'block';
+    return;
+  }
+
+  const biayaKemasan = (k.hargaPerUnit || 0) * jmlUnit;
+  let biayaOps = 0;
+  if (opsMode === 'manual') {
+    biayaOps = opsManual;
+  } else {
+    biayaOps = (parseFloat(opsMode) / 100) * biayaBahan;
+  }
+  const totalBiaya = biayaBahan + biayaKemasan + biayaOps;
+  const totalPendapatan = jmlUnit * hargaJual;
+  const laba = totalPendapatan - totalBiaya;
+  const margin = totalBiaya > 0 ? (laba / totalBiaya * 100) : 0;
+
+  container.innerHTML = `
+    <div class="simulasi-card">
+      <h4>📊 Hasil Simulasi</h4>
+      <div class="simulasi-hasil-item"><span class="label">Formulasi</span><span class="value">${f.nama}</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Volume Produksi</span><span class="value">${liter} L</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Kemasan</span><span class="value">${k.nama} (${jmlUnit} unit)</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Berat per Kemasan</span><span class="value">${beratPerUnit.toFixed(1)} g</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Total Berat Kemasan</span><span class="value">${(totalBeratKemasan).toFixed(3)} kg</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Biaya Bahan</span><span class="value">${rupiah(biayaBahan)}</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Biaya Kemasan</span><span class="value">${rupiah(biayaKemasan)}</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Biaya Operasional</span><span class="value">${rupiah(biayaOps)}</span></div>
+      <div class="simulasi-hasil-item total"><span class="label">Total Biaya</span><span class="value">${rupiah(totalBiaya)}</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Harga Jual/Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
+      <div class="simulasi-hasil-item"><span class="label">Total Pendapatan</span><span class="value">${rupiah(totalPendapatan)}</span></div>
+      <div class="simulasi-hasil-item laba" style="color:${laba >= 0 ? '#2E7D32' : '#C62828'}">
+        <span class="label">${laba >= 0 ? '✅ Laba' : '❌ Rugi'}</span>
+        <span class="value">${rupiah(laba)} (${margin.toFixed(1)}%)</span>
+      </div>
+      <div class="simulasi-hasil-item" style="border-bottom:none; font-size:0.75rem; color:#8D6E63;">
+        <span class="label">Biaya per Unit</span>
+        <span class="value">${rupiah(totalBiaya / jmlUnit)}</span>
+      </div>
     </div>
   `;
-  hasilDiv.innerHTML = html;
-  hasilDiv.style.display = 'block';
+  container.style.display = 'block';
 }
 
 // ================================================================
-// HARGA SIMULASI, AUDIT LOG, RESET, DLL.
+// HARGA SIMULASI
 // ================================================================
 function renderHargaSimulasi() {
   const container = document.getElementById('hargaSimulasiContainer');
   if (!container) return;
   if (userRole !== 'admin-full') {
-    container.innerHTML = '<div class="text-muted">🔒 Hanya admin penuh yang dapat mengatur harga simulasi.</div>';
+    container.innerHTML = '<p class="text-muted">Hanya admin full yang dapat mengatur harga simulasi.</p>';
     return;
   }
-  if (!data.hargaSimulasi) data.hargaSimulasi = {};
-  let html = `<div class="table-wrap"><table>
-    <thead><tr><th>Nama Bahan</th><th>Satuan Dasar</th><th>Harga Simulasi (per satuan)</th></tr></thead>
-    <tbody>`;
-  data.bahan.forEach(b => {
-    const current = data.hargaSimulasi[b.id] !== undefined && data.hargaSimulasi[b.id] !== null ? data.hargaSimulasi[b.id] : '';
-    html += `<tr>
-      <td><strong>${b.nama}</strong></td>
-      <td>${b.satuanDasar}</td>
-      <td><input type="number" step="0.01" class="harga-simulasi-input" data-bahan-id="${b.id}" value="${current}" placeholder="Kosong = pakai harga rata-rata" style="width:160px;padding:6px 10px;border:1.5px solid #e0d6ce;border-radius:8px;font-size:0.8125rem;font-family:inherit;"></td>
-    </tr>`;
-  });
-  html += `</tbody></table></div>
-    <p class="text-muted">Jika dibiarkan kosong, simulasi akan menggunakan harga rata-rata pembelian.</p>`;
-  container.innerHTML = html;
+  container.innerHTML = data.bahan.map(b => {
+    const val = data.hargaSimulasi?.[b.id] ?? '';
+    return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;">
+      <span style="font-weight:600; min-width:120px;">${b.nama}</span>
+      <span style="font-size:0.75rem; color:#8D6E63; min-width:40px;">/${b.satuanDasar}</span>
+      <input type="number" step="0.01" class="harga-simulasi-input" data-id="${b.id}" value="${val}" placeholder="Harga simulasi" style="flex:1; min-width:120px;">
+      <span style="font-size:0.7rem; color:#8D6E63;">(aktual: ${rupiah(b.hargaRataRata || 0)})</span>
+    </div>`;
+  }).join('');
 }
 function simpanHargaSimulasi() {
-  if (userRole !== 'admin-full') {
-    showAlert('❌ Hanya admin penuh!', 'error');
-    return;
-  }
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
   const inputs = document.querySelectorAll('.harga-simulasi-input');
-  if (!data.hargaSimulasi) data.hargaSimulasi = {};
+  let updated = 0;
   inputs.forEach(inp => {
-    const id = inp.dataset.bahanId;
+    const id = inp.dataset.id;
     const val = parseFloat(inp.value);
     if (!isNaN(val) && val >= 0) {
+      if (!data.hargaSimulasi) data.hargaSimulasi = {};
       data.hargaSimulasi[id] = val;
-    } else {
-      delete data.hargaSimulasi[id];
+      updated++;
     }
   });
-  logAudit('update', 'hargaSimulasi', 'all', 'Update harga simulasi', '');
+  logAudit('update', 'hargaSimulasi', 'all', `Update ${updated} harga simulasi`, '');
   renderAll();
-  showAlert('✅ Harga simulasi berhasil disimpan!');
+  showAlert('✅ ' + updated + ' harga simulasi berhasil disimpan!');
 }
+
+// ================================================================
+// AUDIT LOG
+// ================================================================
 function renderAuditLog() {
   const container = document.getElementById('auditLogContainer');
+  if (!container) return;
   if (userRole !== 'admin-full') {
-    container.innerHTML = '<div class="text-muted">🔒 Anda tidak memiliki akses ke riwayat edit.</div>';
+    container.innerHTML = '<p class="text-muted">Akses terbatas.</p>';
     return;
   }
-  const logs = data.auditLogs ? sortByWaktu(data.auditLogs) : [];
-  if (logs.length === 0) {
-    container.innerHTML = '<div class="text-muted">Belum ada riwayat edit.</div>';
-    return;
-  }
-  let html = '';
-  logs.slice(0, 200).forEach(log => {
-    const waktu = formatTanggal(log.timestamp);
-    const actionClass = log.action === 'create' ? 'create' : (log.action === 'update' ? 'update' : 'delete');
-    const actionLabel = log.action === 'create' ? '➕' : (log.action === 'update' ? '✏️' : '🗑️');
-    html += `
-      <div class="log-entry">
-        <span class="time">${waktu}</span>
-        <span class="user">${log.user}</span>
-        <span class="action ${actionClass}">${actionLabel} ${log.action}</span>
-        <span class="detail"><strong>${log.collection}</strong> ${log.docId} — ${log.changes || ''}</span>
-        <span style="font-size:0.7rem;color:#b0a090;flex:0 0 auto;">${log.details || ''}</span>
+  const logs = (data.auditLogs || []).slice(-100).reverse();
+  container.innerHTML = logs.map(log => `
+    <div class="log-entry">
+      <span class="time">${formatTanggal(log.timestamp)}</span>
+      <span class="user">${log.user || 'system'}</span>
+      <span class="action ${log.action || ''}">${log.action || ''}</span>
+      <span class="detail">${log.collection || ''} ${log.changes || ''}</span>
+    </div>
+  `).join('') || '<div class="text-muted">Belum ada riwayat.</div>';
+}
+
+// ================================================================
+// STOK WARNINGS
+// ================================================================
+function checkStokWarnings() {
+  const container = document.getElementById('stokWarningList');
+  if (!container) return;
+  const warnings = [];
+  data.bahan.forEach(b => {
+    if (b.stok <= (b.threshold || 1)) {
+      warnings.push(`${b.nama}: ${b.stok.toFixed(2)} ${b.satuanDasar} (≤ ${b.threshold || 1})`);
+    }
+  });
+  data.kemasanBeli.forEach(k => {
+    if (k.stok <= 5) {
+      warnings.push(`${k.nama} (kemasan): ${k.stok} unit`);
+    }
+  });
+  const badge = document.getElementById('stokNotifBadge');
+  if (warnings.length > 0) {
+    container.innerHTML = `
+      <div style="background:#fce4e4; padding:10px 16px; border-radius:12px; border:1px solid #f5c6c6;">
+        <strong style="color:#C62828;">⚠️ Peringatan Stok Menipis:</strong>
+        <ul style="margin:6px 0 0 20px; font-size:0.8125rem;">
+          ${warnings.map(w => `<li>${w}</li>`).join('')}
+        </ul>
       </div>
     `;
-  });
-  container.innerHTML = html + (logs.length > 200 ? `<div class="text-muted">... dan ${logs.length - 200} entri lainnya.</div>` : '');
+    badge.style.display = 'inline';
+    badge.textContent = warnings.length;
+  } else {
+    container.innerHTML = '';
+    badge.style.display = 'none';
+  }
 }
+
+// ================================================================
+// RESET ALL DATA
+// ================================================================
 function resetAllData() {
-  if (userRole !== 'admin-full') {
-    showAlert('❌ Hanya admin full yang bisa mereset data!','error');
-    return;
-  }
-  if (!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data transaksi, stok, dan produksi.\nFormulasi akan tetap aman.\n\nApakah Anda yakin?')) return;
-  modal('⚠️ KONFIRMASI RESET DATA', `
-    <div style="margin-bottom:16px;">
-      <p style="color:#C62828; font-weight:700; margin-bottom:12px;">
-        ⚠️ TINDAKAN INI TIDAK DAPAT DIBATALKAN!
-      </p>
-      <p style="margin-bottom:16px; color:#3E2723;">
-        Semua data berikut akan dihapus:
-        <ul style="margin:12px 0 12px 20px; color:#5D4A3A;">
-          <li>Stok bahan baku (di-set ke 0)</li>
-          <li>Semua pembelian</li>
-          <li>Semua produksi</li>
-          <li>Semua kemasan</li>
-          <li>Semua penjualan</li>
-          <li>Semua peralatan</li>
-          <li>Semua modal tambahan</li>
-          <li>Semua riwayat keuangan</li>
-        </ul>
-      </p>
-      <p style="font-weight:700; color:#6D4C41; margin-bottom:8px;">
-        Untuk melanjutkan, ketik kata <strong style="color:#C62828;">"RESET"</strong> di bawah ini:
-      </p>
-      <input type="text" id="resetConfirmInput" class="reset-confirm-input" placeholder="Ketik RESET" autocomplete="off" spellcheck="false" style="text-transform:uppercase; text-align:center; font-weight:700; letter-spacing:2px;">
-      <div id="resetConfirmStatus" style="margin-top:8px; font-size:0.8125rem; color:#8D6E63; text-align:center;"></div>
-    </div>
-  `, () => {
-    const input = document.getElementById('resetConfirmInput');
-    const status = document.getElementById('resetConfirmStatus');
-    if (!input || input.value.toUpperCase() !== 'RESET') {
-      if (status) status.innerHTML = '❌ Harap ketik "RESET" untuk melanjutkan.';
-      showAlert('❌ Harap ketik "RESET" untuk melanjutkan!', 'error');
-      return false;
-    }
-    data.bahan.forEach(b => { b.stok = 0; b.hargaRataRata = 0; });
-    data.pembelian = [];
-    data.riwayatKemasan = [];
-    data.kemasanBeli = [];
-    data.produksi = [];
-    data.kemasan = [];
-    data.penjualan = [];
-    data.peralatan = [];
-    data.modalTambahan = [];
-    data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
-    logAudit('delete','all','all','Reset semua data oleh admin','');
-    renderAll();
-    showAlert('✅ Semua data berhasil direset!');
-    closeModal();
-    return true;
-  });
-  setTimeout(() => {
-    const input = document.getElementById('resetConfirmInput');
-    const status = document.getElementById('resetConfirmStatus');
-    if (input) {
-      input.addEventListener('input', function() {
-        const val = this.value.toUpperCase();
-        if (val === 'RESET') {
-          this.classList.add('match');
-          if (status) status.innerHTML = '✅ Cocok! Klik "Simpan" untuk melanjutkan.';
-        } else {
-          this.classList.remove('match');
-          if (status) status.innerHTML = '❌ Ketik "RESET" (huruf besar)';
-        }
-      });
-      if (status) status.innerHTML = '❌ Ketik "RESET" (huruf besar)';
-    }
-  }, 100);
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
+  if (!confirm('⚠️ INI AKAN MENGHAPUS SEMUA DATA! Lanjutkan?')) return;
+  if (!confirm('⚠️ YAKIN? Data akan hilang selamanya!')) return;
+  const defaultData = getDefaultData();
+  data = defaultData;
+  data.hargaSimulasi = {};
+  data.auditLogs = [];
+  logAudit('reset', 'all', 'all', 'Reset semua data ke default', '');
+  renderAll();
+  showAlert('✅ Semua data telah direset ke default.');
 }
+
+// ================================================================
+// HAPUS PEMBELIAN
+// ================================================================
 function hapusPembelian(id) {
-  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  if (!confirm('⚠️ Hapus pembelian ini? Stok akan dikembalikan.')) return;
+  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
   const idx = data.pembelian.findIndex(p => p.id === id);
-  if (idx !== -1) {
-    const p = data.pembelian[idx];
-    const b = getBahan(p.bahanId);
-    if (b) {
-      const jmlDasar = konversiKeDasar(p.jumlah, p.satuan, b.satuanDasar);
-      b.stok -= jmlDasar;
+  if (idx === -1) return;
+  const item = data.pembelian[idx];
+  if (!confirm('⚠️ Hapus pembelian ' + item.bahanId + ' sebesar ' + rupiah(item.hargaTotal) + '?')) return;
+  data.pembelian.splice(idx, 1);
+  const b = getBahan(item.bahanId);
+  if (b) {
+    const pembelian = data.pembelian.filter(p => p.bahanId === item.bahanId);
+    if (pembelian.length === 0) {
+      b.hargaRataRata = 0;
+    } else {
+      let totalJmlDasar = 0, totalHarga = 0;
+      pembelian.forEach(p => {
+        const jmlDasar = konversiKeDasar(p.jumlah, p.satuan, b.satuanDasar);
+        totalJmlDasar += jmlDasar;
+        totalHarga += p.hargaTotal;
+      });
+      b.hargaRataRata = totalJmlDasar > 0 ? totalHarga / totalJmlDasar : 0;
     }
-    data.keuangan.pengeluaran = data.keuangan.pengeluaran.filter(k =>
-      !(k.sumber === 'Beli ' + (b ? b.nama : '') && k.jumlah === p.hargaTotal && k.tanggal === p.tanggal)
-    );
-    data.pembelian.splice(idx, 1);
-    logAudit('delete','pembelian',id,`Pembelian ${b?.nama} ${p.jumlah} ${p.satuan}`, '');
-    renderAll();
-    showAlert('✅ Pembelian dihapus, stok dikembalikan.');
-    return;
   }
-  const idxK = data.riwayatKemasan.findIndex(r => r.id === id);
-  if (idxK !== -1) {
-    const r = data.riwayatKemasan[idxK];
-    const k = data.kemasanBeli.find(kb => kb.nama === r.nama);
-    if (k) k.stok -= r.jumlah;
-    data.keuangan.pengeluaran = data.keuangan.pengeluaran.filter(kb =>
-      !(kb.sumber === 'Beli kemasan ' + r.nama && kb.jumlah === r.jumlah * r.hargaPerUnit && kb.tanggal === r.tanggal)
-    );
-    data.riwayatKemasan.splice(idxK, 1);
-    logAudit('delete','riwayatKemasan',id,`Pembelian kemasan ${r.nama} ${r.jumlah} unit`, '');
-    renderAll();
-    showAlert('✅ Pembelian kemasan dihapus, stok dikembalikan.');
-    return;
-  }
-  showAlert('Data tidak ditemukan.', 'error');
+  logAudit('delete', 'pembelian', id, `Pembelian dihapus`, '');
+  renderAll();
+  showAlert('✅ Pembelian dihapus.');
 }
+function updateBiayaOpsKemasan() {}
 
 // ================================================================
 // TAB SWITCHING
@@ -4810,7 +3702,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!tabBar) return;
     const buttons = tabBar.querySelectorAll('button[data-tab]');
     const contents = container.querySelectorAll('.tab-content');
-    
     buttons.forEach(btn => {
       btn.addEventListener('click', function() {
         const tab = this.dataset.tab;
@@ -4822,7 +3713,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-
   initTabs('page-stok');
   initTabs('page-produksi');
   initTabs('page-laporan');
@@ -4831,7 +3721,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v3.9 - FULL VERSION dengan R&D Larutan');
+console.log('🧼 SI.BERSIH v3.6 - Full Version');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
