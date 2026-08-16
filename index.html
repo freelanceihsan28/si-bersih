@@ -1284,7 +1284,7 @@
 
 <script>
 // ================================================================
-// SERVICE WORKER (dinonaktifkan karena blob URL tidak didukung)
+// SERVICE WORKER (dinonaktifkan)
 // ================================================================
 
 // ================================================================
@@ -1487,7 +1487,7 @@ function migrateHargaRataRata() {
 }
 
 // ================================================================
-// HARGA UNTUK ROLE (sekarang semua role pakai harga rata-rata)
+// HARGA UNTUK ROLE (SEMUA PAKAI HARGA RATA-RATA)
 // ================================================================
 function getHargaBahanForRole(bahanId) {
   return getHargaRataRataBahan(bahanId);
@@ -3380,7 +3380,7 @@ function renderPeralatan() {
 }
 
 // ================================================================
-// SIMULASI (dengan rincian harga per bahan)
+// SIMULASI (dengan rincian harga per bahan dalam tabel)
 // ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
