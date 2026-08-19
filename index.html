@@ -688,20 +688,6 @@
       accent-color: #8D6E63;
       margin: 0;
     }
-    .harga-simulasi-input {
-      width: 160px;
-      padding: 6px 10px;
-      border: 1.5px solid #e0d6ce;
-      border-radius: 8px;
-      font-size: 0.8125rem;
-      font-family: inherit;
-      transition: 0.2s;
-    }
-    .harga-simulasi-input:focus {
-      outline: none;
-      border-color: #8D6E63;
-      box-shadow: 0 0 0 4px rgba(141,110,99,0.10);
-    }
     .total-auto {
       font-weight: 700;
       color: #6D4C41;
@@ -741,6 +727,38 @@
     }
     .purchase-summary .total-label { font-weight: 700; color: #6D4C41; }
     .purchase-summary .total-value { font-weight: 800; color: #6D4C41; font-size: 1.2rem; }
+    .detail-bahan-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      margin: 6px 0 12px 0;
+    }
+    .detail-bahan-table th {
+      background: #ede7e1;
+      text-align: left;
+      padding: 6px 10px;
+      font-weight: 700;
+      color: #3E2723;
+      border-bottom: 2px solid #d5c8be;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+    .detail-bahan-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #ede7e1;
+    }
+    .detail-bahan-table .text-right { text-align: right; }
+    .detail-bahan-table .total-row td { font-weight: 700; color: #6D4C41; border-top: 2px solid #8D6E63; }
+    .table-keuangan-produksi td .btn-edit-ops { 
+      padding: 2px 10px; 
+      font-size: 0.65rem; 
+      background: #5D7A9A; 
+      color: #fff; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+    }
+    .table-keuangan-produksi td .btn-edit-ops:hover { background: #4A6A8A; }
   </style>
 </head>
 <body>
@@ -776,7 +794,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v3.6</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v3.8</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -806,331 +824,329 @@
       <a data-page="simulasi" class="role-admin-full role-atasan role-investor">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/><path d="M12 7v5l3 3"/></svg></span> Simulasi
       </a>
-      <a data-page="hargasimulasi" class="admin-only" style="display:none;">
-        <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span> Harga Simulasi
-      </a>
       <a data-page="audit" class="admin-only" style="display:none;">
         <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span> Riwayat Edit
       </a>
     </div>
   </nav>
-  <!-- DASHBOARD -->
-<div class="page active" id="page-dashboard">
-  <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Dashboard
-  </h2>
-  <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
-    <button class="btn btn-info admin-only" onclick="tambahModal()">
-      <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Modal
-    </button>
-    <button class="btn btn-success admin-only" onclick="backupData()">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Backup Data
-    </button>
-    <button class="btn btn-warning admin-only" onclick="document.getElementById('restoreInput').click()">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 15v4a2 2 0 002 2h14a2 2 0 002-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Restore Data
-    </button>
-    <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
-    <span class="text-muted" style="margin-left:6px; font-size:0.8rem;">Backup/Restore semua data</span>
-  </div>
-  <div id="modalSummary" class="modal-ringkasan"></div>
-  <div id="stokWarningList" style="margin-bottom:16px;"></div>
-  <div style="margin-top:18px;">
-    <h4 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-      Stok Sabun Jadi per Kemasan
-    </h4>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Kemasan</th><th>Jenis Sabun</th><th>Stok</th><th>Harga Jual</th></tr></thead>
-        <tbody id="dashStokKemasanTbody"></tbody>
-      </table>
+    <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </h2>
+    <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-info admin-only" onclick="tambahModal()">
+        <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Modal
+      </button>
+      <button class="btn btn-success admin-only" onclick="backupData()">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Backup Data
+      </button>
+      <button class="btn btn-warning admin-only" onclick="document.getElementById('restoreInput').click()">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 15v4a2 2 0 002 2h14a2 2 0 002-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Restore Data
+      </button>
+      <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
+      <span class="text-muted" style="margin-left:6px; font-size:0.8rem;">Backup/Restore semua data</span>
+    </div>
+    <div id="modalSummary" class="modal-ringkasan"></div>
+    <div id="stokWarningList" style="margin-bottom:16px;"></div>
+    <div style="margin-top:18px;">
+      <h4 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        Stok Sabun Jadi per Kemasan
+      </h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kemasan</th><th>Jenis Sabun</th><th>Stok</th><th>Harga Jual</th></tr></thead>
+          <tbody id="dashStokKemasanTbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- STOK BAHAN -->
-<div class="page" id="page-stok">
-  <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-    Stok Bahan
-  </h2>
-  <div class="tab-bar" id="tabStok">
-    <button class="active" data-tab="stok-bahanbaku">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg></span> Bahan Baku
-    </button>
-    <button data-tab="stok-kemasan">
-      <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg></span> Kemasan
-    </button>
-  </div>
-  <div class="tab-content active" id="tab-stok-bahanbaku">
-    <div class="flex-between">
-      <span class="text-muted">Kelola stok bahan baku dan pembelian (multi-item)</span>
-      <div>
-        <button class="btn btn-primary btn-sm admin-only" onclick="tambahBahan()">
-          <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Bahan
-        </button>
-        <button class="btn btn-danger btn-sm admin-only" onclick="resetAllData()" style="margin-left:6px;">
-          <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span> Reset Semua
-        </button>
-      </div>
+  <!-- STOK BAHAN -->
+  <div class="page" id="page-stok">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      Stok Bahan
+    </h2>
+    <div class="tab-bar" id="tabStok">
+      <button class="active" data-tab="stok-bahanbaku">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg></span> Bahan Baku
+      </button>
+      <button data-tab="stok-kemasan">
+        <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg></span> Kemasan
+      </button>
     </div>
-    <div class="form-row role-admin-full role-operasional role-atasan">
-      <div style="width:100%; margin-bottom:6px;">
-        <strong style="color:#6D4C41;">🛒 Pembelian Banyak Item</strong>
-        <span class="text-muted" style="font-size:0.75rem; margin-left:10px;">Isi total harga per item. Ongkir total akan dibagi proporsional.</span>
+    <div class="tab-content active" id="tab-stok-bahanbaku">
+      <div class="flex-between">
+        <span class="text-muted">Kelola stok bahan baku dan pembelian (multi-item)</span>
+        <div>
+          <button class="btn btn-primary btn-sm admin-only" onclick="tambahBahan()">
+            <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Bahan
+          </button>
+          <button class="btn btn-danger btn-sm admin-only" onclick="resetAllData()" style="margin-left:6px;">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span> Reset Semua
+          </button>
+        </div>
       </div>
-      <div id="itemsContainer">
-        <div class="item-row" data-item-index="0">
-          <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
-          <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
-          <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
-          <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
-          <div class="form-group" style="flex:0 0 36px; min-width:36px;">
-            <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+      <div class="form-row role-admin-full role-operasional role-atasan">
+        <div style="width:100%; margin-bottom:6px;">
+          <strong style="color:#6D4C41;">🛒 Pembelian Banyak Item</strong>
+          <span class="text-muted" style="font-size:0.75rem; margin-left:10px;">Isi total harga per item. Ongkir total akan dibagi proporsional.</span>
+        </div>
+        <div id="itemsContainer">
+          <div class="item-row" data-item-index="0">
+            <div class="form-group"><label>Bahan</label><select class="item-bahan" style="width:100%;"></select></div>
+            <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+            <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
+            <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+            <div class="form-group" style="flex:0 0 36px; min-width:36px;">
+              <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
+            </div>
           </div>
         </div>
-      </div>
-      <div style="width:100%; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn btn-info btn-sm" onclick="addItem()">➕ Tambah Item</button>
-        <div style="flex:1; min-width:150px;">
-          <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Ongkos Kirim Total (Rp)</label>
-          <input type="number" id="totalOngkir" step="0.01" placeholder="0" oninput="hitungTotalPembelian()">
-        </div>
-        <div style="flex:0 0 auto; display:flex; align-items:flex-end;">
-          <div class="purchase-summary" style="margin-top:0;">
-            <span class="total-label">Total Belanja:</span>
-            <span class="total-value" id="grandTotalDisplay">Rp 0</span>
+        <div style="width:100%; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-info btn-sm" onclick="addItem()">➕ Tambah Item</button>
+          <div style="flex:1; min-width:150px;">
+            <label style="font-weight:700; color:#6D4C41; display:block; font-size:0.75rem;">Ongkos Kirim Total (Rp)</label>
+            <input type="number" id="totalOngkir" step="0.01" placeholder="0" oninput="hitungTotalPembelian()">
           </div>
+          <div style="flex:0 0 auto; display:flex; align-items:flex-end;">
+            <div class="purchase-summary" style="margin-top:0;">
+              <span class="total-label">Total Belanja:</span>
+              <span class="total-value" id="grandTotalDisplay">Rp 0</span>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="beliBahanMulti()" style="margin-left:auto;">✅ Beli Semua</button>
         </div>
-        <button class="btn btn-success" onclick="beliBahanMulti()" style="margin-left:auto;">✅ Beli Semua</button>
+      </div>
+      <div class="search-box"><input type="text" id="searchBahan" placeholder="🔍 Cari bahan..." oninput="filterBahan()"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>Stok (kg/L)</th><th>Harga</th><th>Aksi</th></tr></thead>
+          <tbody id="bahanTbody"></tbody>
+        </table>
       </div>
     </div>
-    <div class="search-box"><input type="text" id="searchBahan" placeholder="🔍 Cari bahan..." oninput="filterBahan()"></div>
+    <div class="tab-content" id="tab-stok-kemasan">
+      <div class="flex-between">
+        <span class="text-muted">Kelola stok kemasan</span>
+        <div><button class="btn btn-primary btn-sm admin-only" onclick="tambahKemasanStok()">
+          <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Jenis Kemasan
+        </button></div>
+      </div>
+      <div class="form-row role-admin-full role-operasional role-atasan">
+        <div class="form-group"><label>Pilih Kemasan</label><select id="kemasanBeliSelect"></select></div>
+        <div class="form-group"><label>Jumlah</label><input type="number" id="kemasanBeliJml" step="1" placeholder="0"></div>
+        <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" id="kemasanBeliHarga" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
+        <div class="form-group"><label>Ongkos Kirim (Rp)</label><input type="number" id="kemasanBeliOngkir" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
+        <div class="form-group" style="flex:1 1 100%;"><label>Total Biaya (otomatis)</label><div class="total-auto" id="kemasanTotalAuto">Rp 0</div></div>
+        <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="beliKemasan()">Beli</button></div>
+      </div>
+      <div class="search-box"><input type="text" id="searchKemasan" placeholder="🔍 Cari kemasan..." oninput="filterKemasan()"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>Stok</th><th>Volume (mL)</th><th>Harga/unit</th><th>Aksi</th></tr></thead>
+          <tbody id="kemasanStokTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+    <!-- PERALATAN -->
+  <div class="page" id="page-peralatan">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Pembelian Peralatan Kerja
+    </h2>
+    <p class="text-muted" style="margin-bottom:16px;">Catat pembelian mesin, cetakan, timbangan, wadah, dan peralatan lainnya.</p>
+    <div class="form-row role-adm role-admin-full role-atasan">
+      <div class="form-group"><label>Nama Peralatan</label><input type="text" id="peralatanNama" placeholder="Contoh: Timbangan Digital"></div>
+      <div class="form-group"><label>Jumlah</label><input type="number" id="peralatanJumlah" step="1" placeholder="1"></div>
+      <div class="form-group"><label>Harga/Unit (Rp)</label><input type="number" id="peralatanHarga" step="1" placeholder="0"></div>
+      <div class="form-group"><label>Tanggal</label><input type="date" id="peralatanTanggal"></div>
+      <div class="form-group"><label>Keterangan</label><input type="text" id="peralatanKeterangan" placeholder="Opsional"></div>
+      <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="tambahPeralatan()">Tambah</button></div>
+    </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nama</th><th>Stok (kg/L)</th><th>Harga</th><th>Aksi</th></tr></thead>
-        <tbody id="bahanTbody"></tbody>
+        <thead><tr><th>Nama</th><th>Jml</th><th>Harga/Unit</th><th>Total</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+        <tbody id="peralatanTbody"></tbody>
       </table>
     </div>
   </div>
-  <div class="tab-content" id="tab-stok-kemasan">
-    <div class="flex-between">
-      <span class="text-muted">Kelola stok kemasan</span>
-      <div><button class="btn btn-primary btn-sm admin-only" onclick="tambahKemasanStok()">
-        <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Jenis Kemasan
-      </button></div>
-    </div>
-    <div class="form-row role-admin-full role-operasional role-atasan">
-      <div class="form-group"><label>Pilih Kemasan</label><select id="kemasanBeliSelect"></select></div>
-      <div class="form-group"><label>Jumlah</label><input type="number" id="kemasanBeliJml" step="1" placeholder="0"></div>
-      <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" id="kemasanBeliHarga" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
-      <div class="form-group"><label>Ongkos Kirim (Rp)</label><input type="number" id="kemasanBeliOngkir" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
-      <div class="form-group" style="flex:1 1 100%;"><label>Total Biaya (otomatis)</label><div class="total-auto" id="kemasanTotalAuto">Rp 0</div></div>
-      <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="beliKemasan()">Beli</button></div>
-    </div>
-    <div class="search-box"><input type="text" id="searchKemasan" placeholder="🔍 Cari kemasan..." oninput="filterKemasan()"></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Nama</th><th>Stok</th><th>Volume (mL)</th><th>Harga/unit</th><th>Aksi</th></tr></thead>
-        <tbody id="kemasanStokTbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<!-- PERALATAN -->
-<div class="page" id="page-peralatan">
-  <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    Pembelian Peralatan Kerja
-  </h2>
-  <p class="text-muted" style="margin-bottom:16px;">Catat pembelian mesin, cetakan, timbangan, wadah, dan peralatan lainnya.</p>
-  <div class="form-row role-adm role-admin-full role-atasan">
-    <div class="form-group"><label>Nama Peralatan</label><input type="text" id="peralatanNama" placeholder="Contoh: Timbangan Digital"></div>
-    <div class="form-group"><label>Jumlah</label><input type="number" id="peralatanJumlah" step="1" placeholder="1"></div>
-    <div class="form-group"><label>Harga/Unit (Rp)</label><input type="number" id="peralatanHarga" step="1" placeholder="0"></div>
-    <div class="form-group"><label>Tanggal</label><input type="date" id="peralatanTanggal"></div>
-    <div class="form-group"><label>Keterangan</label><input type="text" id="peralatanKeterangan" placeholder="Opsional"></div>
-    <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="tambahPeralatan()">Tambah</button></div>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Nama</th><th>Jml</th><th>Harga/Unit</th><th>Total</th><th>Tanggal</th><th>Aksi</th></tr></thead>
-      <tbody id="peralatanTbody"></tbody>
-    </table>
-  </div>
-</div>
 
-<!-- PRODUKSI -->
-<div class="page" id="page-produksi">
-  <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-    Produksi
-  </h2>
-  <div class="tab-bar" id="tabProduksi">
-    <button class="active" data-tab="produksi-formula">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg></span> Formula
-    </button>
-    <button data-tab="produksi-buat">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span> Produksi
-    </button>
-    <button data-tab="produksi-kemasan">
-      <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg></span> Pengemasan
-    </button>
-  </div>
-  <div class="tab-content active" id="tab-produksi-formula">
-    <div class="flex-between">
+  <!-- PRODUKSI -->
+  <div class="page" id="page-produksi">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      Produksi
+    </h2>
+    <div class="tab-bar" id="tabProduksi">
+      <button class="active" data-tab="produksi-formula">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg></span> Formula
+      </button>
+      <button data-tab="produksi-buat">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span> Produksi
+      </button>
+      <button data-tab="produksi-kemasan">
+        <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg></span> Pengemasan
+      </button>
+    </div>
+    <div class="tab-content active" id="tab-produksi-formula">
+      <div class="flex-between">
+        <h3 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg>
+          Formulasi (Resep)
+        </h3>
+        <div>
+          <button class="btn btn-primary btn-sm admin-only" onclick="tambahFormulasi()">
+            <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah
+          </button>
+          <button class="btn btn-warning btn-sm admin-only" onclick="resetFormulasiKeDefault()">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span> Reset
+          </button>
+        </div>
+      </div>
+      <div class="search-box"><input type="text" id="searchFormula" placeholder="🔍 Cari formula..." oninput="filterFormula()"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>BJ (kg/L)</th><th>Cara Pembuatan</th><th>Aksi</th></tr></thead>
+          <tbody id="formTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-produksi-buat">
       <h3 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M12 18v-4"/><path d="M12 9v.01"/></svg>
-        Formulasi (Resep)
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+        Buat Produksi
       </h3>
-      <div>
-        <button class="btn btn-primary btn-sm admin-only" onclick="tambahFormulasi()">
-          <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah
-        </button>
-        <button class="btn btn-warning btn-sm admin-only" onclick="resetFormulasiKeDefault()">
-          <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span> Reset
-        </button>
+      <div class="form-row role-admin-full role-atasan role-operasional">
+        <div class="form-group"><label>Formulasi</label><select id="produksiForm"></select></div>
+        <div class="form-group"><label>Liter</label><input type="number" id="produksiLiter" step="0.1" placeholder="0"></div>
+        <div class="form-group">
+          <label>Biaya Operasional</label>
+          <select id="produksiOpsMode" onchange="toggleProduksiOpsManual()">
+            <option value="15">15% dari HPP</option>
+            <option value="20">20% dari HPP</option>
+            <option value="manual">Manual (Rp)</option>
+          </select>
+        </div>
+        <div class="form-group" id="produksiOpsManualGroup" style="display:none;">
+          <label>Nilai Manual (Rp)</label>
+          <input type="number" id="produksiOpsManual" step="1" placeholder="0">
+        </div>
+        <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="buatProduksi()">Buat</button></div>
       </div>
-    </div>
-    <div class="search-box"><input type="text" id="searchFormula" placeholder="🔍 Cari formula..." oninput="filterFormula()"></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Nama</th><th>BJ (kg/L)</th><th>Cara Pembuatan</th><th>Aksi</th></tr></thead>
-        <tbody id="formTbody"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="tab-content" id="tab-produksi-buat">
-    <h3 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 4l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z"/><circle cx="8" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-      Buat Produksi
-    </h3>
-    <div class="form-row role-admin-full role-atasan role-operasional">
-      <div class="form-group"><label>Formulasi</label><select id="produksiForm"></select></div>
-      <div class="form-group"><label>Liter</label><input type="number" id="produksiLiter" step="0.1" placeholder="0"></div>
-      <div class="form-group">
-        <label>Biaya Operasional</label>
-        <select id="produksiOpsMode" onchange="toggleProduksiOpsManual()">
-          <option value="15">15% dari HPP</option>
-          <option value="20">20% dari HPP</option>
-          <option value="manual">Manual (Rp)</option>
+      <div id="produksiDetail" style="background:#faf7f4; padding:14px 16px; border-radius:14px; margin:10px 0; display:none; border:1px solid #ede7e1;"></div>
+      <div class="search-box">
+        <input type="text" id="searchProduksi" placeholder="🔍 Cari produksi..." oninput="filterProduksi()">
+        <select id="filterProduksiStatus" onchange="filterProduksi()">
+          <option value="">Semua Status</option>
+          <option value="proses">Proses</option>
+          <option value="selesai">Selesai</option>
         </select>
       </div>
-      <div class="form-group" id="produksiOpsManualGroup" style="display:none;">
-        <label>Nilai Manual (Rp)</label>
-        <input type="number" id="produksiOpsManual" step="1" placeholder="0">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Formulasi</th><th>Liter</th><th>BJ</th><th>Status</th><th>Sisa (L)</th><th>Biaya Bahan</th><th>Aksi</th></tr></thead>
+          <tbody id="produksiTbody"></tbody>
+        </table>
       </div>
-      <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="buatProduksi()">Buat</button></div>
     </div>
-    <div id="produksiDetail" style="background:#faf7f4; padding:14px 16px; border-radius:14px; margin:10px 0; display:none; border:1px solid #ede7e1;"></div>
-    <div class="search-box">
-      <input type="text" id="searchProduksi" placeholder="🔍 Cari produksi..." oninput="filterProduksi()">
-      <select id="filterProduksiStatus" onchange="filterProduksi()">
-        <option value="">Semua Status</option>
-        <option value="proses">Proses</option>
-        <option value="selesai">Selesai</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Formulasi</th><th>Liter</th><th>BJ</th><th>Status</th><th>Sisa (L)</th><th>Biaya Bahan</th><th>Aksi</th></tr></thead>
-        <tbody id="produksiTbody"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="tab-content" id="tab-produksi-kemasan">
-    <h3 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg>
-      Pengemasan
-    </h3>
-    <div class="form-row role-admin-full role-atasan role-operasional">
-      <div class="form-group">
-        <label>Produksi</label>
-        <select id="kemasanProduksi"></select>
-        <div class="help-text" id="sisaProduksiInfo">Sisa: 0 L</div>
-      </div>
-      <div class="form-group">
-        <label>Kemasan</label>
-        <select id="kemasanNama"></select>
-        <div class="help-text" id="stokKemasanInfo"></div>
-      </div>
-      <div class="form-group" style="flex:1 1 100%;">
-        <label>Mode Isi</label>
-        <div class="radio-group">
-          <label><input type="radio" name="isiMode" value="otomatis" checked onchange="toggleIsiMode()"> Otomatis (Volume × BJ)</label>
-          <label><input type="radio" name="isiMode" value="manual" onchange="toggleIsiMode()"> Manual (gram)</label>
+    <div class="tab-content" id="tab-produksi-kemasan">
+      <h3 style="color:#6D4C41; display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h6"/></svg>
+        Pengemasan
+      </h3>
+      <div class="form-row role-admin-full role-atasan role-operasional">
+        <div class="form-group">
+          <label>Produksi</label>
+          <select id="kemasanProduksi"></select>
+          <div class="help-text" id="sisaProduksiInfo">Sisa: 0 L</div>
+        </div>
+        <div class="form-group">
+          <label>Kemasan</label>
+          <select id="kemasanNama"></select>
+          <div class="help-text" id="stokKemasanInfo"></div>
+        </div>
+        <div class="form-group" style="flex:1 1 100%;">
+          <label>Mode Isi</label>
+          <div class="radio-group">
+            <label><input type="radio" name="isiMode" value="otomatis" checked onchange="toggleIsiMode()"> Otomatis (Volume × BJ)</label>
+            <label><input type="radio" name="isiMode" value="manual" onchange="toggleIsiMode()"> Manual (gram)</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Berat Isi per Kemasan</label>
+          <div style="display:flex; gap:4px;">
+            <input type="number" id="kemasanBeratIsi" step="0.1" placeholder="0" style="flex:2;">
+            <span style="display:flex; align-items:center; padding:0 8px; font-size:0.8rem; color:#6D4C41; font-weight:600;">gram</span>
+          </div>
+          <div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div>
+        </div>
+        <div class="form-group">
+          <label>Jumlah Unit</label>
+          <input type="number" id="kemasanJumlah" step="1" placeholder="0">
+          <div class="help-text" id="totalBeratInfo">Total Berat: 0 g (0 kg)</div>
+        </div>
+        <div class="form-group">
+          <label>Harga jual/unit (Rp)</label>
+          <input type="number" id="kemasanHarga" step="1" placeholder="0">
+        </div>
+        <div class="form-group" style="flex:0 0 80px;">
+          <button class="btn btn-success btn-block" style="margin-top:18px;" onclick="tambahKemasan()">
+            <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
         </div>
       </div>
-      <div class="form-group">
-        <label>Berat Isi per Kemasan</label>
-        <div style="display:flex; gap:4px;">
-          <input type="number" id="kemasanBeratIsi" step="0.1" placeholder="0" style="flex:2;">
-          <span style="display:flex; align-items:center; padding:0 8px; font-size:0.8rem; color:#6D4C41; font-weight:600;">gram</span>
-        </div>
-        <div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div>
+      <div class="search-box"><input type="text" id="searchKemasanJadi" placeholder="🔍 Cari kemasan..." oninput="filterKemasanJadi()"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kemasan</th><th>Stok</th><th>Harga Jual</th><th>Biaya Kemasan</th><th>Aksi</th></tr></thead>
+          <tbody id="kemasanTbody"></tbody>
+        </table>
       </div>
-      <div class="form-group">
-        <label>Jumlah Unit</label>
-        <input type="number" id="kemasanJumlah" step="1" placeholder="0">
-        <div class="help-text" id="totalBeratInfo">Total Berat: 0 g (0 kg)</div>
-      </div>
-      <div class="form-group">
-        <label>Harga jual/unit (Rp)</label>
-        <input type="number" id="kemasanHarga" step="1" placeholder="0">
-      </div>
-      <div class="form-group" style="flex:0 0 80px;">
-        <button class="btn btn-success btn-block" style="margin-top:18px;" onclick="tambahKemasan()">
-          <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
-        </button>
-      </div>
-    </div>
-    <div class="search-box"><input type="text" id="searchKemasanJadi" placeholder="🔍 Cari kemasan..." oninput="filterKemasanJadi()"></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Kemasan</th><th>Stok</th><th>Harga Jual</th><th>Biaya Kemasan</th><th>Aksi</th></tr></thead>
-        <tbody id="kemasanTbody"></tbody>
-      </table>
     </div>
   </div>
-</div>
 
-<!-- PENJUALAN -->
-<div class="page" id="page-penjualan">
-  <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-    Penjualan
-  </h2>
-  <div class="form-row">
-    <div class="form-group"><label>Kemasan</label><select id="jualKemasan"></select></div>
-    <div class="form-group" style="flex:1 1 100%;">
-      <div class="help-text" id="infoJenisSabun" style="font-weight:600; color:#6D4C41;"></div>
+  <!-- PENJUALAN -->
+  <div class="page" id="page-penjualan">
+    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Penjualan
+    </h2>
+    <div style="margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-danger btn-sm admin-only" onclick="hapusPenjualanRusak()">🧹 Hapus Data Rusak</button>
+      <label style="font-weight:600;font-size:0.8125rem; display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="filterHutang" onchange="filterPenjualan()"> Tampilkan hanya hutang
+      </label>
     </div>
-    <div class="form-group"><label>Jumlah</label><input type="number" id="jualJumlah" step="1" placeholder="0"></div>
-    <div class="form-group"><label>Harga/unit</label><input type="number" id="jualHarga" step="1" placeholder="0"></div>
-    <div class="form-group">
-      <label>Status Bayar</label>
-      <select id="jualStatus">
-        <option value="Lunas">Lunas</option>
-        <option value="Hutang">Hutang</option>
-      </select>
+    <div class="form-row">
+      <div class="form-group"><label>Kemasan</label><select id="jualKemasan"></select></div>
+      <div class="form-group" style="flex:1 1 100%;">
+        <div class="help-text" id="infoJenisSabun" style="font-weight:600; color:#6D4C41;"></div>
+      </div>
+      <div class="form-group"><label>Jumlah</label><input type="number" id="jualJumlah" step="1" placeholder="0"></div>
+      <div class="form-group"><label>Harga/unit</label><input type="number" id="jualHarga" step="1" placeholder="0"></div>
+      <div class="form-group">
+        <label>Status Bayar</label>
+        <select id="jualStatus">
+          <option value="Lunas">Lunas</option>
+          <option value="Hutang">Hutang</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="catatJual()">Jual</button></div>
     </div>
-    <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="catatJual()">Jual</button></div>
+    <div class="search-box"><input type="text" id="searchPenjualan" placeholder="🔍 Cari penjualan..." oninput="filterPenjualan()"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Jml</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="jualTbody"></tbody>
+      </table>
+    </div>
   </div>
-  <div style="margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-    <label style="font-weight:600;font-size:0.8125rem; display:flex; align-items:center; gap:6px;">
-      <input type="checkbox" id="filterHutang" onchange="filterPenjualan()"> Tampilkan hanya hutang
-    </label>
-  </div>
-  <div class="search-box"><input type="text" id="searchPenjualan" placeholder="🔍 Cari penjualan..." oninput="filterPenjualan()"></div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Jml</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
-      <tbody id="jualTbody"></tbody>
-    </table>
-  </div>
-</div>
-  <!-- LAPORAN -->
+    <!-- LAPORAN -->
   <div class="page" id="page-laporan">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M21 12v4a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h7"/><path d="M15 6h6"/><path d="M18 3v6"/><path d="M8 11l3 3 6-6"/></svg>
@@ -1210,20 +1226,20 @@
     <p class="text-muted" style="margin-bottom:16px;">Hitung perkiraan biaya produksi dan keuntungan sebelum Anda benar-benar memproduksi.</p>
     <div class="form-row">
       <div class="form-group"><label>Formulasi</label><select id="simulasiForm"></select></div>
-      <div class="form-group"><label>Liter</label><input type="number" id="simulasiLiter" step="0.1" placeholder="0"></div>
+      <div class="form-group"><label>Liter</label><input type="number" id="simulasiLiter" step="0.1" placeholder="0" oninput="hitungSimulasi()"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>Jenis Kemasan</label><select id="simulasiKemasan"></select></div>
       <div class="form-group" style="flex:1 1 100%;">
         <label>Mode Isi</label>
         <div class="radio-group">
-          <label><input type="radio" name="simulasiIsiMode" value="otomatis" checked onchange="toggleSimulasiIsiMode()"> Otomatis (Volume × BJ)</label>
-          <label><input type="radio" name="simulasiIsiMode" value="manual" onchange="toggleSimulasiIsiMode()"> Manual (gram)</label>
+          <label><input type="radio" name="simulasiIsiMode" value="otomatis" checked onchange="toggleSimulasiIsiMode(); hitungSimulasi();"> Otomatis (Volume × BJ)</label>
+          <label><input type="radio" name="simulasiIsiMode" value="manual" onchange="toggleSimulasiIsiMode(); hitungSimulasi();"> Manual (gram)</label>
         </div>
       </div>
-      <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="simulasiBeratIsi" step="0.1" placeholder="0"></div>
-      <div class="form-group"><label>Jumlah Unit</label><input type="number" id="simulasiJmlUnit" step="1" placeholder="0"></div>
-      <div class="form-group"><label>Harga Jual/Unit (Rp)</label><input type="number" id="simulasiHargaJual" step="1" placeholder="0"></div>
+      <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="simulasiBeratIsi" step="0.1" placeholder="0" oninput="hitungSimulasi()"></div>
+      <div class="form-group"><label>Jumlah Unit</label><input type="number" id="simulasiJmlUnit" step="1" placeholder="0" oninput="hitungSimulasi()"></div>
+      <div class="form-group"><label>Harga Jual/Unit (Rp)</label><input type="number" id="simulasiHargaJual" step="1" placeholder="0" oninput="hitungSimulasi()"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>Biaya Operasional</label>
@@ -1243,23 +1259,6 @@
       Hitung Simulasi
     </button>
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
-  </div>
-
-  <!-- HARGA SIMULASI -->
-  <div class="page" id="page-hargasimulasi">
-    <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      Harga Simulasi
-    </h2>
-    <p class="text-muted" style="margin-bottom:16px;">
-      Atur harga bahan yang digunakan khusus untuk perhitungan simulasi dan untuk tampilan di halaman Stok Bahan (bagi non-admin).
-      <strong>Harga ini tidak mempengaruhi harga rata-rata pembelian</strong> dan hanya terlihat oleh admin penuh.
-    </p>
-    <div id="hargaSimulasiContainer"></div>
-    <button class="btn btn-primary" onclick="simpanHargaSimulasi()" style="margin-top:12px;">
-      <span class="icon"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span>
-      Simpan Semua Harga
-    </button>
   </div>
 
   <!-- AUDIT LOG -->
@@ -1293,33 +1292,11 @@
   <button id="fontDec" title="Perkecil font">A−</button>
   <button id="fontInc" title="Perbesar font">A+</button>
 </div>
+
 <script>
 // ================================================================
-// SERVICE WORKER
+// SERVICE WORKER (dinonaktifkan)
 // ================================================================
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open('sibersih-v3').then(c => c.addAll(['/','/index.html'])));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-          if (res && res.status === 200) {
-            const clone = res.clone();
-            caches.open('sibersih-v3').then(c => c.put(e.request, clone));
-          }
-          return res;
-        })).catch(() => new Response('Offline', { status: 503 }))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
-}
 
 // ================================================================
 // FONT SIZE
@@ -1402,8 +1379,7 @@ function getDefaultData() {
     peralatan: [],
     modalTambahan: [],
     keuangan: { pemasukan: [], pengeluaran: [], saldoAwal: 0 },
-    auditLogs: [],
-    hargaSimulasi: {}
+    auditLogs: []
   };
 }
 
@@ -1522,22 +1498,13 @@ function migrateHargaRataRata() {
 }
 
 // ================================================================
-// HARGA UNTUK ROLE
+// HARGA UNTUK ROLE (SEMUA PAKAI HARGA RATA-RATA)
 // ================================================================
 function getHargaBahanForRole(bahanId) {
-  if (userRole === 'admin-full') {
-    return getHargaRataRataBahan(bahanId);
-  }
-  if (data.hargaSimulasi && data.hargaSimulasi[bahanId] !== undefined && data.hargaSimulasi[bahanId] !== null) {
-    return data.hargaSimulasi[bahanId];
-  }
-  return 0;
+  return getHargaRataRataBahan(bahanId);
 }
 
 function hitungBiayaBahanProduksi(prod) {
-  if (userRole === 'admin-full') {
-    return prod.biayaBahan || 0;
-  }
   const f = getFormulasi(prod.formulasiId);
   if (!f) return 0;
   const totalBerat = prod.jumlahLiter * (prod.bj || 1.025);
@@ -1551,8 +1518,7 @@ function hitungBiayaBahanProduksi(prod) {
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    const hargaSim = data.hargaSimulasi && data.hargaSimulasi[it.bahanId] !== undefined ? data.hargaSimulasi[it.bahanId] : 0;
-    totalBiaya += butuhStok * hargaSim;
+    totalBiaya += butuhStok * (b.hargaRataRata || 0);
   });
   return totalBiaya;
 }
@@ -1648,7 +1614,7 @@ function showApp() {
   });
 
   const roleMenus = {
-    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','hargasimulasi','audit'],
+    'admin-full': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi','audit'],
     'atasan': ['dashboard','stok','peralatan','produksi','penjualan','laporan','simulasi'],
     'investor': ['dashboard','peralatan','penjualan','laporan','simulasi'],
     'operasional': ['dashboard','stok','produksi'],
@@ -1660,7 +1626,6 @@ function showApp() {
     link.style.display = allowed.includes(page) ? 'flex' : 'none';
   });
   document.querySelector('.menu-dropdown a[data-page="audit"]').style.display = (userRole === 'admin-full') ? 'flex' : 'none';
-  document.querySelector('.menu-dropdown a[data-page="hargasimulasi"]').style.display = (userRole === 'admin-full') ? 'flex' : 'none';
   navigateTo('dashboard');
 }
 function navigateTo(page) {
@@ -1712,7 +1677,6 @@ function loadDataFromFirestore() {
             firestoreData.formulasi = defaultData.formulasi;
           }
           if (!firestoreData.auditLogs) firestoreData.auditLogs = [];
-          if (!firestoreData.hargaSimulasi) firestoreData.hargaSimulasi = {};
         }
       }
 
@@ -1744,7 +1708,6 @@ function loadDataFromFirestore() {
       }
 
       data = { ...defaultData, ...firestoreData };
-      if (!data.hargaSimulasi) data.hargaSimulasi = {};
       let perluMigrasi = false;
       data.bahan.forEach(b => {
         if (b.hargaRataRata === 0) {
@@ -1816,7 +1779,6 @@ function restoreData(event) {
       if (!confirm('⚠️ Restore akan menimpa SEMUA data saat ini! Lanjutkan?')) return;
       if (!confirm('⚠️ Yakin? Data lama akan hilang jika belum di-backup!')) return;
       data = imported;
-      if (!data.hargaSimulasi) data.hargaSimulasi = {};
       renderAll();
       saveDataToFirestore();
       showAlert('✅ Data berhasil direstore!', 'success');
@@ -2135,7 +2097,7 @@ function hapusModal(id) {
   renderAll();
   showAlert('✅ Catatan modal berhasil dihapus.');
 }
-// ================================================================
+  // ================================================================
 // RENDER ALL
 // ================================================================
 function renderAll() {
@@ -2152,7 +2114,6 @@ function renderAll() {
   renderRiwayat();
   renderPeralatan();
   renderAuditLog();
-  renderHargaSimulasi();
   checkStokWarnings();
   updateSimulasiDropdowns();
   populateItemBahanSelects();
@@ -2241,9 +2202,7 @@ function renderBahan() {
   tbody.innerHTML = data.bahan.map(b => {
     const harga = getHargaBahanForRole(b.id);
     const isAdmin = userRole === 'admin-full';
-    const hargaTxt = (isAdmin && harga > 0) ? rupiah(harga) + '/' + b.satuanDasar :
-                    (!isAdmin && harga > 0) ? rupiah(harga) + '/' + b.satuanDasar :
-                    (isAdmin && harga === 0) ? '-' : (harga === 0 ? 'Belum diatur' : '-');
+    const hargaTxt = (harga > 0) ? rupiah(harga) + '/' + b.satuanDasar : '-';
     const isLow = b.stok <= (b.threshold || 1);
     let aksi = '';
     if (userRole === 'admin-full' || userRole === 'operasional' || userRole === 'atasan') {
@@ -2278,7 +2237,7 @@ function editHargaBahan(id) {
       <div class="form-group"><label>Nama Bahan</label><input value="${b.nama}" disabled style="background:#f5f0eb;"></div>
       <div class="form-group"><label>Harga Rata-rata (per ${b.satuanDasar})</label><input type="number" id="modalHargaBaru" step="0.01" value="${b.hargaRataRata || 0}"></div>
     </div>
-    <p class="text-muted">Harga rata-rata aktual dari pembelian. Hanya admin yang bisa melihat.</p>
+    <p class="text-muted">Harga rata-rata aktual dari pembelian.</p>
   `, () => {
     const hargaBaru = parseFloat(document.getElementById('modalHargaBaru').value);
     if (isNaN(hargaBaru) || hargaBaru < 0) { showAlert('Masukkan harga valid.', 'error'); return; }
@@ -2798,7 +2757,6 @@ function buatProduksi() {
   });
 
   let biayaBahan = 0;
-  const isAdmin = userRole === 'admin-full';
   f.items.forEach(it => {
     const b = getBahan(it.bahanId);
     if (!b) return;
@@ -2808,8 +2766,7 @@ function buatProduksi() {
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    const harga = isAdmin ? (b.hargaRataRata || 0) : (data.hargaSimulasi?.[it.bahanId] || 0);
-    biayaBahan += butuhStok * harga;
+    biayaBahan += butuhStok * (b.hargaRataRata || 0);
   });
 
   const opsMode = document.getElementById('produksiOpsMode').value;
@@ -3130,7 +3087,7 @@ function hapusKemasanWithReturn(id) {
 }
 
 // ================================================================
-// PENJUALAN
+// PENJUALAN (DENGAN FALLBACK UNTUK DATA RUSAK)
 // ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
@@ -3184,44 +3141,7 @@ function catatJual() {
   document.getElementById('jualJumlah').value = '';
   document.getElementById('jualHarga').value = '';
 }
-function hapusJual(id) {
-  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  const jual = data.penjualan.find(j => j.id === id);
-  if (!jual) return;
-  if (!confirm('⚠️ Hapus penjualan ' + jual.jenisSabun + ' x' + jual.jumlahTerjual + '?')) return;
-  data.penjualan = data.penjualan.filter(j => j.id !== id);
-  if (jual.status === 'Lunas') {
-    data.keuangan.pemasukan = data.keuangan.pemasukan.filter(p =>
-      !(p.sumber === 'Penjualan ' + jual.jenisSabun + ' x' + jual.jumlahTerjual && p.jumlah === jual.total)
-    );
-  }
-  logAudit('delete', 'penjualan', id, `Penjualan ${jual.jenisSabun} x${jual.jumlahTerjual} dihapus`, '');
-  renderAll();
-  showAlert('✅ Penjualan dihapus.');
-}
-function bayarHutang(id) {
-  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
-    showAlert('Akses ditolak!', 'error');
-    return;
-  }
-  const jual = data.penjualan.find(j => j.id === id);
-  if (!jual) return;
-  if (jual.status !== 'Hutang') { showAlert('Bukan hutang.', 'warning'); return; }
-  if (!confirm('✅ Bayar hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual + ' = ' + rupiah(jual.total) + '?')) return;
-  jual.status = 'Lunas';
-  data.keuangan.pemasukan.push({
-    id: genId(),
-    sumber: 'Pelunasan hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual,
-    jumlah: jual.total,
-    tanggal: todayStr()
-  });
-  logAudit('update', 'penjualan', id, `Status hutang → lunas (${rupiah(jual.total)})`, '');
-  renderAll();
-  showAlert('✅ Hutang lunas! ' + rupiah(jual.total));
-}
+
 function renderPenjualan() {
   const tbody = document.getElementById('jualTbody');
   if (!tbody) return;
@@ -3233,24 +3153,83 @@ function renderPenjualan() {
     }).join('');
   }
   tbody.innerHTML = sortByWaktu(data.penjualan).map(j => {
-    const sts = j.status === 'Lunas' ? 'badge-success' : 'badge-danger';
+    // FALLBACK UNTUK DATA RUSAK
+    const status = j.status || 'Lunas';
+    const total = j.total || 0;
+    const sts = status === 'Lunas' ? 'badge-success' : 'badge-danger';
     let aksi = '';
-    if (j.status === 'Hutang' && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
+    if (status === 'Hutang' && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
       aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">💰 Bayar</button>`;
     }
     if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
       aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">🗑️</button>`;
     }
     return `<tr>
-      <td>${j.jenisSabun}</td>
+      <td>${j.jenisSabun || 'Tidak diketahui'}</td>
       <td>${j.kemasanId ? (getKemasan(j.kemasanId)?.nama || '-') : '-'}</td>
-      <td>${j.jumlahTerjual}</td>
-      <td>${rupiah(j.total)}</td>
-      <td><span class="badge ${sts}">${j.status}</span></td>
+      <td>${j.jumlahTerjual || 0}</td>
+      <td>${rupiah(total)}</td>
+      <td><span class="badge ${sts}">${status}</span></td>
       <td>${aksi}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
   filterPenjualan();
+}
+
+function hapusJual(id) {
+  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
+  const jual = data.penjualan.find(j => j.id === id);
+  if (!jual) return;
+  if (!confirm('⚠️ Hapus penjualan ' + (jual.jenisSabun || '?') + ' x' + (jual.jumlahTerjual || 0) + '?')) return;
+  data.penjualan = data.penjualan.filter(j => j.id !== id);
+  if (jual.status === 'Lunas') {
+    data.keuangan.pemasukan = data.keuangan.pemasukan.filter(p =>
+      !(p.sumber === 'Penjualan ' + (jual.jenisSabun || '') + ' x' + (jual.jumlahTerjual || 0) && p.jumlah === (jual.total || 0))
+    );
+  }
+  logAudit('delete', 'penjualan', id, `Penjualan ${jual.jenisSabun || '?'} x${jual.jumlahTerjual || 0} dihapus`, '');
+  renderAll();
+  showAlert('✅ Penjualan dihapus.');
+}
+
+function bayarHutang(id) {
+  if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
+  const jual = data.penjualan.find(j => j.id === id);
+  if (!jual) return;
+  if (jual.status !== 'Hutang') { showAlert('Bukan hutang.', 'warning'); return; }
+  if (!confirm('✅ Bayar hutang ' + (jual.jenisSabun || '') + ' x' + (jual.jumlahTerjual || 0) + ' = ' + rupiah(jual.total || 0) + '?')) return;
+  jual.status = 'Lunas';
+  data.keuangan.pemasukan.push({
+    id: genId(),
+    sumber: 'Pelunasan hutang ' + (jual.jenisSabun || '') + ' x' + (jual.jumlahTerjual || 0),
+    jumlah: jual.total || 0,
+    tanggal: todayStr()
+  });
+  logAudit('update', 'penjualan', id, `Status hutang → lunas (${rupiah(jual.total || 0)})`, '');
+  renderAll();
+  showAlert('✅ Hutang lunas! ' + rupiah(jual.total || 0));
+}
+
+function hapusPenjualanRusak() {
+  if (userRole !== 'admin-full') {
+    showAlert('Hanya admin full!', 'error');
+    return;
+  }
+  const rusak = data.penjualan.filter(j => j.total === undefined || j.status === undefined || j.jenisSabun === undefined);
+  if (rusak.length === 0) {
+    showAlert('Tidak ada data penjualan yang rusak.', 'info');
+    return;
+  }
+  if (!confirm(`⚠️ Akan menghapus ${rusak.length} penjualan yang rusak. Lanjutkan?`)) return;
+  data.penjualan = data.penjualan.filter(j => j.total !== undefined && j.status !== undefined && j.jenisSabun !== undefined);
+  renderAll();
+  showAlert(`✅ ${rusak.length} penjualan rusak berhasil dihapus.`);
 }
 
 // ================================================================
@@ -3276,6 +3255,10 @@ function renderLaporanStok() {
     </tr>`;
   }).join('') || '<tr><td colspan="4" class="text-muted">Tidak ada data stok.</td></tr>';
 }
+
+// ================================================================
+// LAPORAN KEUANGAN PRODUKSI (DENGAN TABEL EDIT BIAYA OPERASIONAL)
+// ================================================================
 function renderLaporanKeuanganProduksi() {
   const container = document.getElementById('laporanKeuanganProduksi');
   if (!container) return;
@@ -3284,17 +3267,58 @@ function renderLaporanKeuanganProduksi() {
     container.innerHTML = '<p class="text-muted">Belum ada produksi selesai.</p>';
     return;
   }
+  
   let totalBiayaBahan = 0, totalBiayaOps = 0, totalBiayaKemasan = 0;
+  
+  let tabelHtml = `
+    <div class="table-wrap table-keuangan-produksi">
+      <table>
+        <thead>
+          <tr>
+            <th>Formulasi</th>
+            <th>Liter</th>
+            <th>Biaya Bahan</th>
+            <th>Biaya Operasional</th>
+            <th>Total Biaya</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
   prodSelesai.forEach(p => {
+    const f = getFormulasi(p.formulasiId);
     const biayaOps = p.opsiBiayaOperasional === 'manual' ? p.nilaiManualOps : (parseFloat(p.opsiBiayaOperasional || 15) / 100) * (p.biayaBahan || 0);
+    const totalBiaya = (p.biayaBahan || 0) + biayaOps;
     totalBiayaBahan += p.biayaBahan || 0;
     totalBiayaOps += biayaOps;
+    
+    const modeLabel = p.opsiBiayaOperasional === 'manual' ? 'Manual' : p.opsiBiayaOperasional + '%';
+    
+    tabelHtml += `
+      <tr>
+        <td>${f ? f.nama : '❌'}</td>
+        <td>${p.jumlahLiter} L</td>
+        <td>${rupiah(p.biayaBahan || 0)}</td>
+        <td>${rupiah(biayaOps)} <span style="font-size:0.65rem; color:#8D6E63;">(${modeLabel})</span></td>
+        <td>${rupiah(totalBiaya)}</td>
+        <td>
+          <button class="btn-edit-ops" onclick="editBiayaOperasional('${p.id}')">✏️</button>
+        </td>
+      </tr>
+    `;
   });
+  
+  // Total biaya kemasan
   data.kemasan.forEach(k => {
     if (k.biayaKemasanPerUnit) totalBiayaKemasan += k.biayaKemasanPerUnit * k.jumlahUnit;
   });
   const total = totalBiayaBahan + totalBiayaOps + totalBiayaKemasan;
-  container.innerHTML = `
+  
+  tabelHtml += `
+        </tbody>
+      </table>
+    </div>
     <div class="stat-grid">
       <div class="stat-card"><div class="num">${rupiah(totalBiayaBahan)}</div><div class="lbl">Biaya Bahan</div></div>
       <div class="stat-card"><div class="num">${rupiah(totalBiayaOps)}</div><div class="lbl">Biaya Operasional</div></div>
@@ -3302,7 +3326,74 @@ function renderLaporanKeuanganProduksi() {
       <div class="stat-card green"><div class="num">${rupiah(total)}</div><div class="lbl">Total Biaya Produksi</div></div>
     </div>
   `;
+  
+  container.innerHTML = tabelHtml;
 }
+
+// ================================================================
+// EDIT BIAYA OPERASIONAL PRODUKSI
+// ================================================================
+function editBiayaOperasional(id) {
+  if (userRole !== 'admin-full' && userRole !== 'atasan') {
+    showAlert('Akses ditolak!', 'error');
+    return;
+  }
+  const p = getProduksi(id);
+  if (!p) { showAlert('Produksi tidak ditemukan!', 'error'); return; }
+  
+  const currentMode = p.opsiBiayaOperasional || '15';
+  const currentManual = p.nilaiManualOps || 0;
+  
+  modal('✏️ Edit Biaya Operasional', `
+    <div class="form-row">
+      <div class="form-group" style="flex:1 1 100%;">
+        <label>Mode Biaya Operasional</label>
+        <select id="editOpsMode" onchange="toggleEditOpsManual()">
+          <option value="15" ${currentMode === '15' ? 'selected' : ''}>15% dari Biaya Bahan</option>
+          <option value="20" ${currentMode === '20' ? 'selected' : ''}>20% dari Biaya Bahan</option>
+          <option value="manual" ${currentMode === 'manual' ? 'selected' : ''}>Manual (Rp)</option>
+        </select>
+      </div>
+      <div class="form-group" id="editOpsManualGroup" style="${currentMode === 'manual' ? 'display:block;' : 'display:none;'}">
+        <label>Nilai Manual (Rp)</label>
+        <input type="number" id="editOpsManualValue" step="1" value="${currentManual}" placeholder="0">
+      </div>
+      <div class="form-group" style="flex:1 1 100%;">
+        <label>Informasi</label>
+        <div class="help-text">Biaya bahan saat ini: ${rupiah(p.biayaBahan || 0)}</div>
+        <div class="help-text">Biaya operasional saat ini: ${rupiah(getBiayaOperasionalFromProduksi(p, p.biayaBahan || 0))}</div>
+      </div>
+    </div>
+  `, () => {
+    const mode = document.getElementById('editOpsMode').value;
+    let nilaiManual = 0;
+    if (mode === 'manual') {
+      nilaiManual = parseFloat(document.getElementById('editOpsManualValue').value) || 0;
+      if (nilaiManual <= 0) {
+        showAlert('Masukkan nilai manual > 0!', 'error');
+        return;
+      }
+    }
+    
+    const oldMode = p.opsiBiayaOperasional;
+    const oldManual = p.nilaiManualOps;
+    p.opsiBiayaOperasional = mode;
+    p.nilaiManualOps = nilaiManual;
+    
+    logAudit('update', 'produksi', id, `Biaya operasional: ${oldMode}${oldMode === 'manual' ? ' ('+oldManual+')' : ''} → ${mode}${mode === 'manual' ? ' ('+nilaiManual+')' : ''}`, '');
+    renderAll();
+    showAlert('✅ Biaya operasional berhasil diupdate!');
+  });
+}
+
+function toggleEditOpsManual() {
+  const mode = document.getElementById('editOpsMode').value;
+  document.getElementById('editOpsManualGroup').style.display = (mode === 'manual') ? 'block' : 'none';
+}
+
+// ================================================================
+// LAPORAN FULL
+// ================================================================
 function renderLaporanFull() {
   const container = document.getElementById('laporanFull');
   if (!container) return;
@@ -3350,9 +3441,9 @@ function renderRiwayat() {
       const sts = j.status === 'Lunas' ? '✅ Lunas' : '❌ Hutang';
       return `<tr>
         <td>${formatTanggal(j.tanggal)}</td>
-        <td>${j.jenisSabun}</td>
-        <td>${j.jumlahTerjual}</td>
-        <td>${rupiah(j.total)}</td>
+        <td>${j.jenisSabun || '?'}</td>
+        <td>${j.jumlahTerjual || 0}</td>
+        <td>${rupiah(j.total || 0)}</td>
         <td>${sts}</td>
       </tr>`;
     }).join('') || '<tr><td colspan="5" class="text-muted">Belum ada penjualan.</td></tr>';
@@ -3434,7 +3525,7 @@ function renderPeralatan() {
 }
 
 // ================================================================
-// SIMULASI
+// SIMULASI (dengan rincian harga per bahan dalam tabel)
 // ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
@@ -3461,6 +3552,7 @@ function updateSimulasiDropdowns() {
   toggleSimulasiIsiMode();
   hitungSimulasi();
 }
+
 function hitungSimulasi() {
   const formId = document.getElementById('simulasiForm')?.value;
   const liter = parseFloat(document.getElementById('simulasiLiter')?.value) || 0;
@@ -3471,7 +3563,7 @@ function hitungSimulasi() {
   const opsManual = parseFloat(document.getElementById('simulasiOpsManual')?.value) || 0;
 
   const container = document.getElementById('simulasiHasil');
-  if (!formId || !liter || liter <= 0 || !kemasanId || !jmlUnit || jmlUnit <= 0) {
+  if (!formId || !liter || liter <= 0 || !kemasanId || !jmlUnit || jmlUnit <= 0 || !hargaJual || hargaJual <= 0) {
     container.style.display = 'none';
     return;
   }
@@ -3481,8 +3573,9 @@ function hitungSimulasi() {
   if (!f || !k) { container.style.display = 'none'; return; }
 
   const totalBerat = liter * (f.bj || 1.025);
+  const detailBahan = [];
   let biayaBahan = 0;
-  const isAdmin = userRole === 'admin-full';
+
   f.items.forEach(it => {
     const b = getBahan(it.bahanId);
     if (!b) return;
@@ -3492,8 +3585,17 @@ function hitungSimulasi() {
     if (it.isLarutan && it.konsentrasiLarutan > 0) {
       butuhStok = butuhLarutan * (it.konsentrasiLarutan / 100);
     }
-    const harga = isAdmin ? (b.hargaRataRata || 0) : (data.hargaSimulasi?.[it.bahanId] || 0);
-    biayaBahan += butuhStok * harga;
+    const harga = b.hargaRataRata || 0;
+    const biayaItem = butuhStok * harga;
+    biayaBahan += biayaItem;
+
+    detailBahan.push({
+      nama: b.nama,
+      kebutuhan: butuhStok,
+      satuan: b.satuanDasar,
+      hargaSatuan: harga,
+      biaya: biayaItem
+    });
   });
 
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
@@ -3520,8 +3622,35 @@ function hitungSimulasi() {
   }
   const totalBiaya = biayaBahan + biayaKemasan + biayaOps;
   const totalPendapatan = jmlUnit * hargaJual;
-  const laba = totalPendapatan - totalBiaya;
-  const margin = totalBiaya > 0 ? (laba / totalBiaya * 100) : 0;
+
+  const biayaPerUnit = totalBiaya / jmlUnit;
+  const labaPerUnit = hargaJual - biayaPerUnit;
+  const labaTotal = labaPerUnit * jmlUnit;
+  const margin = totalBiaya > 0 ? (labaTotal / totalBiaya * 100) : 0;
+
+  // Buat tabel rincian bahan
+  let detailHtml = '';
+  if (detailBahan.length > 0) {
+    detailHtml = `
+      <table class="detail-bahan-table">
+        <thead><tr><th>Bahan</th><th>Kebutuhan</th><th>Harga Satuan</th><th>Biaya</th></tr></thead>
+        <tbody>
+          ${detailBahan.map(d => `
+            <tr>
+              <td>${d.nama}</td>
+              <td>${d.kebutuhan.toFixed(3)} ${d.satuan}</td>
+              <td>${rupiah(d.hargaSatuan)}</td>
+              <td class="text-right">${rupiah(d.biaya)}</td>
+            </tr>
+          `).join('')}
+          <tr class="total-row">
+            <td colspan="3"><strong>Total Biaya Bahan</strong></td>
+            <td class="text-right"><strong>${rupiah(biayaBahan)}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+  }
 
   container.innerHTML = `
     <div class="simulasi-card">
@@ -3531,61 +3660,32 @@ function hitungSimulasi() {
       <div class="simulasi-hasil-item"><span class="label">Kemasan</span><span class="value">${k.nama} (${jmlUnit} unit)</span></div>
       <div class="simulasi-hasil-item"><span class="label">Berat per Kemasan</span><span class="value">${beratPerUnit.toFixed(1)} g</span></div>
       <div class="simulasi-hasil-item"><span class="label">Total Berat Kemasan</span><span class="value">${(totalBeratKemasan).toFixed(3)} kg</span></div>
-      <div class="simulasi-hasil-item"><span class="label">Biaya Bahan</span><span class="value">${rupiah(biayaBahan)}</span></div>
+
+      <div style="margin-top:8px;">
+        <strong style="color:#6D4C41;">🧪 Rincian Biaya Bahan</strong>
+        ${detailHtml}
+      </div>
+
       <div class="simulasi-hasil-item"><span class="label">Biaya Kemasan</span><span class="value">${rupiah(biayaKemasan)}</span></div>
       <div class="simulasi-hasil-item"><span class="label">Biaya Operasional</span><span class="value">${rupiah(biayaOps)}</span></div>
       <div class="simulasi-hasil-item total"><span class="label">Total Biaya</span><span class="value">${rupiah(totalBiaya)}</span></div>
-      <div class="simulasi-hasil-item"><span class="label">Harga Jual/Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
-      <div class="simulasi-hasil-item"><span class="label">Total Pendapatan</span><span class="value">${rupiah(totalPendapatan)}</span></div>
-      <div class="simulasi-hasil-item laba" style="color:${laba >= 0 ? '#2E7D32' : '#C62828'}">
-        <span class="label">${laba >= 0 ? '✅ Laba' : '❌ Rugi'}</span>
-        <span class="value">${rupiah(laba)} (${margin.toFixed(1)}%)</span>
-      </div>
-      <div class="simulasi-hasil-item" style="border-bottom:none; font-size:0.75rem; color:#8D6E63;">
-        <span class="label">Biaya per Unit</span>
-        <span class="value">${rupiah(totalBiaya / jmlUnit)}</span>
+
+      <div style="border-top:2px solid #8D6E63; margin:8px 0; padding-top:8px;">
+        <div class="simulasi-hasil-item"><span class="label">Jumlah Unit</span><span class="value">${jmlUnit}</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Harga Jual per Unit</span><span class="value">${rupiah(hargaJual)}</span></div>
+        <div class="simulasi-hasil-item"><span class="label">Biaya per Unit</span><span class="value">${rupiah(biayaPerUnit)}</span></div>
+        <div class="simulasi-hasil-item laba" style="color:${labaPerUnit >= 0 ? '#2E7D32' : '#C62828'}">
+          <span class="label">Laba per Unit</span>
+          <span class="value">${rupiah(labaPerUnit)}</span>
+        </div>
+        <div class="simulasi-hasil-item laba" style="color:${labaTotal >= 0 ? '#2E7D32' : '#C62828'}">
+          <span class="label">Laba Total</span>
+          <span class="value">${rupiah(labaTotal)} (${margin.toFixed(1)}%)</span>
+        </div>
       </div>
     </div>
   `;
   container.style.display = 'block';
-}
-
-// ================================================================
-// HARGA SIMULASI
-// ================================================================
-function renderHargaSimulasi() {
-  const container = document.getElementById('hargaSimulasiContainer');
-  if (!container) return;
-  if (userRole !== 'admin-full') {
-    container.innerHTML = '<p class="text-muted">Hanya admin full yang dapat mengatur harga simulasi.</p>';
-    return;
-  }
-  container.innerHTML = data.bahan.map(b => {
-    const val = data.hargaSimulasi?.[b.id] ?? '';
-    return `<div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;">
-      <span style="font-weight:600; min-width:120px;">${b.nama}</span>
-      <span style="font-size:0.75rem; color:#8D6E63; min-width:40px;">/${b.satuanDasar}</span>
-      <input type="number" step="0.01" class="harga-simulasi-input" data-id="${b.id}" value="${val}" placeholder="Harga simulasi" style="flex:1; min-width:120px;">
-      <span style="font-size:0.7rem; color:#8D6E63;">(aktual: ${rupiah(b.hargaRataRata || 0)})</span>
-    </div>`;
-  }).join('');
-}
-function simpanHargaSimulasi() {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  const inputs = document.querySelectorAll('.harga-simulasi-input');
-  let updated = 0;
-  inputs.forEach(inp => {
-    const id = inp.dataset.id;
-    const val = parseFloat(inp.value);
-    if (!isNaN(val) && val >= 0) {
-      if (!data.hargaSimulasi) data.hargaSimulasi = {};
-      data.hargaSimulasi[id] = val;
-      updated++;
-    }
-  });
-  logAudit('update', 'hargaSimulasi', 'all', `Update ${updated} harga simulasi`, '');
-  renderAll();
-  showAlert('✅ ' + updated + ' harga simulasi berhasil disimpan!');
 }
 
 // ================================================================
@@ -3653,16 +3753,12 @@ function resetAllData() {
   if (!confirm('⚠️ YAKIN? Data akan hilang selamanya!')) return;
   const defaultData = getDefaultData();
   data = defaultData;
-  data.hargaSimulasi = {};
   data.auditLogs = [];
   logAudit('reset', 'all', 'all', 'Reset semua data ke default', '');
   renderAll();
   showAlert('✅ Semua data telah direset ke default.');
 }
 
-// ================================================================
-// HAPUS PEMBELIAN
-// ================================================================
 function hapusPembelian(id) {
   if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
   const idx = data.pembelian.findIndex(p => p.id === id);
@@ -3689,7 +3785,6 @@ function hapusPembelian(id) {
   renderAll();
   showAlert('✅ Pembelian dihapus.');
 }
-function updateBiayaOpsKemasan() {}
 
 // ================================================================
 // TAB SWITCHING
@@ -3721,7 +3816,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v3.6 - Full Version');
+console.log('🧼 SI.BERSIH v3.8 - Full Version (tanpa Harga Simulasi + Edit Biaya Ops)');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 </body>
