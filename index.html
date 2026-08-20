@@ -16,7 +16,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
-    /* --- style lengkap --- */
     * { box-sizing: border-box; margin:0; padding:0; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(145deg, #f5f0eb 0%, #ede7e1 50%, #faf5f0 100%); min-height: 100vh; padding: 0.75rem; color: #3E2723; font-size: 1rem; }
     .app { max-width: 1200px; margin: 0 auto; background: rgba(255,252,249,0.92); backdrop-filter: blur(12px); border-radius: 28px; padding: 1.25rem; box-shadow: 0 8px 40px rgba(62,39,35,0.08); border: 1px solid rgba(255,252,249,0.5); }
@@ -248,7 +247,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v4.3</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v4.4</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -327,7 +326,6 @@
           <button class="btn btn-primary btn-sm admin-only" onclick="tambahBahan()">
             <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Bahan
           </button>
-          <!-- Tombol Reset Semua DIHAPUS dari sini -->
         </div>
       </div>
       <div class="form-row role-admin-full role-operasional role-atasan">
@@ -426,7 +424,6 @@
     </div>
     <div class="tab-content active" id="tab-produksi-formula">
       <div class="flex-between"><h3 style="color:#6D4C41;">📄 Formulasi (Resep)</h3><div><button class="btn btn-primary btn-sm admin-only" onclick="tambahFormulasi()">➕ Tambah</button></div></div>
-      <!-- Tombol Reset Formulasi DIHAPUS dari sini -->
       <div class="search-box"><input type="text" id="searchFormula" placeholder="🔍 Cari formula..." oninput="filterFormula()"></div>
       <div class="table-wrap"><table><thead><tr><th>Nama</th><th>Kode</th><th>BJ (kg/L)</th><th>Cara Pembuatan</th><th>Aksi</th></tr></thead><tbody id="formTbody"></tbody></table></div>
     </div>
@@ -450,20 +447,24 @@
     </div>
   </div>
 
-  <!-- PENGEMASAN -->
+  <!-- PENGEMASAN - PERBAIKAN UTAMA -->
   <div class="page" id="page-pengemasan">
     <h2 style="margin-bottom:16px;color:#6D4C41;display:flex;align-items:center;gap:10px;">📦 Pengemasan</h2>
-    <p class="text-muted" style="margin-bottom:14px;">Ambil batch yang sudah selesai, lalu ubah hasil bulk menjadi stok barang jadi. Biaya kemasan dicatat sebagai biaya/HPP, bukan pengeluaran kas kedua.</p>
+    <p class="text-muted" style="margin-bottom:14px;">Pilih jenis sabun, sistem akan mengambil dari batch paling tua (FIFO).</p>
     <div class="form-row role-admin-full role-atasan role-operasional">
-      <div class="form-group"><label>Batch siap dikemas</label><select id="kemasanProduksi" onchange="updateKemasanProduksiDropdown()"></select><div class="help-text" id="sisaProduksiInfo">Sisa: 0 L</div></div>
+      <div class="form-group">
+        <label>Pilih Jenis Sabun</label>
+        <select id="kemasanProduksi" onchange="updateKemasanProduksiDropdown()"></select>
+        <div class="help-text" id="sisaProduksiInfo">Total sisa: 0 L dari 0 batch</div>
+      </div>
       <div class="form-group"><label>Kemasan</label><select id="kemasanNama" onchange="updateStokKemasanInfo(); hitungTotalBerat()"></select><div class="help-text" id="stokKemasanInfo"></div></div>
       <div class="form-group"><label>Mode Isi</label><div class="radio-group"><label><input type="radio" name="isiMode" value="otomatis" checked onchange="toggleIsiMode()"> Otomatis (Volume × BJ)</label><label><input type="radio" name="isiMode" value="manual" onchange="toggleIsiMode()"> Manual (gram)</label></div></div>
-      <div class="form-group"><label>Berat Isi per Kemasan</label><input type="number" id="kemasanBeratIsi" step="0.1" placeholder="Otomatis" oninput="hitungTotalBerat()"><div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div></div>
+      <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="kemasanBeratIsi" step="0.1" placeholder="Otomatis" oninput="hitungTotalBerat()"><div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div></div>
       <div class="form-group"><label>Jumlah Unit</label><input type="number" id="kemasanJumlah" step="1" placeholder="0" oninput="hitungTotalBerat()"><div class="help-text" id="totalBeratInfo">Total Berat: 0 g</div></div>
       <div class="form-group"><label>Harga Jual/Unit (Rp)</label><input type="number" id="kemasanHarga" step="1" placeholder="0"></div>
       <div class="form-group" style="flex:0 0 100px"><button class="btn btn-success btn-block" style="margin-top:18px" onclick="tambahKemasan()">📦 Proses</button></div>
     </div>
-    <div class="search-box"><input type="text" id="searchKemasanJadi" placeholder="🔍 Cari jenis sabun, batch, kemasan..." oninput="filterKemasanJadi()"></div>
+    <div class="search-box"><input type="text" id="searchKemasanJadi" placeholder="🔍 Cari jenis sabun, kemasan..." oninput="filterKemasanJadi()"></div>
     <div class="history-table-scroll"><table><thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Stok</th><th>Harga Jual</th><th>Biaya Kemasan/unit</th><th>Aksi</th></tr></thead><tbody id="kemasanTbody"></tbody></table></div>
   </div>
 
@@ -571,7 +572,6 @@
     </h2>
     <p class="text-muted" style="margin-bottom:16px;">Semua aktivitas dan perubahan data dicatat di sini.</p>
     
-    <!-- TOMBOL RESET SATU-SATUNYA ADA DI SINI -->
     <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-danger admin-only" onclick="resetTransaksi()" style="background: linear-gradient(135deg, #C62828, #D32F2F); color:#fff;">
         <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span>
@@ -641,7 +641,7 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 // ================================================================
-// DATA DEFAULT (hanya untuk inisialisasi)
+// DATA DEFAULT
 // ================================================================
 function getDefaultData() {
   const bahan = [
@@ -940,7 +940,7 @@ function logAudit(action, collection, docId, changes, details) {
 }
 
 // ================================================================
-// AUTH
+// AUTH (disingkat karena panjang)
 // ================================================================
 function login() {
   const email = document.getElementById('loginEmail').value.trim();
@@ -1001,7 +1001,6 @@ function showApp() {
   document.getElementById('appContainer').style.display = 'block';
   document.getElementById('userEmail').textContent = currentUser.email;
   document.getElementById('userRoleBadge').textContent = userRole.toUpperCase();
-
   document.querySelectorAll('.role-admin-full, .role-operasional, .role-adm, .role-atasan, .role-investor').forEach(el => el.style.display = 'none');
   if (userRole === 'admin-full' || userRole === 'atasan' || userRole === 'operasional' || userRole === 'adm' || userRole === 'investor') {
     document.querySelectorAll('.role-' + userRole).forEach(el => el.style.display = 'inline-block');
@@ -1009,7 +1008,6 @@ function showApp() {
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = (userRole === 'admin-full') ? 'inline-block' : 'none';
   });
-
   const roleMenus = {
     'admin-full': ['dashboard','stok','produksi','pengemasan','penjualan','laporan','simulasi','peralatan','audit'],
     'atasan': ['dashboard','stok','produksi','pengemasan','penjualan','laporan','simulasi','peralatan'],
@@ -1034,7 +1032,7 @@ function navigateTo(page) {
 }
 
 // ================================================================
-// FIRESTORE
+// FIRESTORE (disingkat)
 // ================================================================
 function loadDataFromFirestore() {
   if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1057,7 +1055,6 @@ function loadDataFromFirestore() {
       dataDocId = doc.id;
       let firestoreData = doc.data();
       const defaultData = getDefaultData();
-
       if (firestoreData.kemasan && !firestoreData.stokBarangJadi) {
         firestoreData.stokBarangJadi = [];
         const map = {};
@@ -1084,9 +1081,7 @@ function loadDataFromFirestore() {
         delete firestoreData.kemasan;
       }
       if (!firestoreData.stokBarangJadi) firestoreData.stokBarangJadi = [];
-
       data = { ...defaultData, ...firestoreData };
-
       data.stokBarangJadi.forEach(entry => {
         entry.batchItems = entry.batchItems.map(item => ({
           ...item,
@@ -1095,7 +1090,6 @@ function loadDataFromFirestore() {
         entry.batchItems = entry.batchItems.filter(item => item.jumlahUnit > 0);
       });
       data.stokBarangJadi = data.stokBarangJadi.filter(entry => entry.batchItems.length > 0);
-
       data.penjualan.forEach(sale => {
         if (!sale.batchDetails) {
           const entry = getStokBarangJadiByKey(sale.jenisSabun, sale.kemasanId);
@@ -1118,7 +1112,6 @@ function loadDataFromFirestore() {
         if (!sale.batchDetails) sale.batchDetails = [];
         return sale;
       });
-
       migrateLegacyDoubleCountedCash();
       ensureBatchNumbers();
       migrateHargaRataRata();
@@ -1199,7 +1192,7 @@ function restoreData(event) {
 }
 
 // ================================================================
-// TOAST, FILTER, TAB
+// TOAST, FILTER, TAB (disingkat)
 // ================================================================
 function showAlert(message, type = 'success') {
   const toast = document.getElementById('alertToast');
@@ -1237,7 +1230,7 @@ function toggleSimulasiOpsManual() {
 }
 
 // ================================================================
-// MULTI-ITEM PEMBELIAN BAHAN
+// MULTI-ITEM PEMBELIAN BAHAN (disingkat)
 // ================================================================
 function addItem() {
   const container = document.getElementById('itemsContainer');
@@ -1372,7 +1365,7 @@ function beliBahanMulti() {
 }
 
 // ================================================================
-// MENU
+// MENU, MODAL, TAMBAH MODAL (disingkat)
 // ================================================================
 const menuToggle = document.getElementById('menuToggle');
 const menuDropdown = document.getElementById('menuDropdown');
@@ -1389,9 +1382,6 @@ document.querySelectorAll('.menu-dropdown a[data-page]').forEach(link => {
   });
 });
 
-// ================================================================
-// MODAL
-// ================================================================
 let modalCallback = null;
 function modal(title, html, cb) {
   document.getElementById('modalTitle').textContent = title;
@@ -1408,9 +1398,6 @@ function closeModal() {
   modalCallback = null;
 }
 
-// ================================================================
-// TAMBAH MODAL
-// ================================================================
 function tambahModal() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -1594,7 +1581,7 @@ function renderDashboard() {
 }
 
 // ================================================================
-// STOK BAHAN
+// STOK BAHAN (disingkat)
 // ================================================================
 function renderBahan() {
   const tbody = document.getElementById('bahanTbody');
@@ -1729,7 +1716,7 @@ function tambahBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN
+// STOK KEMASAN (disingkat)
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -1898,7 +1885,7 @@ function hitungTotalKemasan() {
 }
 
 // ================================================================
-// FORMULASI
+// FORMULASI (disingkat)
 // ================================================================
 function renderFormulasi() {
   const tbody = document.getElementById('formTbody');
@@ -2092,10 +2079,9 @@ function hapusFormulasi(id) {
   renderAll();
   showAlert('✅ Formulasi dihapus.');
 }
-// Reset formulasi ke default dihapus
 
 // ================================================================
-// PRODUKSI 
+// PRODUKSI - PERBAIKAN CARA KERJA
 // ================================================================
 function tampilkanCaraKerja(liter) {
   const box = document.getElementById('produksiCaraKerja');
@@ -2262,57 +2248,6 @@ function buatProduksi() {
   document.getElementById('produksiLiter').value = '';
 }
 
-// ================================================================
-// RESET TRANSAKSI (Formulasi Tetap) - SATU-SATUNYA TOMBOL RESET
-// ================================================================
-function resetTransaksi() {
-  if (userRole !== 'admin-full') {
-    showAlert('❌ Hanya admin full yang bisa mereset data!', 'error');
-    return;
-  }
-  
-  if (!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data transaksi:\n\n- Stok bahan dan kemasan (di-reset ke 0)\n- Semua pembelian bahan\n- Semua produksi batch\n- Semua stok barang jadi\n- Semua penjualan\n- Semua peralatan\n- Semua modal tambahan\n- Seluruh laporan keuangan\n- Semua audit log\n\n✅ FORMULASI (resep) akan TETAP ADA.\n\nLanjutkan?')) return;
-  
-  if (!confirm('⚠️ YAKIN? Data transaksi akan hilang permanen! Pastikan sudah backup terlebih dahulu.')) return;
-
-  try {
-    // Simpan data yang ingin dipertahankan
-    const bahan = data.bahan.map(b => ({
-      ...b,
-      stok: 0,
-      hargaRataRata: 0
-    }));
-    const kemasanBeli = data.kemasanBeli.map(k => ({
-      ...k,
-      stok: 0
-    }));
-    const formulasi = data.formulasi;
-
-    // Reset semua data ke default, lalu masukkan kembali yang dipertahankan
-    const defaultData = getDefaultData();
-    data = {
-      ...defaultData,
-      bahan: bahan,
-      kemasanBeli: kemasanBeli,
-      formulasi: formulasi,
-      auditLogs: []
-    };
-
-    // Log aktivitas reset
-    logAudit('reset_transaksi', 'all', 'all', 'Reset semua data transaksi (formulasi tetap)', 'Dilakukan oleh ' + getAuditUser());
-
-    renderAll();
-    saveDataToFirestore();
-    showAlert('✅ Semua data transaksi berhasil direset! Formulasi tetap ada.', 'success');
-  } catch (error) {
-    console.error('Error reset data:', error);
-    showAlert('❌ Gagal mereset data: ' + error.message, 'error');
-  }
-}
-
-// ================================================================
-// SISA FUNGSI (selesaiProd, editProduksi, hapusProduksi, renderProduksi, dll.)
-// ================================================================
 function selesaiProd(id) {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -2495,84 +2430,100 @@ function renderProduksi() {
 }
 
 // ================================================================
-// PENGEMASAN, PENJUALAN, LAPORAN, DLL (fungsi lainnya tetap sama)
+// PENGEMASAN - PERBAIKAN UTAMA: DROPDOWN GROUP PER JENIS SABUN
 // ================================================================
 function updateKemasanProduksiDropdown() {
   const selProd = document.getElementById('kemasanProduksi');
-  const selKemasan = document.getElementById('kemasanNama');
-  if (selProd) {
-    const prodSelesai = data.produksi.filter(p => p.status === 'selesai' && (p.sisaLiter || 0) > 0.001);
-    selProd.innerHTML = prodSelesai.map(p => {
-      const f = getFormulasi(p.formulasiId);
-      return `<option value="${p.id}">${f ? f.nama : '?'} - sisa ${(p.sisaLiter || 0).toFixed(2)}L</option>`;
-    }).join('');
-  }
-  if (selKemasan) {
-    const stokKemasanFisik = data.kemasanBeli.filter(k => k.stok > 0);
-    selKemasan.innerHTML = stokKemasanFisik.map(k => `<option value="${k.id}">${k.nama} (stok ${k.stok})</option>`).join('');
-  }
-  const prodId = selProd?.value;
-  const p = getProduksi(prodId);
   const infoSisa = document.getElementById('sisaProduksiInfo');
-  if (infoSisa) infoSisa.textContent = 'Sisa: ' + (p ? (p.sisaLiter || 0).toFixed(2) : '0') + ' L';
+  if (!selProd) return;
+
+  // Group batch yang sudah selesai per jenis sabun
+  const grouped = {};
+  data.produksi.forEach(p => {
+    if (p.status !== 'selesai' || (p.sisaLiter || 0) <= 0.001) return;
+    const f = getFormulasi(p.formulasiId);
+    const jenis = f ? f.nama : 'Tidak diketahui';
+    const key = jenis;
+    if (!grouped[key]) {
+      grouped[key] = {
+        jenis: jenis,
+        totalSisa: 0,
+        batches: []
+      };
+    }
+    grouped[key].totalSisa += (p.sisaLiter || 0);
+    grouped[key].batches.push({
+      id: p.id,
+      sisa: p.sisaLiter || 0,
+      tanggal: p.tanggalPembuatan || p.createdAt,
+      batchNo: p.batchNo
+    });
+  });
+
+  // Buat dropdown dengan value JSON batch IDs
+  selProd.innerHTML = Object.values(grouped)
+    .sort((a, b) => a.jenis.localeCompare(b.jenis))
+    .map(g => {
+      const label = `${g.jenis} - sisa ${g.totalSisa.toFixed(2)}L (${g.batches.length} batch)`;
+      const value = JSON.stringify(g.batches.map(b => b.id));
+      return `<option value="${value}">${label}</option>`;
+    }).join('');
+
+  // Update info sisa
+  if (infoSisa) {
+    const totalSisa = Object.values(grouped).reduce((sum, g) => sum + g.totalSisa, 0);
+    const totalBatch = Object.values(grouped).reduce((sum, g) => sum + g.batches.length, 0);
+    infoSisa.textContent = `Total sisa: ${totalSisa.toFixed(2)} L dari ${totalBatch} batch`;
+  }
+
+  if (!selProd.innerHTML) {
+    selProd.innerHTML = '<option value="">Tidak ada batch selesai</option>';
+    if (infoSisa) infoSisa.textContent = 'Total sisa: 0 L dari 0 batch';
+  }
+
   updateStokKemasanInfo();
   hitungTotalBerat();
 }
-function updateStokKemasanInfo() {
-  const selKemasan = document.getElementById('kemasanNama');
-  const info = document.getElementById('stokKemasanInfo');
-  if (!selKemasan || !info) return;
-  const id = selKemasan.value;
-  const k = getKemasanBeli(id);
-  info.textContent = k ? 'Stok: ' + k.stok + ' unit' : '';
-}
-function hitungTotalBerat() {
-  const prodId = document.getElementById('kemasanProduksi')?.value;
-  const p = getProduksi(prodId);
-  if (!p) { document.getElementById('totalBeratInfo').textContent = 'Total Berat: 0 g (0 kg)'; return; }
-  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
-  const beratIsi = parseFloat(document.getElementById('kemasanBeratIsi')?.value) || 0;
-  const jml = parseInt(document.getElementById('kemasanJumlah')?.value) || 0;
 
-  let totalBerat = 0;
-  if (mode === 'otomatis') {
-    const volMl = parseFloat(document.getElementById('kemasanNama')?.selectedOptions?.[0]?.text?.match(/\d+\.?\d*/)?.[0]) || 0;
-    totalBerat = jml * volMl * (p.bj || 1.025);
-  } else {
-    totalBerat = jml * beratIsi;
-  }
-  document.getElementById('totalBeratInfo').textContent = `Total Berat: ${totalBerat.toFixed(1)} g (${(totalBerat/1000).toFixed(3)} kg)`;
-}
-function toggleIsiMode() {
-  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
-  const beratIsi = document.getElementById('kemasanBeratIsi');
-  const info = document.getElementById('beratPerKemasanInfo');
-  if (mode === 'manual') {
-    beratIsi.placeholder = 'Masukkan gram';
-    info.textContent = 'Manual: isi sesuai input';
-  } else {
-    beratIsi.placeholder = 'Otomatis (vol × BJ)';
-    info.textContent = 'Otomatis: volume × BJ';
-  }
-  hitungTotalBerat();
-}
 function tambahKemasan() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
     return;
   }
-  const prodId = document.getElementById('kemasanProduksi').value;
+
+  const prodValue = document.getElementById('kemasanProduksi').value;
   const kemasanId = document.getElementById('kemasanNama').value;
   const jml = parseInt(document.getElementById('kemasanJumlah').value);
   const hargaJual = parseFloat(document.getElementById('kemasanHarga').value);
 
-  if (!prodId || !kemasanId || !jml || jml <= 0 || !hargaJual || hargaJual <= 0) {
+  if (!prodValue || !kemasanId || !jml || jml <= 0 || !hargaJual || hargaJual <= 0) {
     showAlert('Isi semua field dengan benar!', 'error');
     return;
   }
-  const p = getProduksi(prodId);
-  if (!p) { showAlert('Produksi tidak ditemukan!', 'error'); return; }
-  if ((p.sisaLiter || 0) < 0.001) { showAlert('Sisa produksi sudah habis!', 'error'); return; }
+
+  // Parse batch IDs dari JSON
+  let batchIds = [];
+  try {
+    batchIds = JSON.parse(prodValue);
+  } catch (e) {
+    showAlert('Error membaca data batch!', 'error');
+    return;
+  }
+
+  // Ambil batch yang valid dan urutkan dari yang paling tua
+  const batches = batchIds
+    .map(id => getProduksi(id))
+    .filter(p => p && p.status === 'selesai' && (p.sisaLiter || 0) > 0.001)
+    .sort((a, b) => {
+      const tA = new Date(a.tanggalPembuatan || a.createdAt);
+      const tB = new Date(b.tanggalPembuatan || b.createdAt);
+      return tA - tB; // paling tua dulu
+    });
+
+  if (batches.length === 0) {
+    showAlert('Tidak ada batch yang tersedia untuk dikemas!', 'error');
+    return;
+  }
 
   const k = getKemasanBeli(kemasanId);
   if (!k) { showAlert('Kemasan tidak ditemukan!', 'error'); return; }
@@ -2583,58 +2534,112 @@ function tambahKemasan() {
   let beratPerUnit = 0;
   if (mode === 'otomatis') {
     const volMl = k.volumeMl || 0;
-    beratPerUnit = volMl * (p.bj || 1.025);
+    // Ambil BJ dari batch pertama
+    const firstBatch = batches[0];
+    const f = getFormulasi(firstBatch.formulasiId);
+    beratPerUnit = volMl * (f ? f.bj || 1.025 : 1.025);
   } else {
     beratPerUnit = beratIsiInput;
   }
   if (beratPerUnit <= 0) { showAlert('Berat isi per kemasan harus > 0!', 'error'); return; }
 
-  const totalBeratGram = beratPerUnit * jml;
-  const totalBeratKg = totalBeratGram / 1000;
+  // Hitung total berat yang dibutuhkan dalam kg
+  const totalBeratKg = (beratPerUnit * jml) / 1000;
 
-  if (totalBeratKg > (p.sisaLiter || 0)) {
-    showAlert(`❌ Tidak cukup sisa produksi! Butuh ${totalBeratKg.toFixed(3)}L, sisa ${(p.sisaLiter || 0).toFixed(3)}L`, 'error');
+  // Ambil dari batch yang paling tua dulu (FIFO)
+  let sisaKemas = totalBeratKg;
+  const usedBatches = [];
+
+  for (const p of batches) {
+    if (sisaKemas <= 0) break;
+    const ambil = Math.min(p.sisaLiter, sisaKemas);
+    if (ambil <= 0) continue;
+    p.sisaLiter -= ambil;
+    sisaKemas -= ambil;
+    usedBatches.push({
+      produksiId: p.id,
+      batchNo: p.batchNo,
+      literTerpakai: ambil,
+      // Hitung berapa unit yang bisa dibuat dari liter ini
+      unitDariBatch: Math.round((ambil / totalBeratKg) * jml)
+    });
+    // Pastikan total unit sesuai
+  }
+
+  // Recalculate unit distribution
+  let totalUnits = 0;
+  usedBatches.forEach(b => {
+    // Hitung ulang unit proporsional
+    b.unitDariBatch = Math.round((b.literTerpakai / totalBeratKg) * jml);
+    totalUnits += b.unitDariBatch;
+  });
+  // Adjust jika ada selisih
+  let diff = jml - totalUnits;
+  if (diff > 0) {
+    // Tambahkan ke batch terakhir
+    if (usedBatches.length > 0) {
+      usedBatches[usedBatches.length - 1].unitDariBatch += diff;
+    }
+  }
+
+  if (sisaKemas > 0.001) {
+    showAlert('❌ Tidak cukup sisa produksi! Butuh ' + totalBeratKg.toFixed(3) + 'L', 'error');
+    // Kembalikan stok yang sudah diambil
+    usedBatches.forEach(b => {
+      const p = getProduksi(b.produksiId);
+      if (p) p.sisaLiter += b.literTerpakai;
+    });
     return;
   }
 
-  p.sisaLiter -= totalBeratKg;
+  // Kurangi stok kemasan
   k.stok -= jml;
 
-  const jenisSabun = getFormulasi(p.formulasiId)?.nama || 'Sabun';
-  let entry = getStokBarangJadiByKey(jenisSabun, kemasanId);
-  if (!entry) {
-    entry = {
-      id: genId(),
-      jenisSabun,
-      kemasanId,
-      batchItems: []
-    };
-    data.stokBarangJadi.push(entry);
-  }
-  const existingBatch = entry.batchItems.find(item => item.produksiId === prodId && item.batchNo === p.batchNo);
-  if (existingBatch) {
-    existingBatch.jumlahUnit += jml;
-    existingBatch.beratPerUnit = beratPerUnit;
-    existingBatch.hargaJual = hargaJual;
-    existingBatch.biayaKemasanPerUnit = k.hargaPerUnit || 0;
-  } else {
-    entry.batchItems.push({
-      batchNo: p.batchNo || '',
-      produksiId: prodId,
-      jumlahUnit: jml,
-      beratPerUnit: beratPerUnit,
-      hargaJual: hargaJual,
-      biayaKemasanPerUnit: k.hargaPerUnit || 0
-    });
-  }
+  // Simpan ke stok barang jadi per batch
+  const jenisSabun = getFormulasi(getProduksi(usedBatches[0]?.produksiId)?.formulasiId)?.nama || 'Sabun';
 
-  logAudit('create', 'stokBarangJadi', entry.id, `Kemasan ${k.nama} x${jml} unit, berat ${beratPerUnit}g/unit, harga ${rupiah(hargaJual)}/unit`, '');
+  // Untuk setiap batch yang digunakan, tambahkan ke stokBarangJadi
+  usedBatches.forEach(b => {
+    if (b.unitDariBatch <= 0) return;
+    let entry = getStokBarangJadiByKey(jenisSabun, kemasanId);
+    if (!entry) {
+      entry = {
+        id: genId(),
+        jenisSabun,
+        kemasanId,
+        batchItems: []
+      };
+      data.stokBarangJadi.push(entry);
+    }
+    const existingBatch = entry.batchItems.find(item => item.produksiId === b.produksiId);
+    if (existingBatch) {
+      existingBatch.jumlahUnit += b.unitDariBatch;
+      existingBatch.beratPerUnit = beratPerUnit;
+      existingBatch.hargaJual = hargaJual;
+      existingBatch.biayaKemasanPerUnit = k.hargaPerUnit || 0;
+    } else {
+      entry.batchItems.push({
+        batchNo: b.batchNo || '',
+        produksiId: b.produksiId,
+        jumlahUnit: b.unitDariBatch,
+        beratPerUnit: beratPerUnit,
+        hargaJual: hargaJual,
+        biayaKemasanPerUnit: k.hargaPerUnit || 0
+      });
+    }
+  });
+
+  logAudit('create', 'stokBarangJadi', 'multiple', `Kemasan ${k.nama} x${jml} unit dari ${usedBatches.length} batch`, '');
   renderAll();
-  showAlert('✅ ' + jml + ' unit ' + k.nama + ' berhasil dikemas! Sisa produksi: ' + (p.sisaLiter || 0).toFixed(3) + 'L');
+  showAlert('✅ ' + jml + ' unit ' + k.nama + ' berhasil dikemas dari ' + usedBatches.length + ' batch!');
   document.getElementById('kemasanJumlah').value = '';
   document.getElementById('kemasanHarga').value = '';
   document.getElementById('kemasanBeratIsi').value = '';
 }
+
+// ================================================================
+// PENGEMASAN - TAMPILAN STOK GABUNGAN
+// ================================================================
 function renderPengemasan() {
   const tbody = document.getElementById('kemasanTbody');
   if (!tbody) return;
@@ -2667,7 +2672,7 @@ function renderPengemasan() {
     return `<tr>
       <td>${g.jenisSabun}</td>
       <td>${g.namaKemasan}</td>
-      <td>${stok}</td>
+      <td><strong>${stok}</strong></td>
       <td>${rupiah(g.hargaJual)}</td>
       <td>${rupiah(g.biayaKemasanPerUnit)} / unit</td>
       <td>${aksi}</td>
@@ -2676,6 +2681,7 @@ function renderPengemasan() {
   filterKemasanJadi();
   updateKemasanProduksiDropdown();
 }
+
 function editKemasanGroup(entryId) {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) {
     showAlert('Akses ditolak!', 'error');
@@ -2701,6 +2707,7 @@ function editKemasanGroup(entryId) {
   renderAll();
   showAlert('✅ Harga jual diperbarui.');
 }
+
 function hapusKemasanGroup(entryId) {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) {
     showAlert('Akses ditolak!', 'error');
@@ -2732,6 +2739,10 @@ function hapusKemasanGroup(entryId) {
   renderAll();
   showAlert('✅ Stok dihapus dan bahan dikembalikan.');
 }
+
+// ================================================================
+// PENJUALAN - STOK GABUNGAN & FIFO (sudah ada di kode sebelumnya)
+// ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
     showAlert('Akses ditolak!', 'error');
@@ -2759,6 +2770,7 @@ function catatJual() {
     return;
   }
 
+  // FIFO: urutkan batch dari yang paling tua
   entry.batchItems.sort((a, b) => {
     const pA = getProduksi(a.produksiId);
     const pB = getProduksi(b.produksiId);
@@ -2813,12 +2825,16 @@ function catatJual() {
     data.penjualan[data.penjualan.length - 1].pemasukanId = pemasukanId;
   }
 
-  logAudit('create', 'penjualan', penjualanId, `Jual ${jenisSabun} x${jml} = ${rupiah(total)} (${status})`, '');
+  logAudit('create', 'penjualan', penjualanId, `Jual ${jenisSabun} x${jml} = ${rupiah(total)} (${status}) dari ${batchDetails.length} batch`, '');
   renderAll();
   showAlert('✅ Penjualan ' + jenisSabun + ' x' + jml + ' = ' + rupiah(total) + ' (' + status + ')');
   document.getElementById('jualJumlah').value = '';
   document.getElementById('jualHarga').value = '';
 }
+
+// ================================================================
+// LAPORAN (sama seperti sebelumnya, sudah mendukung per batch)
+// ================================================================
 function renderPenjualan() {
   const tbody = document.getElementById('jualTbody');
   if (!tbody) return;
@@ -2857,6 +2873,7 @@ function renderPenjualan() {
   }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
   filterPenjualan();
 }
+
 function hapusJual(id) {
   if (!['admin-full', 'adm', 'atasan'].includes(userRole)) {
     showAlert('Akses ditolak!', 'error');
@@ -2917,6 +2934,7 @@ function hapusJual(id) {
   renderAll();
   showAlert('✅ Penjualan dihapus. Stok kembali dan dampak kas dibatalkan.');
 }
+
 function bayarHutang(id) {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -2941,7 +2959,7 @@ function bayarHutang(id) {
 }
 
 // ================================================================
-// LAPORAN (ringkasan)
+// LAPORAN (RINGKASAN, PRODUKSI, DLL) - sama seperti sebelumnya
 // ================================================================
 function renderLaporanStok() { }
 function renderLaporanKeuanganProduksi() {
@@ -2967,7 +2985,7 @@ function renderLaporanKeuanganProduksi() {
       <div class="stat-card green"><div class="num">${rupiah(totalLaba)}</div><div class="lbl">Laba Batch Terjual</div></div>
       <div class="stat-card"><div class="num">${marginTotal.toFixed(1)}%</div><div class="lbl">Margin</div></div>
     </div>
-    <div class="financial-note">Omzet dihitung dari penjualan yang terhubung ke batch. Laba batch hanya dihitung untuk unit yang sudah terjual.</div>
+    <div class="financial-note">Omzet dan laba dihitung per batch berdasarkan penjualan yang menggunakan batch tersebut (FIFO).</div>
     <div class="report-toolbar"><input id="searchLaporanProduksiBatch" class="search-box" style="flex:1;min-width:220px" placeholder="🔍 Cari batch..." oninput="filterLaporanProduksiBatch()"></div>
     <div class="history-table-scroll"><table>
       <thead><tr><th>Batch</th><th>Tanggal</th><th>Formulasi</th><th>Liter</th><th>HPP Batch</th><th>Terjual</th><th>Omzet</th><th>HPP Terjual</th><th>Laba</th><th>Margin</th><th>Aksi</th></tr></thead>
@@ -2996,6 +3014,7 @@ function hitungKinerjaBatch(p) {
       if (batch.produksiId === p.id) {
         const qty = batch.jumlah;
         omzet += qty * batch.hargaJual;
+        // HPP per unit proporsional
         const totalBeratBatch = p.jumlahLiter * (p.bj || 1.025);
         const hppPerUnit = (biayaProduksi / p.jumlahLiter) * (batch.jumlah / p.jumlahLiter);
         const hppUnit = hppPerUnit + (batch.biayaKemasan || 0);
@@ -3358,6 +3377,51 @@ function hitungSimulasi() {
 }
 
 // ================================================================
+// RESET TRANSAKSI (Formulasi Tetap)
+// ================================================================
+function resetTransaksi() {
+  if (userRole !== 'admin-full') {
+    showAlert('❌ Hanya admin full yang bisa mereset data!', 'error');
+    return;
+  }
+  
+  if (!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data transaksi:\n\n- Stok bahan dan kemasan (di-reset ke 0)\n- Semua pembelian bahan\n- Semua produksi batch\n- Semua stok barang jadi\n- Semua penjualan\n- Semua peralatan\n- Semua modal tambahan\n- Seluruh laporan keuangan\n- Semua audit log\n\n✅ FORMULASI (resep) akan TETAP ADA.\n\nLanjutkan?')) return;
+  
+  if (!confirm('⚠️ YAKIN? Data transaksi akan hilang permanen! Pastikan sudah backup terlebih dahulu.')) return;
+
+  try {
+    const bahan = data.bahan.map(b => ({
+      ...b,
+      stok: 0,
+      hargaRataRata: 0
+    }));
+    const kemasanBeli = data.kemasanBeli.map(k => ({
+      ...k,
+      stok: 0
+    }));
+    const formulasi = data.formulasi;
+
+    const defaultData = getDefaultData();
+    data = {
+      ...defaultData,
+      bahan: bahan,
+      kemasanBeli: kemasanBeli,
+      formulasi: formulasi,
+      auditLogs: []
+    };
+
+    logAudit('reset_transaksi', 'all', 'all', 'Reset semua data transaksi (formulasi tetap)', 'Dilakukan oleh ' + getAuditUser());
+
+    renderAll();
+    saveDataToFirestore();
+    showAlert('✅ Semua data transaksi berhasil direset! Formulasi tetap ada.', 'success');
+  } catch (error) {
+    console.error('Error reset data:', error);
+    showAlert('❌ Gagal mereset data: ' + error.message, 'error');
+  }
+}
+
+// ================================================================
 // AUDIT LOG
 // ================================================================
 function renderAuditLog() {
@@ -3450,7 +3514,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v4.3 - Satu tombol reset di Aktivitas (Formulasi tetap)');
+console.log('🧼 SI.BERSIH v4.4 - Pengemasan group per jenis sabun, FIFO, stok gabungan');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 
