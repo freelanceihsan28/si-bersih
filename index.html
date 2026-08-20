@@ -16,6 +16,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
+    /* --- style lengkap (sama seperti sebelumnya, tidak saya tulis ulang) --- */
     * { box-sizing: border-box; margin:0; padding:0; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(145deg, #f5f0eb 0%, #ede7e1 50%, #faf5f0 100%); min-height: 100vh; padding: 0.75rem; color: #3E2723; font-size: 1rem; }
     .app { max-width: 1200px; margin: 0 auto; background: rgba(255,252,249,0.92); backdrop-filter: blur(12px); border-radius: 28px; padding: 1.25rem; box-shadow: 0 8px 40px rgba(62,39,35,0.08); border: 1px solid rgba(255,252,249,0.5); }
@@ -247,7 +248,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v4.4</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v4.5</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -270,7 +271,8 @@
       <a data-page="audit" class="admin-only" style="display:none;"><span class="icon">🕘</span> Aktivitas</a>
     </div>
   </nav>
-    <!-- DASHBOARD -->
+
+  <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -339,6 +341,7 @@
             <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
             <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
             <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+            <div class="form-group"><label>Tanggal</label><input type="date" class="item-tanggal" value=""></div>
             <div class="form-group" style="flex:0 0 36px; min-width:36px;">
               <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
             </div>
@@ -379,6 +382,7 @@
         <div class="form-group"><label>Jumlah</label><input type="number" id="kemasanBeliJml" step="1" placeholder="0"></div>
         <div class="form-group"><label>Harga/unit (Rp)</label><input type="number" id="kemasanBeliHarga" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
         <div class="form-group"><label>Ongkos Kirim (Rp)</label><input type="number" id="kemasanBeliOngkir" step="1" placeholder="0" oninput="hitungTotalKemasan()"></div>
+        <div class="form-group"><label>Tanggal</label><input type="date" id="kemasanBeliTanggal" value=""></div>
         <div class="form-group" style="flex:1 1 100%;"><label>Total Biaya (otomatis)</label><div class="total-auto" id="kemasanTotalAuto">Rp 0</div></div>
         <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="beliKemasan()">Beli</button></div>
       </div>
@@ -391,7 +395,8 @@
       </div>
     </div>
   </div>
-    <!-- PERALATAN -->
+
+  <!-- PERALATAN -->
   <div class="page" id="page-peralatan">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -447,7 +452,7 @@
     </div>
   </div>
 
-  <!-- PENGEMASAN - PERBAIKAN UTAMA -->
+  <!-- PENGEMASAN -->
   <div class="page" id="page-pengemasan">
     <h2 style="margin-bottom:16px;color:#6D4C41;display:flex;align-items:center;gap:10px;">📦 Pengemasan</h2>
     <p class="text-muted" style="margin-bottom:14px;">Pilih jenis sabun, sistem akan mengambil dari batch paling tua (FIFO).</p>
@@ -462,6 +467,7 @@
       <div class="form-group"><label>Berat Isi per Kemasan (gram)</label><input type="number" id="kemasanBeratIsi" step="0.1" placeholder="Otomatis" oninput="hitungTotalBerat()"><div class="help-text" id="beratPerKemasanInfo">Otomatis: volume × BJ</div></div>
       <div class="form-group"><label>Jumlah Unit</label><input type="number" id="kemasanJumlah" step="1" placeholder="0" oninput="hitungTotalBerat()"><div class="help-text" id="totalBeratInfo">Total Berat: 0 g</div></div>
       <div class="form-group"><label>Harga Jual/Unit (Rp)</label><input type="number" id="kemasanHarga" step="1" placeholder="0"></div>
+      <div class="form-group"><label>Tanggal Pengemasan</label><input type="date" id="kemasanTanggal"></div>
       <div class="form-group" style="flex:0 0 100px"><button class="btn btn-success btn-block" style="margin-top:18px" onclick="tambahKemasan()">📦 Proses</button></div>
     </div>
     <div class="search-box"><input type="text" id="searchKemasanJadi" placeholder="🔍 Cari jenis sabun, kemasan..." oninput="filterKemasanJadi()"></div>
@@ -488,6 +494,7 @@
           <option value="Hutang">Hutang</option>
         </select>
       </div>
+      <div class="form-group"><label>Tanggal Penjualan</label><input type="date" id="jualTanggal"></div>
       <div class="form-group" style="flex:0 0 80px;"><button class="btn btn-success btn-block" style="margin-top:18px;" onclick="catatJual()">Jual</button></div>
     </div>
     <div style="margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -498,12 +505,13 @@
     <div class="search-box"><input type="text" id="searchPenjualan" placeholder="🔍 Cari penjualan..." oninput="filterPenjualan()"></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Jml</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Jml</th><th>Total</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
         <tbody id="jualTbody"></tbody>
       </table>
     </div>
   </div>
-    <!-- LAPORAN KEUANGAN -->
+
+  <!-- LAPORAN KEUANGAN -->
   <div class="page" id="page-laporan">
     <h2 style="margin-bottom:16px;color:#6D4C41;display:flex;align-items:center;gap:10px;">📊 Laporan Keuangan</h2>
     <div class="tab-bar" id="tabLaporan">
@@ -564,7 +572,7 @@
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
   </div>
 
-  <!-- AUDIT LOG dengan tombol reset -->
+  <!-- AUDIT LOG -->
   <div class="page" id="page-audit">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
@@ -756,7 +764,20 @@ function formatTanggal(tgl) {
   if (!tgl) return '-';
   const d = new Date(tgl);
   if (isNaN(d)) return tgl;
+  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function formatTanggalWaktu(tgl) {
+  if (!tgl) return '-';
+  const d = new Date(tgl);
+  if (isNaN(d)) return tgl;
   return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function sortByTanggal(arr) {
+  return [...arr].sort((a, b) => {
+    const t1 = a.tanggal || a.createdAt || '';
+    const t2 = b.tanggal || b.createdAt || '';
+    return t1 < t2 ? 1 : -1;
+  });
 }
 function sortByWaktu(arr) {
   return [...arr].sort((a, b) => {
@@ -940,7 +961,7 @@ function logAudit(action, collection, docId, changes, details) {
 }
 
 // ================================================================
-// AUTH (disingkat karena panjang)
+// AUTH
 // ================================================================
 function login() {
   const email = document.getElementById('loginEmail').value.trim();
@@ -1032,7 +1053,7 @@ function navigateTo(page) {
 }
 
 // ================================================================
-// FIRESTORE (disingkat)
+// FIRESTORE - DIPERBAIKI
 // ================================================================
 function loadDataFromFirestore() {
   if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -1055,15 +1076,18 @@ function loadDataFromFirestore() {
       dataDocId = doc.id;
       let firestoreData = doc.data();
       const defaultData = getDefaultData();
-      if (firestoreData.kemasan && !firestoreData.stokBarangJadi) {
-        firestoreData.stokBarangJadi = [];
+
+      // MIGRASI DATA LAMA KE STRUKTUR BARU
+      // Jika ada data kemasan lama (array), konversi ke stokBarangJadi
+      if (firestoreData.kemasan && Array.isArray(firestoreData.kemasan) && firestoreData.kemasan.length > 0) {
+        if (!firestoreData.stokBarangJadi) firestoreData.stokBarangJadi = [];
         const map = {};
         firestoreData.kemasan.forEach(k => {
-          const key = k.jenisSabun + '|' + k.kemasanId;
+          const key = (k.jenisSabun || 'Sabun') + '|' + k.kemasanId;
           if (!map[key]) {
             map[key] = {
               id: genId(),
-              jenisSabun: k.jenisSabun,
+              jenisSabun: k.jenisSabun || 'Sabun',
               kemasanId: k.kemasanId,
               batchItems: []
             };
@@ -1072,16 +1096,23 @@ function loadDataFromFirestore() {
           map[key].batchItems.push({
             batchNo: k.batchNo || '',
             produksiId: k.produksiId,
-            jumlahUnit: k.jumlahUnit,
-            beratPerUnit: k.beratPerUnit,
-            hargaJual: k.hargaJualPerUnit,
-            biayaKemasanPerUnit: k.biayaKemasanPerUnit || 0
+            jumlahUnit: k.jumlahUnit || 0,
+            beratPerUnit: k.beratPerUnit || 0,
+            hargaJual: k.hargaJualPerUnit || 0,
+            biayaKemasanPerUnit: k.biayaKemasanPerUnit || 0,
+            tanggal: k.tanggal || k.createdAt || todayStr()
           });
         });
         delete firestoreData.kemasan;
       }
+
+      // Pastikan stokBarangJadi ada
       if (!firestoreData.stokBarangJadi) firestoreData.stokBarangJadi = [];
+
+      // Gabungkan dengan default
       data = { ...defaultData, ...firestoreData };
+
+      // Bersihkan stokBarangJadi
       data.stokBarangJadi.forEach(entry => {
         entry.batchItems = entry.batchItems.map(item => ({
           ...item,
@@ -1090,6 +1121,8 @@ function loadDataFromFirestore() {
         entry.batchItems = entry.batchItems.filter(item => item.jumlahUnit > 0);
       });
       data.stokBarangJadi = data.stokBarangJadi.filter(entry => entry.batchItems.length > 0);
+
+      // Pastikan setiap penjualan punya batchDetails
       data.penjualan.forEach(sale => {
         if (!sale.batchDetails) {
           const entry = getStokBarangJadiByKey(sale.jenisSabun, sale.kemasanId);
@@ -1098,10 +1131,11 @@ function loadDataFromFirestore() {
             sale.batchDetails = [{
               batchNo: batch.batchNo,
               produksiId: batch.produksiId,
-              jumlah: sale.jumlahTerjual,
+              jumlah: sale.jumlahTerjual || 0,
               hargaHpp: 0,
-              hargaJual: sale.hargaPerUnit,
-              biayaKemasan: batch.biayaKemasanPerUnit || 0
+              hargaJual: sale.hargaPerUnit || 0,
+              biayaKemasan: batch.biayaKemasanPerUnit || 0,
+              tanggal: sale.tanggal || sale.createdAt || todayStr()
             }];
           } else {
             sale.batchDetails = [];
@@ -1112,9 +1146,15 @@ function loadDataFromFirestore() {
         if (!sale.batchDetails) sale.batchDetails = [];
         return sale;
       });
+
+      // Migrasi keuangan
       migrateLegacyDoubleCountedCash();
       ensureBatchNumbers();
       migrateHargaRataRata();
+      
+      // Set tanggal default untuk yang kosong
+      setDefaultDates();
+      
       renderAll();
       checkStokWarnings();
       updateSimulasiDropdowns();
@@ -1127,6 +1167,21 @@ function loadDataFromFirestore() {
     showAlert('Koneksi Firestore terputus!', 'error');
   });
 }
+
+function setDefaultDates() {
+  const now = todayStr();
+  data.pembelian.forEach(p => { if (!p.tanggal) p.tanggal = now; });
+  data.produksi.forEach(p => { if (!p.tanggalPembuatan) p.tanggalPembuatan = now; });
+  data.stokBarangJadi.forEach(entry => {
+    entry.batchItems.forEach(item => { if (!item.tanggal) item.tanggal = now; });
+  });
+  data.penjualan.forEach(j => { if (!j.tanggal) j.tanggal = now; });
+  data.peralatan.forEach(p => { if (!p.tanggal) p.tanggal = now; });
+  data.modalTambahan.forEach(m => { if (!m.tanggal) m.tanggal = now; });
+  data.keuangan.pemasukan.forEach(p => { if (!p.tanggal) p.tanggal = now; });
+  data.keuangan.pengeluaran.forEach(p => { if (!p.tanggal) p.tanggal = now; });
+}
+
 async function saveDataToFirestore() {
   if (!dataDocId) { showAlert('❌ Data tidak terhubung ke Firestore!', 'error'); return; }
   try {
@@ -1179,6 +1234,7 @@ function restoreData(event) {
       if (!confirm('⚠️ Restore akan menimpa SEMUA data saat ini! Lanjutkan?')) return;
       if (!confirm('⚠️ Yakin? Data lama akan hilang jika belum di-backup!')) return;
       data = imported;
+      setDefaultDates();
       renderAll();
       saveDataToFirestore();
       showAlert('✅ Data berhasil direstore!', 'success');
@@ -1192,7 +1248,7 @@ function restoreData(event) {
 }
 
 // ================================================================
-// TOAST, FILTER, TAB (disingkat)
+// TOAST, FILTER, TAB
 // ================================================================
 function showAlert(message, type = 'success') {
   const toast = document.getElementById('alertToast');
@@ -1230,7 +1286,7 @@ function toggleSimulasiOpsManual() {
 }
 
 // ================================================================
-// MULTI-ITEM PEMBELIAN BAHAN (disingkat)
+// MULTI-ITEM PEMBELIAN BAHAN (dengan tanggal)
 // ================================================================
 function addItem() {
   const container = document.getElementById('itemsContainer');
@@ -1242,6 +1298,7 @@ function addItem() {
     <div class="form-group"><label>Jumlah</label><input type="number" class="item-jumlah" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
     <div class="form-group"><label>Satuan</label><select class="item-satuan"><option value="g">g</option><option value="ml">mL</option><option value="kg">kg</option><option value="L">L</option></select></div>
     <div class="form-group"><label>Harga Total (Rp)</label><input type="number" class="item-totalHarga" step="0.01" placeholder="0" oninput="hitungTotalPembelian()"></div>
+    <div class="form-group"><label>Tanggal</label><input type="date" class="item-tanggal" value="${todayStr()}"></div>
     <div class="form-group" style="flex:0 0 36px; min-width:36px;">
       <button class="btn btn-danger btn-sm btn-remove-item" onclick="removeItem(this)" style="margin-top:18px;" title="Hapus item">✕</button>
     </div>
@@ -1287,16 +1344,19 @@ function beliBahanMulti() {
   const rows = document.querySelectorAll('.item-row');
   const items = [];
   let allValid = true;
+  let tanggal = todayStr();
   rows.forEach(row => {
     const bahanId = row.querySelector('.item-bahan').value;
     const jml = parseFloat(row.querySelector('.item-jumlah').value);
     const satuan = row.querySelector('.item-satuan').value;
     const totalHarga = parseFloat(row.querySelector('.item-totalHarga').value);
+    const tgl = row.querySelector('.item-tanggal').value || todayStr();
     if (!bahanId || !jml || jml <= 0 || !totalHarga || totalHarga <= 0) {
       allValid = false;
       return;
     }
-    items.push({ bahanId, jml, satuan, totalHarga });
+    tanggal = tgl;
+    items.push({ bahanId, jml, satuan, totalHarga, tanggal: tgl });
   });
   if (!allValid || items.length === 0) {
     showAlert('Isi semua field dengan benar!', 'error');
@@ -1307,7 +1367,6 @@ function beliBahanMulti() {
   const totalSubtotal = subtotals.reduce((a,b) => a+b, 0);
   if (totalSubtotal === 0) { showAlert('Total belanja harus > 0', 'error'); return; }
 
-  const now = todayStr();
   let grandTotal = 0;
   items.forEach((it, idx) => {
     const b = getBahan(it.bahanId);
@@ -1333,7 +1392,7 @@ function beliBahanMulti() {
       hargaTotal: totalBiayaItem,
       ongkir: ongkirItem,
       hargaUnit: it.totalHarga / it.jml,
-      tanggal: now,
+      tanggal: it.tanggal || todayStr(),
       createdBy: getAuditUser(),
       createdAt: getAuditTime()
     });
@@ -1345,7 +1404,7 @@ function beliBahanMulti() {
     id: genId(),
     sumber: 'Pembelian bahan (multi-item)',
     jumlah: grandTotal,
-    tanggal: now
+    tanggal: tanggal || todayStr()
   });
 
   document.querySelectorAll('.item-jumlah').forEach(inp => inp.value = '');
@@ -1358,6 +1417,7 @@ function beliBahanMulti() {
   if (firstRow) {
     firstRow.querySelector('.item-jumlah').value = '';
     firstRow.querySelector('.item-totalHarga').value = '';
+    firstRow.querySelector('.item-tanggal').value = todayStr();
   }
   populateItemBahanSelects();
   renderAll();
@@ -1365,7 +1425,7 @@ function beliBahanMulti() {
 }
 
 // ================================================================
-// MENU, MODAL, TAMBAH MODAL (disingkat)
+// MENU & MODAL
 // ================================================================
 const menuToggle = document.getElementById('menuToggle');
 const menuDropdown = document.getElementById('menuDropdown');
@@ -1398,6 +1458,9 @@ function closeModal() {
   modalCallback = null;
 }
 
+// ================================================================
+// TAMBAH MODAL (dengan tanggal)
+// ================================================================
 function tambahModal() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -1581,7 +1644,7 @@ function renderDashboard() {
 }
 
 // ================================================================
-// STOK BAHAN (disingkat)
+// STOK BAHAN (disingkat - tetap sama)
 // ================================================================
 function renderBahan() {
   const tbody = document.getElementById('bahanTbody');
@@ -1716,7 +1779,7 @@ function tambahBahan() {
 }
 
 // ================================================================
-// STOK KEMASAN (disingkat)
+// STOK KEMASAN (dengan tanggal)
 // ================================================================
 function renderKemasanStok() {
   const tbody = document.getElementById('kemasanStokTbody');
@@ -1823,9 +1886,10 @@ function tambahKemasanStok() {
       return;
     }
     const id = genId();
+    const tgl = todayStr();
     data.kemasanBeli.push({ id, nama, stok, hargaPerUnit: harga, volumeMl });
-    data.riwayatKemasan.push({ id: genId(), nama, jumlah: stok, hargaPerUnit: harga, ongkir: 0, tanggal: todayStr(), createdBy: getAuditUser(), createdAt: getAuditTime() });
-    data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + nama, jumlah: stok * harga, tanggal: todayStr() });
+    data.riwayatKemasan.push({ id: genId(), nama, jumlah: stok, hargaPerUnit: harga, ongkir: 0, tanggal: tgl, createdBy: getAuditUser(), createdAt: getAuditTime() });
+    data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + nama, jumlah: stok * harga, tanggal: tgl });
     logAudit('create', 'kemasanBeli', id, `Kemasan ${nama} ditambahkan dengan stok ${stok}, volume ${volumeMl}mL, harga ${rupiah(harga)}`, '');
     renderAll();
     showAlert('✅ Kemasan "' + nama + '" berhasil ditambahkan!');
@@ -1840,6 +1904,7 @@ function beliKemasan() {
   const jml = parseInt(document.getElementById('kemasanBeliJml').value);
   const hargaUnit = parseFloat(document.getElementById('kemasanBeliHarga').value) || 0;
   const ongkir = parseFloat(document.getElementById('kemasanBeliOngkir').value) || 0;
+  const tgl = document.getElementById('kemasanBeliTanggal').value || todayStr();
   const totalBiaya = (jml * hargaUnit) + ongkir;
 
   if (!id || !jml || jml <= 0 || !hargaUnit || hargaUnit <= 0 || totalBiaya <= 0) {
@@ -1863,11 +1928,11 @@ function beliKemasan() {
     hargaPerUnit: hargaUnit,
     ongkir: ongkir,
     totalBiaya: totalBiaya,
-    tanggal: todayStr(),
+    tanggal: tgl,
     createdBy: getAuditUser(),
     createdAt: getAuditTime()
   });
-  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + k.nama, jumlah: totalBiaya, tanggal: todayStr() });
+  data.keuangan.pengeluaran.push({ id: genId(), sumber: 'Beli kemasan ' + k.nama, jumlah: totalBiaya, tanggal: tgl });
   logAudit('update', 'kemasanBeli', id, `Stok: ${oldStok} → ${k.stok}, Harga rata-rata: ${oldHarga} → ${k.hargaPerUnit}`, `Beli ${jml} unit ${k.nama}`);
   document.getElementById('kemasanBeliJml').value = '';
   document.getElementById('kemasanBeliHarga').value = '';
@@ -1885,7 +1950,7 @@ function hitungTotalKemasan() {
 }
 
 // ================================================================
-// FORMULASI (disingkat)
+// FORMULASI (sama seperti sebelumnya)
 // ================================================================
 function renderFormulasi() {
   const tbody = document.getElementById('formTbody');
@@ -2081,7 +2146,7 @@ function hapusFormulasi(id) {
 }
 
 // ================================================================
-// PRODUKSI - PERBAIKAN CARA KERJA
+// PRODUKSI 
 // ================================================================
 function tampilkanCaraKerja(liter) {
   const box = document.getElementById('produksiCaraKerja');
@@ -2430,14 +2495,13 @@ function renderProduksi() {
 }
 
 // ================================================================
-// PENGEMASAN - PERBAIKAN UTAMA: DROPDOWN GROUP PER JENIS SABUN
+// PENGEMASAN - GROUP PER JENIS SABUN & FIFO (dengan tanggal)
 // ================================================================
 function updateKemasanProduksiDropdown() {
   const selProd = document.getElementById('kemasanProduksi');
   const infoSisa = document.getElementById('sisaProduksiInfo');
   if (!selProd) return;
 
-  // Group batch yang sudah selesai per jenis sabun
   const grouped = {};
   data.produksi.forEach(p => {
     if (p.status !== 'selesai' || (p.sisaLiter || 0) <= 0.001) return;
@@ -2460,7 +2524,6 @@ function updateKemasanProduksiDropdown() {
     });
   });
 
-  // Buat dropdown dengan value JSON batch IDs
   selProd.innerHTML = Object.values(grouped)
     .sort((a, b) => a.jenis.localeCompare(b.jenis))
     .map(g => {
@@ -2469,7 +2532,6 @@ function updateKemasanProduksiDropdown() {
       return `<option value="${value}">${label}</option>`;
     }).join('');
 
-  // Update info sisa
   if (infoSisa) {
     const totalSisa = Object.values(grouped).reduce((sum, g) => sum + g.totalSisa, 0);
     const totalBatch = Object.values(grouped).reduce((sum, g) => sum + g.batches.length, 0);
@@ -2480,6 +2542,10 @@ function updateKemasanProduksiDropdown() {
     selProd.innerHTML = '<option value="">Tidak ada batch selesai</option>';
     if (infoSisa) infoSisa.textContent = 'Total sisa: 0 L dari 0 batch';
   }
+
+  // Set tanggal default
+  const tglInput = document.getElementById('kemasanTanggal');
+  if (tglInput && !tglInput.value) tglInput.value = todayStr();
 
   updateStokKemasanInfo();
   hitungTotalBerat();
@@ -2495,13 +2561,13 @@ function tambahKemasan() {
   const kemasanId = document.getElementById('kemasanNama').value;
   const jml = parseInt(document.getElementById('kemasanJumlah').value);
   const hargaJual = parseFloat(document.getElementById('kemasanHarga').value);
+  const tanggal = document.getElementById('kemasanTanggal').value || todayStr();
 
   if (!prodValue || !kemasanId || !jml || jml <= 0 || !hargaJual || hargaJual <= 0) {
     showAlert('Isi semua field dengan benar!', 'error');
     return;
   }
 
-  // Parse batch IDs dari JSON
   let batchIds = [];
   try {
     batchIds = JSON.parse(prodValue);
@@ -2510,14 +2576,13 @@ function tambahKemasan() {
     return;
   }
 
-  // Ambil batch yang valid dan urutkan dari yang paling tua
   const batches = batchIds
     .map(id => getProduksi(id))
     .filter(p => p && p.status === 'selesai' && (p.sisaLiter || 0) > 0.001)
     .sort((a, b) => {
       const tA = new Date(a.tanggalPembuatan || a.createdAt);
       const tB = new Date(b.tanggalPembuatan || b.createdAt);
-      return tA - tB; // paling tua dulu
+      return tA - tB;
     });
 
   if (batches.length === 0) {
@@ -2534,7 +2599,6 @@ function tambahKemasan() {
   let beratPerUnit = 0;
   if (mode === 'otomatis') {
     const volMl = k.volumeMl || 0;
-    // Ambil BJ dari batch pertama
     const firstBatch = batches[0];
     const f = getFormulasi(firstBatch.formulasiId);
     beratPerUnit = volMl * (f ? f.bj || 1.025 : 1.025);
@@ -2543,10 +2607,8 @@ function tambahKemasan() {
   }
   if (beratPerUnit <= 0) { showAlert('Berat isi per kemasan harus > 0!', 'error'); return; }
 
-  // Hitung total berat yang dibutuhkan dalam kg
   const totalBeratKg = (beratPerUnit * jml) / 1000;
 
-  // Ambil dari batch yang paling tua dulu (FIFO)
   let sisaKemas = totalBeratKg;
   const usedBatches = [];
 
@@ -2560,31 +2622,12 @@ function tambahKemasan() {
       produksiId: p.id,
       batchNo: p.batchNo,
       literTerpakai: ambil,
-      // Hitung berapa unit yang bisa dibuat dari liter ini
-      unitDariBatch: Math.round((ambil / totalBeratKg) * jml)
+      tanggal: p.tanggalPembuatan || tanggal
     });
-    // Pastikan total unit sesuai
-  }
-
-  // Recalculate unit distribution
-  let totalUnits = 0;
-  usedBatches.forEach(b => {
-    // Hitung ulang unit proporsional
-    b.unitDariBatch = Math.round((b.literTerpakai / totalBeratKg) * jml);
-    totalUnits += b.unitDariBatch;
-  });
-  // Adjust jika ada selisih
-  let diff = jml - totalUnits;
-  if (diff > 0) {
-    // Tambahkan ke batch terakhir
-    if (usedBatches.length > 0) {
-      usedBatches[usedBatches.length - 1].unitDariBatch += diff;
-    }
   }
 
   if (sisaKemas > 0.001) {
     showAlert('❌ Tidak cukup sisa produksi! Butuh ' + totalBeratKg.toFixed(3) + 'L', 'error');
-    // Kembalikan stok yang sudah diambil
     usedBatches.forEach(b => {
       const p = getProduksi(b.produksiId);
       if (p) p.sisaLiter += b.literTerpakai;
@@ -2592,13 +2635,27 @@ function tambahKemasan() {
     return;
   }
 
-  // Kurangi stok kemasan
   k.stok -= jml;
 
-  // Simpan ke stok barang jadi per batch
   const jenisSabun = getFormulasi(getProduksi(usedBatches[0]?.produksiId)?.formulasiId)?.nama || 'Sabun';
 
-  // Untuk setiap batch yang digunakan, tambahkan ke stokBarangJadi
+  // Distribusi unit proporsional
+  let totalUnits = 0;
+  usedBatches.forEach((b, idx) => {
+    if (idx === usedBatches.length - 1) {
+      b.unitDariBatch = jml - totalUnits;
+    } else {
+      b.unitDariBatch = Math.round((b.literTerpakai / totalBeratKg) * jml);
+      totalUnits += b.unitDariBatch;
+    }
+  });
+
+  // Pastikan total unit = jml
+  let diff = jml - usedBatches.reduce((sum, b) => sum + (b.unitDariBatch || 0), 0);
+  if (diff !== 0 && usedBatches.length > 0) {
+    usedBatches[usedBatches.length - 1].unitDariBatch += diff;
+  }
+
   usedBatches.forEach(b => {
     if (b.unitDariBatch <= 0) return;
     let entry = getStokBarangJadiByKey(jenisSabun, kemasanId);
@@ -2617,6 +2674,7 @@ function tambahKemasan() {
       existingBatch.beratPerUnit = beratPerUnit;
       existingBatch.hargaJual = hargaJual;
       existingBatch.biayaKemasanPerUnit = k.hargaPerUnit || 0;
+      existingBatch.tanggal = b.tanggal || tanggal;
     } else {
       entry.batchItems.push({
         batchNo: b.batchNo || '',
@@ -2624,7 +2682,8 @@ function tambahKemasan() {
         jumlahUnit: b.unitDariBatch,
         beratPerUnit: beratPerUnit,
         hargaJual: hargaJual,
-        biayaKemasanPerUnit: k.hargaPerUnit || 0
+        biayaKemasanPerUnit: k.hargaPerUnit || 0,
+        tanggal: b.tanggal || tanggal
       });
     }
   });
@@ -2637,9 +2696,6 @@ function tambahKemasan() {
   document.getElementById('kemasanBeratIsi').value = '';
 }
 
-// ================================================================
-// PENGEMASAN - TAMPILAN STOK GABUNGAN
-// ================================================================
 function renderPengemasan() {
   const tbody = document.getElementById('kemasanTbody');
   if (!tbody) return;
@@ -2741,7 +2797,7 @@ function hapusKemasanGroup(entryId) {
 }
 
 // ================================================================
-// PENJUALAN - STOK GABUNGAN & FIFO (sudah ada di kode sebelumnya)
+// PENJUALAN - STOK GABUNGAN & FIFO (dengan tanggal)
 // ================================================================
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
@@ -2755,6 +2811,7 @@ function catatJual() {
   const jml = parseInt(document.getElementById('jualJumlah').value);
   const harga = parseFloat(document.getElementById('jualHarga').value);
   const status = document.getElementById('jualStatus').value;
+  const tanggal = document.getElementById('jualTanggal').value || todayStr();
 
   if (!jml || jml <= 0 || !harga || harga <= 0) {
     showAlert('Isi semua field dengan benar!', 'error');
@@ -2792,7 +2849,8 @@ function catatJual() {
       jumlah: ambil,
       hargaHpp: 0,
       hargaJual: harga,
-      biayaKemasan: batch.biayaKemasanPerUnit || 0
+      biayaKemasan: batch.biayaKemasanPerUnit || 0,
+      tanggal: batch.tanggal || tanggal
     });
     if (batch.jumlahUnit === 0) {
       entry.batchItems = entry.batchItems.filter(item => item.jumlahUnit > 0);
@@ -2813,7 +2871,7 @@ function catatJual() {
     hargaPerUnit: harga,
     total,
     status,
-    tanggal: todayStr(),
+    tanggal: tanggal,
     createdAt: getAuditTime(),
     createdBy: getAuditUser(),
     batchDetails: batchDetails
@@ -2821,7 +2879,7 @@ function catatJual() {
 
   if (status === 'Lunas') {
     const pemasukanId = genId();
-    data.keuangan.pemasukan.push({ id: pemasukanId, sumber: 'Penjualan ' + jenisSabun + ' x' + jml, jumlah: total, tanggal: todayStr() });
+    data.keuangan.pemasukan.push({ id: pemasukanId, sumber: 'Penjualan ' + jenisSabun + ' x' + jml, jumlah: total, tanggal: tanggal });
     data.penjualan[data.penjualan.length - 1].pemasukanId = pemasukanId;
   }
 
@@ -2832,9 +2890,6 @@ function catatJual() {
   document.getElementById('jualHarga').value = '';
 }
 
-// ================================================================
-// LAPORAN (sama seperti sebelumnya, sudah mendukung per batch)
-// ================================================================
 function renderPenjualan() {
   const tbody = document.getElementById('jualTbody');
   if (!tbody) return;
@@ -2852,6 +2907,10 @@ function renderPenjualan() {
     });
   }
 
+  // Set tanggal default
+  const tglInput = document.getElementById('jualTanggal');
+  if (tglInput && !tglInput.value) tglInput.value = todayStr();
+
   tbody.innerHTML = sortByWaktu(data.penjualan).map(j => {
     const sts = j.status === 'Lunas' ? 'badge-success' : 'badge-danger';
     let aksi = '';
@@ -2868,9 +2927,10 @@ function renderPenjualan() {
       <td>${j.jumlahTerjual}</td>
       <td>${rupiah(j.total)}</td>
       <td><span class="badge ${sts}">${j.status}</span></td>
+      <td>${formatTanggal(j.tanggal || j.createdAt)}</td>
       <td>${aksi}</td>
     </tr>`;
-  }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
+  }).join('') || '<tr><td colspan="7" class="text-muted">Belum ada penjualan.</td></tr>';
   filterPenjualan();
 }
 
@@ -2899,7 +2959,8 @@ function hapusJual(id) {
         jumlahUnit: batch.jumlah,
         beratPerUnit: 0,
         hargaJual: batch.hargaJual,
-        biayaKemasanPerUnit: batch.biayaKemasan || 0
+        biayaKemasanPerUnit: batch.biayaKemasan || 0,
+        tanggal: batch.tanggal || jual.tanggal
       });
     });
   } else {
@@ -2914,7 +2975,8 @@ function hapusJual(id) {
           jumlahUnit: batch.jumlah,
           beratPerUnit: 0,
           hargaJual: batch.hargaJual,
-          biayaKemasanPerUnit: batch.biayaKemasan || 0
+          biayaKemasanPerUnit: batch.biayaKemasan || 0,
+          tanggal: batch.tanggal || jual.tanggal
         });
       }
     });
@@ -2946,11 +3008,12 @@ function bayarHutang(id) {
   if (!confirm('✅ Bayar hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual + ' = ' + rupiah(jual.total) + '?')) return;
   jual.status = 'Lunas';
   const pemasukanId = genId();
+  const tgl = todayStr();
   data.keuangan.pemasukan.push({
     id: pemasukanId,
     sumber: 'Pelunasan hutang ' + jual.jenisSabun + ' x' + jual.jumlahTerjual,
     jumlah: jual.total,
-    tanggal: todayStr()
+    tanggal: tgl
   });
   jual.pemasukanId = pemasukanId;
   logAudit('update', 'penjualan', id, `Status hutang → lunas (${rupiah(jual.total)})`, '');
@@ -2959,7 +3022,7 @@ function bayarHutang(id) {
 }
 
 // ================================================================
-// LAPORAN (RINGKASAN, PRODUKSI, DLL) - sama seperti sebelumnya
+// LAPORAN (per batch dengan FIFO)
 // ================================================================
 function renderLaporanStok() { }
 function renderLaporanKeuanganProduksi() {
@@ -3014,7 +3077,6 @@ function hitungKinerjaBatch(p) {
       if (batch.produksiId === p.id) {
         const qty = batch.jumlah;
         omzet += qty * batch.hargaJual;
-        // HPP per unit proporsional
         const totalBeratBatch = p.jumlahLiter * (p.bj || 1.025);
         const hppPerUnit = (biayaProduksi / p.jumlahLiter) * (batch.jumlah / p.jumlahLiter);
         const hppUnit = hppPerUnit + (batch.biayaKemasan || 0);
@@ -3092,7 +3154,7 @@ function renderLaporanPenjualan() {
       <tbody id="laporanPenjualanTbody">${sortByWaktu(data.penjualan).map(j => {
         const kemasan = getKemasanBeli(j.kemasanId);
         return `<tr>
-          <td>${formatTanggal(j.createdAt || j.tanggal)}</td>
+          <td>${formatTanggal(j.tanggal || j.createdAt)}</td>
           <td>${j.jenisSabun}</td>
           <td>${kemasan ? kemasan.nama : '-'}</td>
           <td>${j.jumlahTerjual}</td>
@@ -3211,7 +3273,7 @@ function hapusPeralatan(id) {
 }
 
 // ================================================================
-// SIMULASI
+// SIMULASI (sama seperti sebelumnya)
 // ================================================================
 function toggleSimulasiIsiMode() {
   const mode = document.querySelector('input[name="simulasiIsiMode"]:checked')?.value || 'otomatis';
@@ -3434,7 +3496,7 @@ function renderAuditLog() {
   const logs = (data.auditLogs || []).slice(-100).reverse();
   container.innerHTML = logs.map(log => `
     <div class="log-entry">
-      <span class="time">${formatTanggal(log.timestamp)}</span>
+      <span class="time">${formatTanggalWaktu(log.timestamp)}</span>
       <span class="user">${log.user || 'system'}</span>
       <span class="action ${log.action || ''}">${log.action || ''}</span>
       <span class="detail">${log.collection || ''} ${log.changes || ''}</span>
@@ -3514,7 +3576,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v4.4 - Pengemasan group per jenis sabun, FIFO, stok gabungan');
+console.log('🧼 SI.BERSIH v4.5 - Dengan kolom tanggal di semua transaksi');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 
