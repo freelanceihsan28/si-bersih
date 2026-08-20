@@ -16,6 +16,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
+    /* --- style lengkap --- */
     * { box-sizing: border-box; margin:0; padding:0; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(145deg, #f5f0eb 0%, #ede7e1 50%, #faf5f0 100%); min-height: 100vh; padding: 0.75rem; color: #3E2723; font-size: 1rem; }
     .app { max-width: 1200px; margin: 0 auto; background: rgba(255,252,249,0.92); backdrop-filter: blur(12px); border-radius: 28px; padding: 1.25rem; box-shadow: 0 8px 40px rgba(62,39,35,0.08); border: 1px solid rgba(255,252,249,0.5); }
@@ -247,7 +248,7 @@
       <button class="menu-toggle" id="menuToggle" aria-label="Menu">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="brand">🧼 SI.BERSIH <small>v4.2</small></span>
+      <span class="brand">🧼 SI.BERSIH <small>v4.3</small></span>
       <span id="stokNotifBadge" style="display:none;" class="notif-badge">!</span>
     </div>
     <div class="user-info">
@@ -326,9 +327,7 @@
           <button class="btn btn-primary btn-sm admin-only" onclick="tambahBahan()">
             <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> Tambah Bahan
           </button>
-          <button class="btn btn-danger btn-sm admin-only" onclick="resetAllData()" style="margin-left:6px;">
-            <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span> Reset Semua
-          </button>
+          <!-- Tombol Reset Semua DIHAPUS dari sini -->
         </div>
       </div>
       <div class="form-row role-admin-full role-operasional role-atasan">
@@ -426,21 +425,22 @@
       <button data-tab="produksi-riwayat">🕘 Riwayat Pembuatan</button>
     </div>
     <div class="tab-content active" id="tab-produksi-formula">
-      <div class="flex-between"><h3 style="color:#6D4C41;">📄 Formulasi (Resep)</h3><div><button class="btn btn-primary btn-sm admin-only" onclick="tambahFormulasi()">➕ Tambah</button><button class="btn btn-warning btn-sm admin-only" onclick="resetFormulasiKeDefault()">↻ Reset</button></div></div>
+      <div class="flex-between"><h3 style="color:#6D4C41;">📄 Formulasi (Resep)</h3><div><button class="btn btn-primary btn-sm admin-only" onclick="tambahFormulasi()">➕ Tambah</button></div></div>
+      <!-- Tombol Reset Formulasi DIHAPUS dari sini -->
       <div class="search-box"><input type="text" id="searchFormula" placeholder="🔍 Cari formula..." oninput="filterFormula()"></div>
       <div class="table-wrap"><table><thead><tr><th>Nama</th><th>Kode</th><th>BJ (kg/L)</th><th>Cara Pembuatan</th><th>Aksi</th></tr></thead><tbody id="formTbody"></tbody></table></div>
     </div>
     <div class="tab-content" id="tab-produksi-buat">
       <h3 style="color:#6D4C41;">✨ Pembuatan Batch</h3>
       <div class="form-row role-admin-full role-atasan role-operasional">
-        <div class="form-group"><label>Formulasi</label><select id="produksiForm" onchange="renderCaraKerjaProduksi(); hitungPreviewProduksi()"></select></div>
-        <div class="form-group"><label>Tanggal Pembuatan</label><input type="date" id="produksiTanggal" onchange="hitungPreviewProduksi()"></div>
-        <div class="form-group"><label>Liter</label><input type="number" id="produksiLiter" step="0.1" placeholder="0" oninput="renderCaraKerjaProduksi(); hitungPreviewProduksi()"></div>
-        <div class="form-group"><label>Biaya Operasional</label><select id="produksiOpsMode" onchange="toggleProduksiOpsManual(); hitungPreviewProduksi()"><option value="15">15% dari biaya bahan</option><option value="20">20% dari biaya bahan</option><option value="manual">Manual (Rp)</option></select></div>
-        <div class="form-group" id="produksiOpsManualGroup" style="display:none;"><label>Nilai Manual (Rp)</label><input type="number" id="produksiOpsManual" step="1" placeholder="0" oninput="hitungPreviewProduksi()"></div>
+        <div class="form-group"><label>Formulasi</label><select id="produksiForm"></select></div>
+        <div class="form-group"><label>Tanggal Pembuatan</label><input type="date" id="produksiTanggal"></div>
+        <div class="form-group"><label>Liter</label><input type="number" id="produksiLiter" step="0.1" placeholder="0"></div>
+        <div class="form-group"><label>Biaya Operasional</label><select id="produksiOpsMode" onchange="toggleProduksiOpsManual();"><option value="15">15% dari biaya bahan</option><option value="20">20% dari biaya bahan</option><option value="manual">Manual (Rp)</option></select></div>
+        <div class="form-group" id="produksiOpsManualGroup" style="display:none;"><label>Nilai Manual (Rp)</label><input type="number" id="produksiOpsManual" step="1" placeholder="0"></div>
       </div>
-      <div id="produksiCaraKerja" class="info-card"><strong>🧪 Cara Kerja Pembuatan</strong><div class="text-muted" style="margin-top:8px;">Pilih formulasi dan masukkan liter untuk melihat takaran aktual.</div></div>
-      <div id="produksiPreview" class="info-card"><strong>📐 Kebutuhan Batch</strong><div class="text-muted" style="margin-top:8px;">Masukkan liter untuk melihat kebutuhan bahan.</div></div>
+      <div id="produksiCaraKerja" class="info-card" style="display:none;"></div>
+      <div id="produksiPreview" class="info-card"><strong>📐 Kebutuhan Batch</strong><div class="text-muted" style="margin-top:8px;">Masukkan liter dan pilih formulasi, lalu klik Buat Batch.</div></div>
       <button class="btn btn-primary role-admin-full role-atasan role-operasional" onclick="buatProduksi()">🏭 Buat Batch</button>
     </div>
     <div class="tab-content" id="tab-produksi-riwayat">
@@ -563,13 +563,23 @@
     <div id="simulasiHasil" style="margin-top:20px; display:none;"></div>
   </div>
 
-  <!-- AUDIT LOG -->
+  <!-- AUDIT LOG dengan tombol reset -->
   <div class="page" id="page-audit">
     <h2 style="margin-bottom:16px; color:#6D4C41; display:flex; align-items:center; gap:10px;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4C41" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
       Aktivitas
     </h2>
-    <p class="text-muted" style="margin-bottom:16px;">Semua aktivitas dan perubahan data dicatat di sini. Hanya dapat diakses oleh <strong>ihsan@sabunku.com</strong>.</p>
+    <p class="text-muted" style="margin-bottom:16px;">Semua aktivitas dan perubahan data dicatat di sini.</p>
+    
+    <!-- TOMBOL RESET SATU-SATUNYA ADA DI SINI -->
+    <div style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-danger admin-only" onclick="resetTransaksi()" style="background: linear-gradient(135deg, #C62828, #D32F2F); color:#fff;">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/><path d="M12 8v4l3 3"/></svg></span>
+        🗑️ Reset Semua Data (Formulasi Tetap)
+      </button>
+      <span class="text-muted" style="font-size:0.75rem; align-self:center;">Menghapus semua transaksi, stok, dan keuangan. Formulasi tetap ada.</span>
+    </div>
+
     <div id="auditLogContainer">
       <div class="text-muted">Memuat riwayat...</div>
     </div>
@@ -631,7 +641,7 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 // ================================================================
-// DATA DEFAULT
+// DATA DEFAULT (hanya untuk inisialisasi)
 // ================================================================
 function getDefaultData() {
   const bahan = [
@@ -1048,7 +1058,6 @@ function loadDataFromFirestore() {
       let firestoreData = doc.data();
       const defaultData = getDefaultData();
 
-      // Migrasi data lama ke struktur baru jika diperlukan
       if (firestoreData.kemasan && !firestoreData.stokBarangJadi) {
         firestoreData.stokBarangJadi = [];
         const map = {};
@@ -2083,33 +2092,24 @@ function hapusFormulasi(id) {
   renderAll();
   showAlert('✅ Formulasi dihapus.');
 }
-function resetFormulasiKeDefault() {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  if (!confirm('⚠️ Reset formulasi ke default? Semua formulasi kustom akan hilang!')) return;
-  const defaultData = getDefaultData();
-  data.formulasi = defaultData.formulasi;
-  logAudit('reset', 'formulasi', 'all', 'Reset formulasi ke default', '');
-  renderAll();
-  showAlert('✅ Formulasi direset ke default.');
-}
+// Reset formulasi ke default dihapus
 
 // ================================================================
-// PRODUKSI - PERBAIKAN UTAMA
+// PRODUKSI 
 // ================================================================
-function renderCaraKerjaProduksi() {
+function tampilkanCaraKerja(liter) {
   const box = document.getElementById('produksiCaraKerja');
   if (!box) return;
-  const f = getFormulasi(document.getElementById('produksiForm')?.value);
-  const liter = parseFloat(document.getElementById('produksiLiter')?.value) || 0;
+  const formulasiId = document.getElementById('produksiForm').value;
+  const f = getFormulasi(formulasiId);
   if (!f) {
-    box.innerHTML = '<strong>🧪 Cara Kerja Pembuatan</strong><div class="text-muted" style="margin-top:8px">Pilih formulasi.</div>';
+    box.innerHTML = '<strong>🧪 Cara Kerja Pembuatan</strong><div class="text-muted" style="margin-top:8px;">Pilih formulasi terlebih dahulu.</div>';
+    box.style.display = 'block';
     return;
   }
-  if (liter <= 0) {
-    const steps = String(f.caraPembuatan || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
-    box.innerHTML = `<strong>🧪 Cara Kerja: ${f.nama}</strong>
-      <div style="margin-top:8px; color:#8D6E63; font-style:italic;">Masukkan liter untuk melihat takaran aktual.</div>
-      <div style="margin-top:6px;">${steps.length ? steps.map((x,i) => `<div class="sop-step"><span class="sop-num">${i+1}</span><span>${x}</span></div>`).join('') : '<div class="text-muted">Cara kerja belum diisi.</div>'}</div>`;
+  if (!liter || liter <= 0) {
+    box.innerHTML = `<strong>🧪 Cara Kerja: ${f.nama}</strong><div class="text-muted" style="margin-top:8px;">Masukkan liter yang valid.</div>`;
+    box.style.display = 'block';
     return;
   }
 
@@ -2128,9 +2128,7 @@ function renderCaraKerjaProduksi() {
     const nilaiTampilan = b.satuanDasar === 'kg' ? butuhStok * 1000 : butuhStok * 1000;
     kebutuhan[b.id] = {
       nama: b.nama,
-      nilai: butuhStok,
-      satuan: b.satuanDasar,
-      tampilan: `${(nilaiTampilan).toFixed(1)} ${satuanTampilan}`
+      tampilan: `${nilaiTampilan.toFixed(1)} ${satuanTampilan}`
     };
   });
 
@@ -2152,6 +2150,7 @@ function renderCaraKerjaProduksi() {
   box.innerHTML = `<strong>🧪 Cara Kerja: ${f.nama} (${liter} L)</strong>
     <div style="margin-top:8px;">${stepHtml || '<div class="text-muted">Tidak ada langkah.</div>'}</div>
     <div class="financial-note" style="margin-top:8px;">Total berat batch: ${totalBerat.toFixed(3)} kg</div>`;
+  box.style.display = 'block';
 }
 
 function hitungPreviewProduksi() {
@@ -2160,7 +2159,7 @@ function hitungPreviewProduksi() {
   const f = getFormulasi(document.getElementById('produksiForm')?.value);
   const liter = parseFloat(document.getElementById('produksiLiter')?.value) || 0;
   if (!f || liter <= 0) {
-    box.innerHTML = '<strong>📐 Kebutuhan Batch</strong><div class="text-muted" style="margin-top:8px">Masukkan liter untuk melihat kebutuhan bahan.</div>';
+    box.innerHTML = '<strong>📐 Kebutuhan Batch</strong><div class="text-muted" style="margin-top:8px;">Pilih formulasi dan masukkan liter, lalu klik Buat Batch.</div>';
     return;
   }
   const totalBerat = liter * (f.bj || 1.025);
@@ -2258,11 +2257,62 @@ function buatProduksi() {
 
   logAudit('create', 'produksi', id, `Batch ${batchNo}: ${f.nama} ${liter}L, biaya bahan ${rupiah(biayaBahan)}`, '');
   renderAll();
-  renderCaraKerjaProduksi();
+  tampilkanCaraKerja(liter);
   showAlert(`✅ Batch ${batchNo} berhasil dibuat. Biaya bahan ${rupiah(biayaBahan)} tidak mengurangi saldo kas lagi.`);
   document.getElementById('produksiLiter').value = '';
 }
 
+// ================================================================
+// RESET TRANSAKSI (Formulasi Tetap) - SATU-SATUNYA TOMBOL RESET
+// ================================================================
+function resetTransaksi() {
+  if (userRole !== 'admin-full') {
+    showAlert('❌ Hanya admin full yang bisa mereset data!', 'error');
+    return;
+  }
+  
+  if (!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data transaksi:\n\n- Stok bahan dan kemasan (di-reset ke 0)\n- Semua pembelian bahan\n- Semua produksi batch\n- Semua stok barang jadi\n- Semua penjualan\n- Semua peralatan\n- Semua modal tambahan\n- Seluruh laporan keuangan\n- Semua audit log\n\n✅ FORMULASI (resep) akan TETAP ADA.\n\nLanjutkan?')) return;
+  
+  if (!confirm('⚠️ YAKIN? Data transaksi akan hilang permanen! Pastikan sudah backup terlebih dahulu.')) return;
+
+  try {
+    // Simpan data yang ingin dipertahankan
+    const bahan = data.bahan.map(b => ({
+      ...b,
+      stok: 0,
+      hargaRataRata: 0
+    }));
+    const kemasanBeli = data.kemasanBeli.map(k => ({
+      ...k,
+      stok: 0
+    }));
+    const formulasi = data.formulasi;
+
+    // Reset semua data ke default, lalu masukkan kembali yang dipertahankan
+    const defaultData = getDefaultData();
+    data = {
+      ...defaultData,
+      bahan: bahan,
+      kemasanBeli: kemasanBeli,
+      formulasi: formulasi,
+      auditLogs: []
+    };
+
+    // Log aktivitas reset
+    logAudit('reset_transaksi', 'all', 'all', 'Reset semua data transaksi (formulasi tetap)', 'Dilakukan oleh ' + getAuditUser());
+
+    renderAll();
+    saveDataToFirestore();
+    showAlert('✅ Semua data transaksi berhasil direset! Formulasi tetap ada.', 'success');
+  } catch (error) {
+    console.error('Error reset data:', error);
+    showAlert('❌ Gagal mereset data: ' + error.message, 'error');
+  }
+}
+
+// ================================================================
+// SISA FUNGSI (selesaiProd, editProduksi, hapusProduksi, renderProduksi, dll.)
+// ================================================================
 function selesaiProd(id) {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
     showAlert('Akses ditolak!', 'error');
@@ -2441,27 +2491,12 @@ function renderProduksi() {
   toggleProduksiOpsManual();
   const dt = document.getElementById('produksiTanggal');
   if (dt && !dt.value) dt.value = todayStr();
-  renderCaraKerjaProduksi();
   hitungPreviewProduksi();
 }
 
 // ================================================================
-// PENGEMASAN, PENJUALAN, LAPORAN, DLL
-// (saya singkatkan karena sudah sama dengan versi sebelumnya)
+// PENGEMASAN, PENJUALAN, LAPORAN, DLL (fungsi lainnya tetap sama)
 // ================================================================
-function toggleIsiMode() {
-  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
-  const beratIsi = document.getElementById('kemasanBeratIsi');
-  const info = document.getElementById('beratPerKemasanInfo');
-  if (mode === 'manual') {
-    beratIsi.placeholder = 'Masukkan gram';
-    info.textContent = 'Manual: isi sesuai input';
-  } else {
-    beratIsi.placeholder = 'Otomatis (vol × BJ)';
-    info.textContent = 'Otomatis: volume × BJ';
-  }
-  hitungTotalBerat();
-}
 function updateKemasanProduksiDropdown() {
   const selProd = document.getElementById('kemasanProduksi');
   const selKemasan = document.getElementById('kemasanNama');
@@ -2507,6 +2542,19 @@ function hitungTotalBerat() {
     totalBerat = jml * beratIsi;
   }
   document.getElementById('totalBeratInfo').textContent = `Total Berat: ${totalBerat.toFixed(1)} g (${(totalBerat/1000).toFixed(3)} kg)`;
+}
+function toggleIsiMode() {
+  const mode = document.querySelector('input[name="isiMode"]:checked')?.value || 'otomatis';
+  const beratIsi = document.getElementById('kemasanBeratIsi');
+  const info = document.getElementById('beratPerKemasanInfo');
+  if (mode === 'manual') {
+    beratIsi.placeholder = 'Masukkan gram';
+    info.textContent = 'Manual: isi sesuai input';
+  } else {
+    beratIsi.placeholder = 'Otomatis (vol × BJ)';
+    info.textContent = 'Otomatis: volume × BJ';
+  }
+  hitungTotalBerat();
 }
 function tambahKemasan() {
   if (userRole !== 'admin-full' && userRole !== 'operasional' && userRole !== 'atasan') {
@@ -2684,7 +2732,6 @@ function hapusKemasanGroup(entryId) {
   renderAll();
   showAlert('✅ Stok dihapus dan bahan dikembalikan.');
 }
-
 function catatJual() {
   if (userRole !== 'admin-full' && userRole !== 'adm' && userRole !== 'atasan' && userRole !== 'investor') {
     showAlert('Akses ditolak!', 'error');
@@ -2712,7 +2759,6 @@ function catatJual() {
     return;
   }
 
-  // FIFO
   entry.batchItems.sort((a, b) => {
     const pA = getProduksi(a.produksiId);
     const pB = getProduksi(b.produksiId);
@@ -2772,6 +2818,44 @@ function catatJual() {
   showAlert('✅ Penjualan ' + jenisSabun + ' x' + jml + ' = ' + rupiah(total) + ' (' + status + ')');
   document.getElementById('jualJumlah').value = '';
   document.getElementById('jualHarga').value = '';
+}
+function renderPenjualan() {
+  const tbody = document.getElementById('jualTbody');
+  if (!tbody) return;
+
+  const selStok = document.getElementById('jualStokSelect');
+  if (selStok) {
+    selStok.innerHTML = '<option value="">Pilih stok</option>';
+    data.stokBarangJadi.forEach(entry => {
+      const total = entry.batchItems.reduce((sum, item) => sum + item.jumlahUnit, 0);
+      if (total > 0) {
+        const kemasan = getKemasanBeli(entry.kemasanId);
+        const label = `${entry.jenisSabun} - ${kemasan ? kemasan.nama : '??'} (stok ${total})`;
+        selStok.innerHTML += `<option value="${entry.jenisSabun}|${entry.kemasanId}">${label}</option>`;
+      }
+    });
+  }
+
+  tbody.innerHTML = sortByWaktu(data.penjualan).map(j => {
+    const sts = j.status === 'Lunas' ? 'badge-success' : 'badge-danger';
+    let aksi = '';
+    if (j.status === 'Hutang' && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
+      aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">💰 Bayar</button>`;
+    }
+    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
+      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">🗑️</button>`;
+    }
+    const kemasan = getKemasanBeli(j.kemasanId);
+    return `<tr>
+      <td>${j.jenisSabun}</td>
+      <td>${kemasan ? kemasan.nama : '-'}</td>
+      <td>${j.jumlahTerjual}</td>
+      <td>${rupiah(j.total)}</td>
+      <td><span class="badge ${sts}">${j.status}</span></td>
+      <td>${aksi}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
+  filterPenjualan();
 }
 function hapusJual(id) {
   if (!['admin-full', 'adm', 'atasan'].includes(userRole)) {
@@ -2855,73 +2939,11 @@ function bayarHutang(id) {
   renderAll();
   showAlert('✅ Hutang lunas! ' + rupiah(jual.total));
 }
-function renderPenjualan() {
-  const tbody = document.getElementById('jualTbody');
-  if (!tbody) return;
-
-  const selStok = document.getElementById('jualStokSelect');
-  if (selStok) {
-    selStok.innerHTML = '<option value="">Pilih stok</option>';
-    data.stokBarangJadi.forEach(entry => {
-      const total = entry.batchItems.reduce((sum, item) => sum + item.jumlahUnit, 0);
-      if (total > 0) {
-        const kemasan = getKemasanBeli(entry.kemasanId);
-        const label = `${entry.jenisSabun} - ${kemasan ? kemasan.nama : '??'} (stok ${total})`;
-        selStok.innerHTML += `<option value="${entry.jenisSabun}|${entry.kemasanId}">${label}</option>`;
-      }
-    });
-  }
-
-  tbody.innerHTML = sortByWaktu(data.penjualan).map(j => {
-    const sts = j.status === 'Lunas' ? 'badge-success' : 'badge-danger';
-    let aksi = '';
-    if (j.status === 'Hutang' && (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan')) {
-      aksi += `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">💰 Bayar</button>`;
-    }
-    if (userRole === 'admin-full' || userRole === 'adm' || userRole === 'atasan') {
-      aksi += `<button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">🗑️</button>`;
-    }
-    const kemasan = getKemasanBeli(j.kemasanId);
-    return `<tr>
-      <td>${j.jenisSabun}</td>
-      <td>${kemasan ? kemasan.nama : '-'}</td>
-      <td>${j.jumlahTerjual}</td>
-      <td>${rupiah(j.total)}</td>
-      <td><span class="badge ${sts}">${j.status}</span></td>
-      <td>${aksi}</td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="6" class="text-muted">Belum ada penjualan.</td></tr>';
-  filterPenjualan();
-}
 
 // ================================================================
-// LAPORAN
+// LAPORAN (ringkasan)
 // ================================================================
-function renderLaporanStok() {}
-function hitungKinerjaBatch(p) {
-  const ops = getBiayaOperasionalFromProduksi(p, p.biayaBahan || 0);
-  const biayaProduksi = (p.biayaBahan || 0) + ops;
-
-  let omzet = 0, hppTerjual = 0, qtyTerjual = 0;
-  data.penjualan.forEach(j => {
-    j.batchDetails.forEach(batch => {
-      if (batch.produksiId === p.id) {
-        const qty = batch.jumlah;
-        omzet += qty * batch.hargaJual;
-        const totalBeratBatch = p.jumlahLiter * (p.bj || 1.025);
-        const hppPerUnit = biayaProduksi / p.jumlahLiter * (batch.jumlah / p.jumlahLiter);
-        const hppUnit = hppPerUnit + (batch.biayaKemasan || 0);
-        hppTerjual += qty * hppUnit;
-        qtyTerjual += qty;
-      }
-    });
-  });
-
-  const laba = omzet - hppTerjual;
-  const margin = omzet > 0 ? (laba / omzet) * 100 : 0;
-  const markup = hppTerjual > 0 ? (laba / hppTerjual) * 100 : 0;
-  return { ops, biayaProduksi, omzet, hppTerjual, laba, margin, markup, qtyTerjual };
-}
+function renderLaporanStok() { }
 function renderLaporanKeuanganProduksi() {
   const c = document.getElementById('laporanKeuanganProduksi');
   if (!c) return;
@@ -2945,8 +2967,8 @@ function renderLaporanKeuanganProduksi() {
       <div class="stat-card green"><div class="num">${rupiah(totalLaba)}</div><div class="lbl">Laba Batch Terjual</div></div>
       <div class="stat-card"><div class="num">${marginTotal.toFixed(1)}%</div><div class="lbl">Margin</div></div>
     </div>
-    <div class="financial-note">Omzet dihitung dari penjualan yang terhubung ke batch. Laba batch hanya dihitung untuk unit yang sudah terjual: omzet dikurangi HPP unit yang terjual. Bahan yang masih menjadi stok belum dianggap sebagai biaya terjual. Biaya bahan/produksi tidak mengurangi saldo kas lagi karena pembelian dibayar saat pembelian.</div>
-    <div class="report-toolbar"><input id="searchLaporanProduksiBatch" class="search-box" style="flex:1;min-width:220px" placeholder="🔍 Cari batch, formulasi, tanggal..." oninput="filterLaporanProduksiBatch()"></div>
+    <div class="financial-note">Omzet dihitung dari penjualan yang terhubung ke batch. Laba batch hanya dihitung untuk unit yang sudah terjual.</div>
+    <div class="report-toolbar"><input id="searchLaporanProduksiBatch" class="search-box" style="flex:1;min-width:220px" placeholder="🔍 Cari batch..." oninput="filterLaporanProduksiBatch()"></div>
     <div class="history-table-scroll"><table>
       <thead><tr><th>Batch</th><th>Tanggal</th><th>Formulasi</th><th>Liter</th><th>HPP Batch</th><th>Terjual</th><th>Omzet</th><th>HPP Terjual</th><th>Laba</th><th>Margin</th><th>Aksi</th></tr></thead>
       <tbody id="laporanProduksiBatchTbody">${rows.map(({p, kinerja}) => `<tr>
@@ -2964,6 +2986,27 @@ function renderLaporanKeuanganProduksi() {
       </tr>`).join('') || '<tr><td colspan="11" class="text-muted">Belum ada batch.</td></tr>'}</tbody>
     </table></div>`;
   filterLaporanProduksiBatch();
+}
+function hitungKinerjaBatch(p) {
+  const ops = getBiayaOperasionalFromProduksi(p, p.biayaBahan || 0);
+  const biayaProduksi = (p.biayaBahan || 0) + ops;
+  let omzet = 0, hppTerjual = 0, qtyTerjual = 0;
+  data.penjualan.forEach(j => {
+    j.batchDetails.forEach(batch => {
+      if (batch.produksiId === p.id) {
+        const qty = batch.jumlah;
+        omzet += qty * batch.hargaJual;
+        const totalBeratBatch = p.jumlahLiter * (p.bj || 1.025);
+        const hppPerUnit = (biayaProduksi / p.jumlahLiter) * (batch.jumlah / p.jumlahLiter);
+        const hppUnit = hppPerUnit + (batch.biayaKemasan || 0);
+        hppTerjual += qty * hppUnit;
+        qtyTerjual += qty;
+      }
+    });
+  });
+  const laba = omzet - hppTerjual;
+  const margin = omzet > 0 ? (laba / omzet) * 100 : 0;
+  return { ops, biayaProduksi, omzet, hppTerjual, laba, margin, qtyTerjual };
 }
 function editBiayaOperasionalProduksi(id) {
   if (!['admin-full', 'atasan'].includes(userRole)) { showAlert('Akses ditolak!', 'error'); return; }
@@ -3007,9 +3050,8 @@ function renderLaporanRingkasan() {
     </div>
     <div class="info-card">
       <div><b>Penjualan lunas:</b> ${rupiah(masuk)} &nbsp; · &nbsp; <b>Piutang:</b> ${rupiah(utang)}</div>
-      <div style="margin-top:6px"><b>Saldo awal:</b> ${rupiah(data.keuangan.saldoAwal||0)} &nbsp; · &nbsp; <b>Perubahan kas:</b> ${rupiah(modalTotal+masuk-keluar)}</div>
+      <div style="margin-top:6px"><b>Saldo awal:</b> ${rupiah(data.keuangan.saldoAwal||0)}</div>
     </div>
-    <div class="financial-note">Saldo kas hanya menghitung transaksi uang nyata. Biaya bahan saat pembuatan tidak dikurangkan lagi karena pembelian bahan sudah menjadi pengeluaran saat pembelian.</div>
   `;
 }
 function renderLaporanPenjualan() {
@@ -3056,7 +3098,6 @@ function renderLaporanArusKas() {
     <div class="stat-grid">
       <div class="stat-card green"><div class="num">${rupiah(masuk)}</div><div class="lbl">Kas Masuk</div></div>
       <div class="stat-card red"><div class="num">${rupiah(keluar)}</div><div class="lbl">Kas Keluar</div></div>
-      <div class="stat-card"><div class="num">${rupiah((data.keuangan.saldoAwal||0) + data.modalTambahan.reduce((s,m) => s + m.jumlah, 0) + masuk - keluar)}</div><div class="lbl">Saldo Kas</div></div>
     </div>
     <div class="history-table-scroll"><table>
       <thead><tr><th>Tanggal</th><th>Jenis</th><th>Sumber</th><th>Jumlah</th></tr></thead>
@@ -3091,8 +3132,7 @@ function renderLaporanPengeluaran() {
       </tr>`).join('') || '<tr><td colspan="3" class="text-muted">Belum ada pengeluaran.</td></tr>'}</tbody>
     </table></div>`;
 }
-
-function renderRiwayat() {}
+function renderRiwayat() { }
 function renderPeralatan() {
   const tbody = document.getElementById('peralatanTbody');
   if (!tbody) return;
@@ -3381,21 +3421,6 @@ function checkStokWarnings() {
 }
 
 // ================================================================
-// RESET ALL DATA
-// ================================================================
-function resetAllData() {
-  if (userRole !== 'admin-full') { showAlert('Hanya admin full!', 'error'); return; }
-  if (!confirm('⚠️ INI AKAN MENGHAPUS SEMUA DATA! Lanjutkan?')) return;
-  if (!confirm('⚠️ YAKIN? Data akan hilang selamanya!')) return;
-  const defaultData = getDefaultData();
-  data = defaultData;
-  data.auditLogs = [];
-  logAudit('reset', 'all', 'all', 'Reset semua data ke default', '');
-  renderAll();
-  showAlert('✅ Semua data telah direset ke default.');
-}
-
-// ================================================================
 // TAB SWITCHING
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -3425,8 +3450,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ================================================================
 // INIT
 // ================================================================
-console.log('🧼 SI.BERSIH v4.2 - Full Version dengan FIFO dan Stok Terkelompok');
-console.log('✅ Cara kerja menampilkan takaran aktual berdasarkan liter yang diinput.');
+console.log('🧼 SI.BERSIH v4.3 - Satu tombol reset di Aktivitas (Formulasi tetap)');
 Object.keys(ALLOWED_EMAILS).forEach(e => console.log('  - ' + e + ' (' + ALLOWED_EMAILS[e] + ')'));
 </script>
 
