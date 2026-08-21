@@ -294,8 +294,29 @@ function editFormulasi(id){let f=getForm(id);modal('Edit Formulasi',`<div class=
 function hapusFormulasi(id){if(confirm('Hapus formulasi?')){data.formulasi=data.formulasi.filter(x=>x.id!==id);renderAll()}}
 
 function calcNeeds(f,liter){let totalBerat=liter*(f.bj||1.025),items=[],cost=0;for(let it of f.items||[]){let b=getBahan(it.bahanId);if(!b)continue;let qtyLarutan=totalBerat*(it.persen||0)/100;let qty=qtyLarutan;if(it.isLarutan&&it.konsentrasiLarutan>0){/* Persentase formulasi = jumlah larutan; stok bahan aktif = larutan x konsentrasi. */qty=qtyLarutan*it.konsentrasiLarutan/100}let costItem=qty*(b.hargaRataRata||0);cost+=costItem;items.push({...it,bahan:b,qty,qtyLarutan,cost:costItem})}return{totalBerat,items,cost}}
-function formatQtyInstruksi(x){let q=x?.qtyLarutan??x?.qty??0;let unit=x?.bahan?.satuanDasar||'';if(x?.isLarutan&&x?.konsentrasiLarutan>0)return `${(q*1000).toFixed(0)} gram larutan ${x.bahan.nama.replace(/\s+Padat$/i,'')} ${x.konsentrasiLarutan}%`;if(unit==='kg')return `${(q*1000).toFixed(0)} gram ${x.bahan.nama}`;if(unit==='L')return `${q.toFixed(3)} L ${x.bahan.nama}`;return `${q.toFixed(3)} ${unit} ${x.bahan.nama}`}
-function buildCaraKerja(f,c){let teks=f.caraPembuatan||'';let items=[...(f.items||[])].sort((a,b)=>(a.step||0)-(b.step||0)).map(it=>c.items.find(x=>x.bahanId===it.bahanId&&x.step===it.step)).filter(Boolean);items.forEach(x=>{let display=formatQtyInstruksi(x);teks=teks.replace(/\.\.\./,display);let nama=x.bahan.nama.replace(/\s+Padat$/i,'');let re=new RegExp('\\b'+nama.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\s+20%)?','gi');teks=teks.replace(re,display)});return teks.replace(/\n/g,'<br>')}
+function formatQtyInstruksi(x){
+  const q=Number(x?.qtyLarutan??x?.qty??0);
+  const unit=(x?.bahan?.satuanDasar||'').toLowerCase();
+  // Template sudah menyediakan satuan (gram / mL), jadi fungsi ini hanya mengembalikan ANGKA.
+  // Semua kebutuhan dibuat konsisten dalam gram atau mL.
+  if(unit==='kg') return String(Math.round(q*1000));
+  if(unit==='l') return String(Math.round(q*1000));
+  return String(Math.round(q));
+}
+function buildCaraKerja(f,c){
+  let teks=f.caraPembuatan||'';
+  const items=[...(f.items||[])]
+    .sort((a,b)=>(a.step||0)-(b.step||0))
+    .map(it=>c.items.find(x=>x.bahanId===it.bahanId&&x.step===it.step))
+    .filter(Boolean);
+
+  // Isi setiap tanda "..." tepat satu kali, sesuai urutan langkah.
+  // Jangan mengganti nama bahan lagi karena nama + satuan sudah ada di template.
+  items.forEach(x=>{
+    teks=teks.replace(/\.\.\./,formatQtyInstruksi(x));
+  });
+  return teks.replace(/\n/g,'<br>');
+}
 function buildKebutuhanBatch(f,c,l){let steps=[...(f.items||[])].sort((a,b)=>(a.step||0)-(b.step||0)).map((it,i)=>{let x=c.items.find(z=>z.bahanId===it.bahanId&&z.step===it.step);return x?`<div><b>${i+1}. ${x.bahan.nama}</b> — <strong>${(x.qtyLarutan??x.qty).toFixed(3)} ${x.isLarutan?'kg larutan':x.bahan.satuanDasar}</strong></div>`:''}).join('');return `<b>📐 Kebutuhan Batch ${l} L — ${f.nama}</b><div class="small">BJ ${f.bj} kg/L · berat ${c.totalBerat.toFixed(3)} kg · biaya bahan ${rupiah(c.cost)}</div>${steps}`}
 function renderCaraKerjaBatch(f,c,l){return `<div class="cara-buat"><b>🧪 CARA KERJA BATCH ${l} L</b><hr><b>Instruksi:</b><div style="margin-top:8px">${buildCaraKerja(f,c)}</div></div>`}
 function generateBatchCode(f,tanggal){
