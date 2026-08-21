@@ -129,7 +129,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="form-group"><label>Tanggal</label><input id="produksiTanggal" type="date"></div>
 <div class="form-group"><label>Liter</label><input id="produksiLiter" type="number" step=".1" oninput="hitungPreviewProduksi()"></div>
 <div class="form-group"><label>Biaya Operasional</label><select id="produksiOpsMode" onchange="toggleOpsManual()"><option value="15">15%</option><option value="20">20%</option><option value="manual">Manual</option></select></div>
-<div class="form-group" id="opsManualGroup" style="display:none"><label>Nominal Biaya Operasional Manual (Rp)</label><input id="produksiOpsManual" type="number" min="0" step="1000" placeholder="Contoh: 25000"></div>
+<div class="form-group" id="opsManualGroup" style="display:none;background:#ecfdf5;border:1.5px solid #99d8d1;border-radius:12px;padding:10px"><label style="color:#0f766e">Nominal Biaya Operasional Manual (Rp)</label><input id="produksiOpsManual" type="number" min="0" step="1000" inputmode="numeric" placeholder="Contoh: 25000"><div class="small" style="margin-top:5px">Masukkan nominal biaya operasional untuk batch ini.</div></div>
 </div>
 <div id="produksiPreview" class="info-card">Pilih formulasi dan liter.</div>
 <button type="button" id="btnBuatBatch" class="btn btn-primary" onclick="window.buatProduksi()">🏭 Buat Batch</button>
@@ -313,6 +313,21 @@ function generateBatchCode(f,tanggal){
 }
 window.generateBatchCode=generateBatchCode;
 function hitungPreviewProduksi(){let f=getForm(document.getElementById('produksiForm').value),l=+document.getElementById('produksiLiter').value||0,box=document.getElementById('produksiPreview');if(!f||l<=0){box.innerHTML='Pilih formulasi dan liter.';return}let c=calcNeeds(f,l);box.innerHTML=buildKebutuhanBatch(f,c,l)+`<div class="small" style="margin-top:8px">Tekan <b>🏭 Buat Batch</b> untuk menampilkan Cara Kerja dengan takaran yang sudah terisi.</div>`}
+function toggleOpsManual(){
+  const mode=document.getElementById('produksiOpsMode');
+  const group=document.getElementById('opsManualGroup');
+  const input=document.getElementById('produksiOpsManual');
+  if(!mode||!group)return;
+  const manual=mode.value==='manual';
+  group.style.display=manual?'block':'none';
+  if(manual){
+    setTimeout(()=>input?.focus(),50);
+  }else if(input){
+    input.value='';
+  }
+}
+window.toggleOpsManual=toggleOpsManual;
+
 function buatProduksi(){
 try{
 if(!['admin-full','operasional','atasan'].includes(userRole))return alertx('Akses ditolak','error');
@@ -383,7 +398,7 @@ function modal(title,html,cb){document.getElementById('modalTitle').textContent=
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');modalCallback=null}
 function filterTable(tid,sid){let q=(document.getElementById(sid).value||'').toLowerCase();document.querySelectorAll('#'+tid+' tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')}
 let fs=+localStorage.getItem('sibersih-font')||16;document.documentElement.style.fontSize=fs+'px';fontInc.onclick=()=>{fs=Math.min(24,fs+1);document.documentElement.style.fontSize=fs+'px';localStorage.setItem('sibersih-font',fs)};fontDec.onclick=()=>{fs=Math.max(12,fs-1);document.documentElement.style.fontSize=fs+'px';localStorage.setItem('sibersih-font',fs)}
-produksiTanggal.value=todayStr();kemasanTanggal.value=todayStr();jualTanggal.value=todayStr();
+produksiTanggal.value=todayStr();kemasanTanggal.value=todayStr();jualTanggal.value=todayStr();toggleOpsManual();
 </script>
 </body>
 </html>
