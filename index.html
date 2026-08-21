@@ -132,7 +132,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="form-group" id="opsManualGroup" style="display:none"><label>Manual (Rp)</label><input id="produksiOpsManual" type="number"></div>
 </div>
 <div id="produksiPreview" class="info-card">Pilih formulasi dan liter.</div>
-<button class="btn btn-primary" onclick="buatProduksi()">🏭 Buat Batch</button>
+<button type="button" id="btnBuatBatch" class="btn btn-primary" onclick="window.buatProduksi()">🏭 Buat Batch</button>
 </div>
 <div class="tab-content" id="tab-prod-riwayat">
 <div class="search-box"><input id="searchProduksi" placeholder="🔍 Cari batch..." oninput="filterTable('produksiTbody','searchProduksi')"></div>
@@ -299,7 +299,32 @@ function buildCaraKerja(f,c){let teks=f.caraPembuatan||'';let items=[...(f.items
 function buildKebutuhanBatch(f,c,l){let steps=[...(f.items||[])].sort((a,b)=>(a.step||0)-(b.step||0)).map((it,i)=>{let x=c.items.find(z=>z.bahanId===it.bahanId&&z.step===it.step);return x?`<div><b>${i+1}. ${x.bahan.nama}</b> — <strong>${(x.qtyLarutan??x.qty).toFixed(3)} ${x.isLarutan?'kg larutan':x.bahan.satuanDasar}</strong></div>`:''}).join('');return `<b>📐 Kebutuhan Batch ${l} L — ${f.nama}</b><div class="small">BJ ${f.bj} kg/L · berat ${c.totalBerat.toFixed(3)} kg · biaya bahan ${rupiah(c.cost)}</div>${steps}`}
 function renderCaraKerjaBatch(f,c,l){return `<div class="cara-buat"><b>🧪 CARA KERJA BATCH ${l} L</b><hr><b>Instruksi:</b><div style="margin-top:8px">${buildCaraKerja(f,c)}</div></div>`}
 function hitungPreviewProduksi(){let f=getForm(document.getElementById('produksiForm').value),l=+document.getElementById('produksiLiter').value||0,box=document.getElementById('produksiPreview');if(!f||l<=0){box.innerHTML='Pilih formulasi dan liter.';return}let c=calcNeeds(f,l);box.innerHTML=buildKebutuhanBatch(f,c,l)+`<div class="small" style="margin-top:8px">Tekan <b>🏭 Buat Batch</b> untuk menampilkan Cara Kerja dengan takaran yang sudah terisi.</div>`}
-function buatProduksi(){if(!['admin-full','operasional','atasan'].includes(userRole))return alertx('Akses ditolak','error');let fid=produksiForm.value,l=+produksiLiter.value||0,tgl=produksiTanggal.value||todayStr(),f=getForm(fid);if(!f||l<=0)return alertx('Pilih formulasi dan liter','error');let c=calcNeeds(f,l),bad=c.items.filter(x=>x.bahan.stok<x.qty);if(bad.length)return alertx('Stok tidak cukup: '+bad.map(x=>x.bahan.nama).join(', '),'error');c.items.forEach(x=>x.bahan.stok-=x.qty);let opsMode=produksiOpsMode.value,ops=opsMode==='manual'?(+produksiOpsManual.value||0):c.cost*(+opsMode/100),id=genId(),caraKerjaHtml=renderCaraKerjaBatch(f,c,l);data.produksi.push({id,batchNo:batchCode(f,tgl),formulasiId:fid,jumlahLiter:l,sisaLiter:l,bj:f.bj,biayaBahan:c.cost,biayaOperasional:ops,opsMode,tanggalPembuatan:tgl,createdAt:new Date().toISOString(),createdBy:currentUser.email,caraKerjaHtml});logAudit('create','produksi',id,'Batch '+id);renderAll();document.getElementById('produksiPreview').innerHTML=buildKebutuhanBatch(f,c,l)+caraKerjaHtml;alertx('Batch berhasil dibuat')}
+function buatProduksi(){
+try{
+if(!['admin-full','operasional','atasan'].includes(userRole))return alertx('Akses ditolak','error');
+const fid=document.getElementById('produksiForm')?.value||'';
+const l=Number(document.getElementById('produksiLiter')?.value)||0;
+const tgl=document.getElementById('produksiTanggal')?.value||todayStr();
+const f=getForm(fid);
+if(!f||l<=0)return alertx('Pilih formulasi dan liter','error');
+if(!data||!Array.isArray(data.produksi))return alertx('Data produksi belum siap. Muat ulang halaman.','error');
+const c=calcNeeds(f,l);
+const bad=c.items.filter(x=>Number(x.bahan?.stok||0)<Number(x.qty||0));
+if(bad.length)return alertx('Stok tidak cukup: '+bad.map(x=>x.bahan.nama).join(', '),'error');
+const opsMode=document.getElementById('produksiOpsMode')?.value||'15';
+const ops=opsMode==='manual'?(Number(document.getElementById('produksiOpsManual')?.value)||0):c.cost*(Number(opsMode)/100);
+const id=genId();
+const caraKerjaHtml=renderCaraKerjaBatch(f,c,l);
+c.items.forEach(x=>{x.bahan.stok-=x.qty});
+data.produksi.push({id,batchNo:batchCode(f,tgl),formulasiId:fid,jumlahLiter:l,sisaLiter:l,bj:f.bj,biayaBahan:c.cost,biayaOperasional:ops,opsMode,tanggalPembuatan:tgl,createdAt:new Date().toISOString(),createdBy:currentUser?.email||'',caraKerjaHtml});
+logAudit('create','produksi',id,'Batch '+id);
+renderAll();
+const preview=document.getElementById('produksiPreview');
+if(preview)preview.innerHTML=buildKebutuhanBatch(f,c,l)+caraKerjaHtml;
+alertx('Batch berhasil dibuat');
+}catch(err){console.error('buatProduksi error:',err);alertx('Gagal membuat batch: '+(err?.message||err),'error')}
+}
+window.buatProduksi=buatProduksi;
 function lihatCaraKerjaBatch(id){let p=getProd(id),f=getForm(p?.formulasiId);if(!p||!f)return;let html=p.caraKerjaHtml;if(!html){let c=calcNeeds(f,p.jumlahLiter);html=renderCaraKerjaBatch(f,c,p.jumlahLiter);p.caraKerjaHtml=html;saveData()}modal('Cara Kerja — '+p.batchNo,`<div class="cara-buat">${html}</div>`,()=>{})}
 function renderProduksi(){let arr=[...data.produksi].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));document.getElementById('produksiTbody').innerHTML=arr.map(p=>{let f=getForm(p.formulasiId),used=p.jumlahLiter-(p.sisaLiter||0),status=used<=.001?'Selesai':'Sebagian Dikemas';return`<tr><td><b>${p.batchNo}</b></td><td>${fmtDate(p.tanggalPembuatan)}</td><td>${f?.nama||'-'}</td><td>${p.jumlahLiter}</td><td><span class="badge ${status==='Selesai'?'badge-success':'badge-warning'}">${status}</span></td><td>${(p.sisaLiter||0).toFixed(3)}</td><td>${rupiah((p.biayaBahan||0)+(p.biayaOperasional||0))}</td><td><button class="btn btn-info btn-sm" onclick="lihatCaraKerjaBatch('${p.id}')">📖 Cara Kerja</button> <button class="btn btn-danger btn-sm" onclick="hapusProduksi('${p.id}')">🗑</button></td></tr>`}).join('')||'<tr><td colspan="8">Belum ada produksi.</td></tr>'}
 function hapusProduksi(id){let p=getProd(id);if(data.stokBarangJadi.some(e=>e.batchItems.some(i=>i.produksiId===id)))return alertx('Batch sudah pernah dikemas. Hapus pengemasan terkait terlebih dahulu.','error');if(!confirm('Hapus batch?'))return;let f=getForm(p.formulasiId);if(f){let c=calcNeeds(f,p.jumlahLiter);c.items.forEach(x=>x.bahan.stok+=x.qty)}data.produksi=data.produksi.filter(x=>x.id!==id);renderAll();alertx('Batch dihapus dan bahan dikembalikan')}
