@@ -129,7 +129,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="form-group"><label>Tanggal</label><input id="produksiTanggal" type="date"></div>
 <div class="form-group"><label>Liter</label><input id="produksiLiter" type="number" step=".1" oninput="hitungPreviewProduksi()"></div>
 <div class="form-group"><label>Biaya Operasional</label><select id="produksiOpsMode" onchange="toggleOpsManual()"><option value="15">15%</option><option value="20">20%</option><option value="manual">Manual</option></select></div>
-<div class="form-group" id="opsManualGroup" style="display:none"><label>Manual (Rp)</label><input id="produksiOpsManual" type="number"></div>
+<div class="form-group" id="opsManualGroup" style="display:none"><label>Nominal Biaya Operasional Manual (Rp)</label><input id="produksiOpsManual" type="number" min="0" step="1000" placeholder="Contoh: 25000"></div>
 </div>
 <div id="produksiPreview" class="info-card">Pilih formulasi dan liter.</div>
 <button type="button" id="btnBuatBatch" class="btn btn-primary" onclick="window.buatProduksi()">🏭 Buat Batch</button>
@@ -298,6 +298,20 @@ function formatQtyInstruksi(x){let q=x?.qtyLarutan??x?.qty??0;let unit=x?.bahan?
 function buildCaraKerja(f,c){let teks=f.caraPembuatan||'';let items=[...(f.items||[])].sort((a,b)=>(a.step||0)-(b.step||0)).map(it=>c.items.find(x=>x.bahanId===it.bahanId&&x.step===it.step)).filter(Boolean);items.forEach(x=>{let display=formatQtyInstruksi(x);teks=teks.replace(/\.\.\./,display);let nama=x.bahan.nama.replace(/\s+Padat$/i,'');let re=new RegExp('\\b'+nama.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\s+20%)?','gi');teks=teks.replace(re,display)});return teks.replace(/\n/g,'<br>')}
 function buildKebutuhanBatch(f,c,l){let steps=[...(f.items||[])].sort((a,b)=>(a.step||0)-(b.step||0)).map((it,i)=>{let x=c.items.find(z=>z.bahanId===it.bahanId&&z.step===it.step);return x?`<div><b>${i+1}. ${x.bahan.nama}</b> — <strong>${(x.qtyLarutan??x.qty).toFixed(3)} ${x.isLarutan?'kg larutan':x.bahan.satuanDasar}</strong></div>`:''}).join('');return `<b>📐 Kebutuhan Batch ${l} L — ${f.nama}</b><div class="small">BJ ${f.bj} kg/L · berat ${c.totalBerat.toFixed(3)} kg · biaya bahan ${rupiah(c.cost)}</div>${steps}`}
 function renderCaraKerjaBatch(f,c,l){return `<div class="cara-buat"><b>🧪 CARA KERJA BATCH ${l} L</b><hr><b>Instruksi:</b><div style="margin-top:8px">${buildCaraKerja(f,c)}</div></div>`}
+function generateBatchCode(f,tanggal){
+  const d=new Date((tanggal||todayStr())+'T00:00:00');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=String(d.getFullYear()).slice(-2);
+  const year=d.getFullYear();
+  const initials=(f?.nama||'SB').replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase().padEnd(2,'X');
+  const count=(data?.produksi||[]).filter(p=>{
+    const q=new Date((p.tanggalPembuatan||p.createdAt||'')+'T00:00:00');
+    return q.getFullYear()===year && getForm(p.formulasiId)?.nama===f?.nama;
+  }).length+1;
+  return `${initials}-${dd}${mm}${yy}-${String(count).padStart(2,'0')}`;
+}
+window.generateBatchCode=generateBatchCode;
 function hitungPreviewProduksi(){let f=getForm(document.getElementById('produksiForm').value),l=+document.getElementById('produksiLiter').value||0,box=document.getElementById('produksiPreview');if(!f||l<=0){box.innerHTML='Pilih formulasi dan liter.';return}let c=calcNeeds(f,l);box.innerHTML=buildKebutuhanBatch(f,c,l)+`<div class="small" style="margin-top:8px">Tekan <b>🏭 Buat Batch</b> untuk menampilkan Cara Kerja dengan takaran yang sudah terisi.</div>`}
 function buatProduksi(){
 try{
@@ -312,11 +326,13 @@ const c=calcNeeds(f,l);
 const bad=c.items.filter(x=>Number(x.bahan?.stok||0)<Number(x.qty||0));
 if(bad.length)return alertx('Stok tidak cukup: '+bad.map(x=>x.bahan.nama).join(', '),'error');
 const opsMode=document.getElementById('produksiOpsMode')?.value||'15';
-const ops=opsMode==='manual'?(Number(document.getElementById('produksiOpsManual')?.value)||0):c.cost*(Number(opsMode)/100);
+const manualOps=Number(document.getElementById('produksiOpsManual')?.value)||0;
+if(opsMode==='manual' && manualOps<=0)return alertx('Masukkan nominal biaya operasional manual terlebih dahulu','error');
+const ops=opsMode==='manual'?manualOps:c.cost*(Number(opsMode)/100);
 const id=genId();
 const caraKerjaHtml=renderCaraKerjaBatch(f,c,l);
 c.items.forEach(x=>{x.bahan.stok-=x.qty});
-data.produksi.push({id,batchNo:batchCode(f,tgl),formulasiId:fid,jumlahLiter:l,sisaLiter:l,bj:f.bj,biayaBahan:c.cost,biayaOperasional:ops,opsMode,tanggalPembuatan:tgl,createdAt:new Date().toISOString(),createdBy:currentUser?.email||'',caraKerjaHtml});
+data.produksi.push({id,batchNo:generateBatchCode(f,tgl),formulasiId:fid,jumlahLiter:l,sisaLiter:l,bj:f.bj,biayaBahan:c.cost,biayaOperasional:ops,opsMode,tanggalPembuatan:tgl,createdAt:new Date().toISOString(),createdBy:currentUser?.email||'',caraKerjaHtml});
 logAudit('create','produksi',id,'Batch '+id);
 renderAll();
 const preview=document.getElementById('produksiPreview');
