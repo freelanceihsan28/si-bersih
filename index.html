@@ -411,5 +411,14 @@ document.addEventListener('DOMContentLoaded',window.sortAllDatedTables);
 new MutationObserver(()=>{clearTimeout(window.__sib);window.__sib=setTimeout(window.sortAllDatedTables,20)}).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
+<script id="safe-date-sort">
+(function(){
+function pd(v){v=String(v||'').trim();var m=v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);if(m)return new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0),+(m[6]||0)).getTime();m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);if(m)return new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0)).getTime();var t=Date.parse(v);return isNaN(t)?NaN:t;}
+window.sortAllDatedTables=function(root){(root||document).querySelectorAll('table').forEach(function(t){if(!t.tBodies.length)return;var h=t.querySelectorAll('thead th'),i=-1;for(var j=0;j<h.length;j++)if(/tanggal|tgl|date|waktu/i.test(h[j].textContent.trim())){i=j;break;}if(i<0)return;var b=t.tBodies[0],a=[].slice.call(b.rows).map(function(r,n){return{r:r,n:n,t:pd(r.cells[i]?r.cells[i].textContent:'')}});if(!a.some(function(x){return !isNaN(x.t)}))return;a.sort(function(x,y){if(isNaN(x.t)&&isNaN(y.t))return x.n-y.n;if(isNaN(x.t))return 1;if(isNaN(y.t))return -1;return y.t-x.t||x.n-y.n;});a.forEach(function(x){b.appendChild(x.r);});});};
+document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){window.sortAllDatedTables();},0);});
+document.addEventListener('click',function(e){var x=e.target&&e.target.closest?e.target.closest('button,[role="button"],a'):null;if(!x)return;var q=(x.textContent||'').toLowerCase();if(/tambah|simpan|buat|edit|hapus|jual|kemas|beli|tab|riwayat|laporan/.test(q))setTimeout(function(){window.sortAllDatedTables();},50);});
+})();
+</script>
+<style id="cara-kerja-safe">.cara-kerja-precreate,.cara-kerja[data-state="precreate"],[data-cara-kerja-state="precreate"]{display:none!important}</style>
 </body>
 </html>
