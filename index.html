@@ -282,17 +282,29 @@ function hapusKemasanBeli(id){if(confirm('Hapus kemasan?')){data.kemasanBeli=dat
 function purchaseRowHtml(index=1, item=null){
   const bahanId=item?.bahanId||data.bahan[0]?.id||'';
   const ket=item?.keterangan||'';
+  const bahan=data.bahan.find(b=>b.id===bahanId);
+  const unit=bahan?.satuanDasar||'unit';
   return `<div class="purchase-row" style="border:2px solid #d7e6e4;border-radius:14px;padding:14px;margin-bottom:12px;background:#f8fcfb;box-shadow:0 2px 8px rgba(0,0,0,.04)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <b style="color:#126f69">🧪 BAHAN ${index}</b>
       ${index>1?`<button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.purchase-row').remove();renumberPurchaseRows()">Hapus bahan</button>`:''}
     </div>
-    <div class="form-group"><label>Bahan</label><select class="pb">${data.bahan.map(b=>`<option value="${b.id}" ${b.id===bahanId?'selected':''}>${escapeHtml(b.nama)}</option>`).join('')}</select></div>
-    <div class="form-group"><label>Qty</label><input class="pq" type="number" step=".01" value="${item?Number(item.qty)||'':''}"></div>
-    <div class="form-group"><label>Harga Total</label><input class="ph" type="number" step="1" value="${item?Number(item.harga)||'':''}"></div>
+    <div class="form-group"><label>Bahan</label><select class="pb" onchange="updatePurchaseUnit(this)">${data.bahan.map(b=>`<option value="${b.id}" ${b.id===bahanId?'selected':''}>${escapeHtml(b.nama)} (${escapeHtml(b.satuanDasar||'unit')})</option>`).join('')}</select></div>
+    <div class="form-group"><label>Qty <span class="purchase-unit-label">(${escapeHtml(unit)})</span></label><div style="display:flex;gap:8px;align-items:center"><input class="pq" type="number" step=".01" value="${item?Number(item.qty)||'':''}" style="flex:1"><b class="purchase-unit-badge" style="min-width:42px;text-align:center;color:#126f69;background:#e8f5f3;border-radius:8px;padding:9px 8px">${escapeHtml(unit)}</b></div></div>
+    <div class="form-group"><label>Harga Total (Rp)</label><input class="ph" type="number" step="1" value="${item?Number(item.harga)||'':''}></div>
     <div class="form-group"><label>Keterangan / Supplier / Jenis</label><input class="pket" type="text" value="${escapeHtml(ket)}" placeholder="Contoh: Supplier ABC / Texapon KAO / Grade tertentu"></div>
   </div>`;
 }
+function updatePurchaseUnit(select){
+  const row=select.closest('.purchase-row');
+  const b=data.bahan.find(x=>x.id===select.value);
+  const unit=b?.satuanDasar||'unit';
+  const label=row?.querySelector('.purchase-unit-label');
+  const badge=row?.querySelector('.purchase-unit-badge');
+  if(label)label.textContent=`(${unit})`;
+  if(badge)badge.textContent=unit;
+}
+
 function tambahPembelianBahan(){
   modal('Pembelian Bahan',`<div class="small" style="margin-bottom:12px">Kamu bisa membeli beberapa bahan sekaligus. Setiap bahan dipisahkan dalam kotak sendiri agar tidak tertukar.</div><div id="purchaseItems">${purchaseRowHtml(1)}</div><button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button><div class="form-group" style="margin-top:12px"><label>Tanggal Pembelian</label><input id="pt" type="date" value="${todayStr()}"></div>`,()=>{
     let rows=[...document.querySelectorAll('#purchaseItems .purchase-row')],total=0,items=[];
