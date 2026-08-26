@@ -827,6 +827,20 @@ function editFormulasi(id){
 }
 function hapusFormulasi(id){if(confirm('Hapus formulasi?')){data.formulasi=data.formulasi.filter(x=>x.id!==id);renderAll()}}
 
+function batchCode(f,tanggal){
+  const d=new Date(tanggal+'T00:00:00');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=String(d.getFullYear()).slice(-2);
+  const initials=(f.nama||'SB').replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase().padEnd(2,'X');
+  const year=d.getFullYear();
+  const count=data.produksi.filter(p=>{
+    const q=new Date(p.tanggalPembuatan||p.createdAt);
+    return q.getFullYear()===year && getForm(p.formulasiId)?.nama===f.nama;
+  }).length+1;
+  return `${initials}-${dd}${mm}${yy}-${String(count).padStart(2,'0')}`;
+}
+
 function calcNeeds(f,liter){
   const totalBerat=liter*(f.bj||1.025);
   const items=[];
