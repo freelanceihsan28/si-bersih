@@ -310,8 +310,8 @@ function nilaiCaraKerja(item, teks, qty){
 
   // Template menentukan satuan tampilannya.
   if(lower.includes('gram')){
-    // Bahan kg -> gram. Cairan L pada template "gram" diperlakukan sebagai gram
-    // (sesuai asumsi formulasi air/cairan berbasis densitas 1 kg/L).
+    // qty sudah merupakan jumlah yang benar untuk ditampilkan:
+    // bahan biasa = kebutuhan aktif, bahan larutan = kebutuhan larutan.
     return formatAngkaID(unit === 'l' ? qty * 1000 : qty * 1000);
   }
   if(lower.includes('ml')){
@@ -332,7 +332,7 @@ function buildCaraKerja(f, calc){
     const item = items[idx++];
     if(!item) return '<strong>…</strong>';
     const before = teks.slice(0, Math.max(0, teks.indexOf('...')));
-    return '<strong>' + nilaiCaraKerja(item, teks, item.qty) + '</strong>';
+    return '<strong>' + nilaiCaraKerja(item, teks, item.qtyTampil) + '</strong>';
   });
 
   return '<div class="cara-kerja-generated"><b>🧪 CARA KERJA + TAKARAN BATCH</b><hr>' +
@@ -349,7 +349,7 @@ function tampilkanCaraKerjaTerakhir(){
     ' kg · biaya bahan ' + rupiah(calc.cost) + '</div>';
   const steps = (calc.items || []).slice().sort((a,b)=>(a.step||0)-(b.step||0)).map((x,i)=>
     '<div><b>'+(i+1)+'. '+(x.bahan?.nama||'Bahan')+'</b> — <strong>'+
-    formatAngkaID(x.qty)+' '+(x.bahan?.satuanDasar||'')+'</strong></div>'
+    formatAngkaID(x.qtyTampil)+' '+(x.bahan?.satuanDasar||'')+'</strong></div>'
   ).join('');
   box.innerHTML = header + '<div class="cara-buat">' + steps + '</div>' + buildCaraKerja(f, calc);
 }
@@ -800,7 +800,7 @@ function editFormulasi(id){
     <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px"><h3 style="margin:0">Detail Bahan & Persentase</h3><button type="button" class="btn btn-primary btn-sm" id="editTambahBahan">＋ Tambah Bahan</button></div>
     <div id="editFormulaItems">${rows||'<div class="small">Belum ada bahan. Klik “Tambah Bahan”.</div>'}</div>
     <div class="form-group" style="margin-top:16px"><label>CARA PEMBUATAN</label><textarea id="fCara" rows="10">${escHtml(f.caraPembuatan||'')}</textarea></div>
-    <p class="small">Persentase dipakai langsung untuk menghitung kebutuhan batch. Jika “Bahan berupa larutan” dicentang, stok bahan aktif dihitung sesuai konsentrasi larutan.</p>
+    <p class="small"><b>Catatan:</b> persentase formulasi adalah kebutuhan bahan aktif/bahan dasar. Jika “Bahan berupa larutan” dicentang, stok dan HPP tetap memakai kebutuhan bahan aktif, tetapi <b>Cara Kerja menampilkan jumlah larutan yang harus ditambahkan</b> (kebutuhan aktif ÷ konsentrasi). Contoh NaOH 20%: 12,792 g aktif → <b>63,96 g larutan NaOH 20%</b>.</p>
   `,()=>{
     f.nama=document.getElementById('fNama').value.trim()||f.nama;
     const bjRaw=document.getElementById('fBj').value.replace(',','.'); f.bj=Number(bjRaw)||f.bj;
@@ -827,31 +827,41 @@ function editFormulasi(id){
 }
 function hapusFormulasi(id){if(confirm('Hapus formulasi?')){data.formulasi=data.formulasi.filter(x=>x.id!==id);renderAll()}}
 
-function calcNeeds(f,liter){let totalBerat=liter*(f.bj||1.025),items=[],cost=0;for(let it of f.items||[]){let b=getBahan(it.bahanId);if(!b)continue;let qty=totalBerat*(it.persen||0)/100;if(it.isLarutan&&it.konsentrasiLarutan>0){/* 1.5% adalah larutan NaOH 20%: bahan stok yang dikonsumsi = 1.5% x 20%. */qty*=it.konsentrasiLarutan/100}let costItem=qty*(b.hargaRataRata||0);cost+=costItem;items.push({...it,bahan:b,qty,cost:costItem})}return{totalBerat,items,cost}}
-function batchCode(f,tanggal){let d=new Date(tanggal+'T00:00:00'),dd=String(d.getDate()).padStart(2,'0'),mm=String(d.getMonth()+1).padStart(2,'0'),yy=String(d.getFullYear()).slice(-2),initials=(f.nama||'SB').replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase().padEnd(2,'X'),year=d.getFullYear(),count=data.produksi.filter(p=>{let q=new Date(p.tanggalPembuatan||p.createdAt);return q.getFullYear()===year&&getForm(p.formulasiId)?.nama===f.nama}).length+1;return `${initials}-${dd}${mm}${yy}-${String(count).padStart(2,'0')}`}
-function hitungPreviewProduksi(){
-  const f=getForm(document.getElementById('produksiForm').value);
-  const l=+document.getElementById('produksiLiter').value||0;
-  const box=document.getElementById('produksiPreview');
+function calcNeeds(f,liter){
+  const totalBerat=liter*(f.bj||1.025);
+  const items=[];
+  let cost=0;
 
-  // Begitu input berubah, Cara Kerja lama tidak ikut tampil.
-  produksiCaraKerjaTerakhir=null;
+  for(const it of (f.items||[])){
+    const b=getBahan(it.bahanId);
+    if(!b) continue;
 
-  if(!f||l<=0){
-    box.innerHTML='Pilih formulasi dan liter.';
-    return;
+    // Persentase formulasi = kebutuhan bahan aktif/bahan dasar.
+    const qtyAktif=totalBerat*(Number(it.persen)||0)/100;
+
+    // Jika bahan berupa larutan, Cara Kerja harus menampilkan
+    // jumlah larutan yang benar-benar ditambahkan.
+    // Contoh: 12,792 g NaOH aktif pada larutan 20%
+    // => 12,792 / 0,20 = 63,96 g larutan NaOH 20%.
+    const kons=Number(it.konsentrasiLarutan)||0;
+    const qtyLarutan=(it.isLarutan && kons>0) ? qtyAktif/(kons/100) : qtyAktif;
+
+    // Stok bahan dasar/aktif dan HPP tetap menggunakan kebutuhan aktif.
+    const costItem=qtyAktif*(b.hargaRataRata||0);
+    cost+=costItem;
+
+    items.push({
+      ...it,
+      bahan:b,
+      qty:qtyAktif,
+      qtyAktif,
+      qtyLarutan,
+      qtyTampil:qtyLarutan,
+      cost:costItem
+    });
   }
 
-  const c=calcNeeds(f,l);
-  const steps=(c.items||[]).slice().sort((a,b)=>(a.step||0)-(b.step||0)).map((x,i)=>
-    '<div><b>'+(i+1)+'. '+(x.bahan?.nama||'Bahan')+'</b> — <strong>'+
-    formatAngkaID(x.qty)+' '+(x.bahan?.satuanDasar||'')+'</strong></div>'
-  ).join('');
-
-  box.innerHTML='<b>📐 Kebutuhan Batch '+formatAngkaID(l)+' L — '+f.nama+'</b>'+
-    '<div class="small">BJ '+f.bj+' kg/L · berat '+formatAngkaID(c.totalBerat)+
-    ' kg · biaya bahan '+rupiah(c.cost)+'</div>'+
-    '<div class="small" style="margin-top:10px">Tekan 🏭 <b>Buat Batch</b> untuk menampilkan Cara Kerja dengan takaran yang sudah terisi.</div>';
+  return {totalBerat,items,cost};
 }
 
 function buatProduksi(){
