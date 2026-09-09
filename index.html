@@ -50,16 +50,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 .small{font-size:.75rem;color:var(--muted)}.right{text-align:right}.money{font-weight:800}.green{color:var(--green)}.red{color:var(--red)}
 .font-control{position:fixed;right:14px;bottom:14px;z-index:1000;background:#fff;padding:5px;border-radius:30px;box-shadow:0 4px 18px rgba(0,0,0,.12)}.font-control button{border:0;background:var(--teal);color:#fff;width:34px;height:34px;border-radius:50%;margin:2px;font-weight:800}
 @media(max-width:650px){body{padding:6px}.app{padding:8px;border-radius:18px}.user-info #userEmail{display:none}.form-group{flex-basis:100%}.tab-bar button{flex-basis:45%}.table-wrap{max-height:460px}table{font-size:.74rem}.menu-dropdown{min-width:210px}.stat-grid{grid-template-columns:1fr 1fr}}
-
-/* Tabel komposisi bahan yang rapi */
-.compact-table td, .compact-table th {
-  padding: 6px 8px !important;
-  font-size: 0.75rem !important;
-}
-.compact-table th {
-  background: #e7f6f3;
-  font-weight: 700;
-}
+.compact-table td,.compact-table th{padding:6px 8px!important;font-size:.75rem!important}.compact-table th{background:#e7f6f3;font-weight:700}
 </style>
 </head>
 <body>
@@ -146,7 +137,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="form-group" id="opsManualGroup" style="display:none"><label>Manual (Rp)</label><input id="produksiOpsManual" type="number"></div>
 </div>
 <div id="produksiPreview" class="info-card" style="display:none"></div>
-<button class="btn btn-primary" onclick="buatProduksi()">🏭 Buat Batch</button>
+<button class="btn btn-primary" id="btnBuatBatch" onclick="buatProduksi()">🏭 Buat Batch</button>
 </div>
 <div class="tab-content" id="tab-prod-riwayat">
 <div class="search-box"><input id="searchProduksi" placeholder="🔍 Cari batch..." oninput="filterTable('produksiTbody','searchProduksi')"></div>
@@ -169,8 +160,6 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div id="packagingPreview" class="info-card"></div>
 <div class="search-box"><input id="searchKemasanJadi" placeholder="🔍 Cari..." oninput="filterTable('kemasanTbody','searchKemasanJadi')"></div>
 <div class="history-table-scroll"><table><thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Stok</th><th>Harga Jual</th><th>HPP/Unit</th><th>Aksi</th></tr></thead><tbody id="kemasanTbody"></tbody></table></div>
-
-<!-- Riwayat Pengemasan hanya di halaman ini -->
 <h3 style="margin-top:24px">🕘 Riwayat Pengemasan</h3>
 <div id="riwayatPengemasanContainer"></div>
 </div>
@@ -293,13 +282,14 @@ function getKemasan(id) {
 function stokEntry(j, k) {
   return data?.stokBarangJadi?.find(x => x.jenisSabun === j && x.kemasanId === k);
 }
-function alertx(msg, type = 'success') {
-  let t = document.getElementById('alertToast');
+function alertx(msg, type) {
+  type = type || 'success';
+  var t = document.getElementById('alertToast');
   t.className = 'alert-toast ' + (type === 'error' ? 'error' : type === 'warning' ? 'warning' : '');
   document.getElementById('alertMessage').textContent = msg;
   t.style.display = 'block';
   clearTimeout(t._x);
-  t._x = setTimeout(() => t.style.display = 'none', 4000);
+  t._x = setTimeout(function() { t.style.display = 'none'; }, 4000);
 }
 function logAudit(action, collection, docId, changes) {
   if (!currentUser) return;
@@ -308,14 +298,14 @@ function logAudit(action, collection, docId, changes) {
     id: genId(),
     timestamp: new Date().toISOString(),
     user: currentUser.email,
-    action,
-    collection,
-    docId,
-    changes
+    action: action,
+    collection: collection,
+    docId: docId,
+    changes: changes
   });
 }
 function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 function formatAngkaID(n) {
   return Number(n || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
@@ -328,7 +318,7 @@ async function saveData() {
   if (!data) return;
   try {
     if (!dataDocId) {
-      const ref = await db.collection('si_bersih_data').add(data);
+      var ref = await db.collection('si_bersih_data').add(data);
       dataDocId = ref.id;
     } else {
       await db.collection('si_bersih_data').doc(dataDocId).set(JSON.parse(JSON.stringify(data)));
@@ -378,22 +368,7 @@ function defaultFormula() {
     id: 'f1',
     nama: 'Sabun Cair',
     bj: 1.025,
-    caraPembuatan: `PAKAI SARUNG TANGAN DAN MASKER
-Siapkan air di satu wadah
-Tambahkan EDTA
-Di wadah terpisah tambahkan ABS
-Tambahkan NaOH 20%
-Aduk hingga homogen dan berubah menjadi coklat muda
-Tambahkan Asam Sitrat 20%
-Tambahkan Texapon
-Aduk hingga homogen
-Tambahkan Pewangi
-Tambahkan Pewarna
-Tambahkan air sedikit demi sedikit sampai homogen
-Tambahkan NaCl yang sudah dilarutkan
-Tambahkan CAPB
-Aduk hingga homogen
-DIAMKAN 24 JAM`,
+    caraPembuatan: 'PAKAI SARUNG TANGAN DAN MASKER\nSiapkan air di satu wadah\nTambahkan EDTA\nDi wadah terpisah tambahkan ABS\nTambahkan NaOH 20%\nAduk hingga homogen dan berubah menjadi coklat muda\nTambahkan Asam Sitrat 20%\nTambahkan Texapon\nAduk hingga homogen\nTambahkan Pewangi\nTambahkan Pewarna\nTambahkan air sedikit demi sedikit sampai homogen\nTambahkan NaCl yang sudah dilarutkan\nTambahkan CAPB\nAduk hingga homogen\nDIAMKAN 24 JAM',
     items: [
       { bahanId: 'b4', persen: 55, step: 1, isLarutan: false, konsentrasiLarutan: 0 },
       { bahanId: 'b6', persen: 1, step: 2, isLarutan: false, konsentrasiLarutan: 0 },
@@ -413,16 +388,16 @@ DIAMKAN 24 JAM`,
 // AUTH
 // ============================================================
 function login() {
-  let e = document.getElementById('loginEmail').value.trim();
-  let p = document.getElementById('loginPassword').value.trim();
-  let err = document.getElementById('loginError');
+  var e = document.getElementById('loginEmail').value.trim();
+  var p = document.getElementById('loginPassword').value.trim();
+  var err = document.getElementById('loginError');
   err.style.display = 'none';
   if (!e || !p) {
     err.textContent = 'Isi email dan password.';
     err.style.display = 'block';
     return;
   }
-  auth.signInWithEmailAndPassword(e, p).catch(x => {
+  auth.signInWithEmailAndPassword(e, p).catch(function(x) {
     err.textContent = x.message;
     err.style.display = 'block';
   });
@@ -431,7 +406,7 @@ function logout() {
   if (unsubscribeSnapshot) unsubscribeSnapshot();
   auth.signOut();
 }
-auth.onAuthStateChanged(u => {
+auth.onAuthStateChanged(function(u) {
   if (u && ALLOWED_EMAILS[u.email]) {
     currentUser = u;
     userRole = ALLOWED_EMAILS[u.email];
@@ -447,68 +422,95 @@ function showApp() {
   document.getElementById('appContainer').style.display = 'block';
   document.getElementById('userEmail').textContent = currentUser.email;
   document.getElementById('userRoleBadge').textContent = userRole.toUpperCase();
-  document.querySelectorAll('.admin-only').forEach(x => x.style.display = userRole === 'admin-full' ? 'inline-block' : 'none');
+  var admins = document.querySelectorAll('.admin-only');
+  for (var i = 0; i < admins.length; i++) {
+    admins[i].style.display = userRole === 'admin-full' ? 'inline-block' : 'none';
+  }
   document.getElementById('auditMenu').style.display = userRole === 'admin-full' ? 'block' : 'none';
   navigateTo('dashboard');
 }
 function loadData() {
   if (unsubscribeSnapshot) unsubscribeSnapshot();
-  unsubscribeSnapshot = db.collection('si_bersih_data').limit(1).onSnapshot(async s => {
+  unsubscribeSnapshot = db.collection('si_bersih_data').limit(1).onSnapshot(function(s) {
     if (s.empty) {
       data = defaults();
-      await saveData();
-      renderAll(false);
+      saveData().then(function() { renderAll(false); });
     } else {
-      const doc = s.docs[0];
+      var doc = s.docs[0];
       data = { ...defaults(), ...doc.data() };
       dataDocId = doc.id;
-      ['bahan','kemasanBeli','formulasi','produksi','pengemasan','stokBarangJadi',
-       'penjualan','peralatan','pembelianBahan','pembelianKemasan','modalTambahan',
-       'auditLogs'].forEach(k => { if (!data[k]) data[k] = []; });
+      var arrs = ['bahan','kemasanBeli','formulasi','produksi','pengemasan','stokBarangJadi',
+       'penjualan','peralatan','pembelianBahan','pembelianKemasan','modalTambahan','auditLogs'];
+      for (var i = 0; i < arrs.length; i++) {
+        if (!data[arrs[i]]) data[arrs[i]] = [];
+      }
       if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
       if (!data.keuangan.pemasukan) data.keuangan.pemasukan = [];
       if (!data.keuangan.pengeluaran) data.keuangan.pengeluaran = [];
       renderAll(false);
     }
-  }, e => alertx('Firestore: ' + e.message, 'error'));
+  }, function(e) { alertx('Firestore: ' + e.message, 'error'); });
 }
 
 // ============================================================
 // NAVIGASI
 // ============================================================
 function navigateTo(page) {
-  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-  const el = document.getElementById('page-' + page);
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) {
+    pages[i].classList.remove('active');
+  }
+  var el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
-  document.querySelectorAll('.menu-dropdown a[data-page]').forEach(x => x.classList.remove('active-page'));
-  const activeLink = document.querySelector(`.menu-dropdown a[data-page="${page}"]`);
+  var links = document.querySelectorAll('.menu-dropdown a[data-page]');
+  for (var j = 0; j < links.length; j++) {
+    links[j].classList.remove('active-page');
+  }
+  var activeLink = document.querySelector('.menu-dropdown a[data-page="' + page + '"]');
   if (activeLink) activeLink.classList.add('active-page');
 }
-document.getElementById('menuToggle').onclick = e => {
+document.getElementById('menuToggle').onclick = function(e) {
   e.stopPropagation();
   document.getElementById('menuDropdown').classList.toggle('open');
 };
-document.addEventListener('click', e => {
-  const m = document.getElementById('menuDropdown');
+document.addEventListener('click', function(e) {
+  var m = document.getElementById('menuDropdown');
   if (!m.contains(e.target) && e.target.id !== 'menuToggle') m.classList.remove('open');
 });
-document.querySelectorAll('.menu-dropdown a[data-page]').forEach(x => x.onclick = () => {
-  navigateTo(x.dataset.page);
-  document.getElementById('menuDropdown').classList.remove('open');
-  renderAll(false);
-});
-document.querySelectorAll('.tab-bar').forEach(bar => bar.querySelectorAll('button[data-tab]').forEach(b => b.onclick = () => {
-  bar.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-  b.classList.add('active');
-  let parent = bar.parentElement;
-  parent.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-  document.getElementById('tab-' + b.dataset.tab).classList.add('active');
-}));
+var menuLinks = document.querySelectorAll('.menu-dropdown a[data-page]');
+for (var mi = 0; mi < menuLinks.length; mi++) {
+  menuLinks[mi].onclick = function() {
+    navigateTo(this.dataset.page);
+    document.getElementById('menuDropdown').classList.remove('open');
+    renderAll(false);
+  };
+}
+var tabBars = document.querySelectorAll('.tab-bar');
+for (var tb = 0; tb < tabBars.length; tb++) {
+  var btns = tabBars[tb].querySelectorAll('button[data-tab]');
+  for (var btn = 0; btn < btns.length; btn++) {
+    btns[btn].onclick = function() {
+      var bar = this.parentElement;
+      var children = bar.querySelectorAll('button');
+      for (var c = 0; c < children.length; c++) {
+        children[c].classList.remove('active');
+      }
+      this.classList.add('active');
+      var parent = bar.parentElement;
+      var contents = parent.querySelectorAll('.tab-content');
+      for (var cc = 0; cc < contents.length; cc++) {
+        contents[cc].classList.remove('active');
+      }
+      document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    };
+  }
+}
 
 // ============================================================
 // RENDER ALL
 // ============================================================
-function renderAll(shouldSave = false) {
+function renderAll(shouldSave) {
+  shouldSave = shouldSave || false;
   renderDashboard();
   renderBahan();
   renderKemasanStok();
@@ -530,87 +532,145 @@ function renderAll(shouldSave = false) {
 // DASHBOARD
 // ============================================================
 function renderDashboard() {
-  let g = {};
-  (data.stokBarangJadi || []).forEach(e => {
-    let key = e.jenisSabun + '|' + e.kemasanId;
+  var g = {};
+  var stokJadi = data.stokBarangJadi || [];
+  for (var i = 0; i < stokJadi.length; i++) {
+    var e = stokJadi[i];
+    var key = e.jenisSabun + '|' + e.kemasanId;
     if (!g[key]) g[key] = { jenisSabun: e.jenisSabun, kemasanId: e.kemasanId, stok: 0, harga: 0 };
-    e.batchItems.forEach(i => {
-      g[key].stok += Number(i.jumlahUnit) || 0;
-      g[key].harga = i.hargaJual || g[key].harga;
-    });
-  });
-  document.getElementById('dashStokKemasanTbody').innerHTML = Object.values(g).map(x =>
-    `<tr><td>${getKemasan(x.kemasanId)?.nama || '-'}</td><td>${x.jenisSabun}</td><td><b>${x.stok}</b></td><td>${rupiah(x.harga)}</td></tr>`
-  ).join('') || '<tr><td colspan="4">Belum ada stok.</td></tr>';
+    var items = e.batchItems || [];
+    for (var j = 0; j < items.length; j++) {
+      g[key].stok += Number(items[j].jumlahUnit) || 0;
+      g[key].harga = items[j].hargaJual || g[key].harga;
+    }
+  }
+  var html = '';
+  var vals = Object.values(g);
+  if (vals.length === 0) {
+    html = '<tr><td colspan="4">Belum ada stok.</td></tr>';
+  } else {
+    for (var v = 0; v < vals.length; v++) {
+      var x = vals[v];
+      var kem = getKemasan(x.kemasanId);
+      html += '<tr><td>' + (kem?.nama || '-') + '</td><td>' + x.jenisSabun + '</td><td><b>' + x.stok + '</b></td><td>' + rupiah(x.harga) + '</td></tr>';
+    }
+  }
+  document.getElementById('dashStokKemasanTbody').innerHTML = html;
 
-  let modal = (data.modalTambahan || []).reduce((s, x) => s + (Number(x.jumlah) || 0), 0);
-  let masuk = (data.keuangan.pemasukan || []).reduce((s, x) => s + (Number(x.jumlah) || 0), 0);
-  let keluar = (data.keuangan.pengeluaran || []).reduce((s, x) => s + (Number(x.jumlah) || 0), 0);
-  let kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
+  var modal = 0;
+  var tambahan = data.modalTambahan || [];
+  for (var m = 0; m < tambahan.length; m++) {
+    modal += Number(tambahan[m].jumlah) || 0;
+  }
+  var masuk = 0;
+  var pemasukan = data.keuangan.pemasukan || [];
+  for (var pm = 0; pm < pemasukan.length; pm++) {
+    masuk += Number(pemasukan[pm].jumlah) || 0;
+  }
+  var keluar = 0;
+  var pengeluaran = data.keuangan.pengeluaran || [];
+  for (var pk = 0; pk < pengeluaran.length; pk++) {
+    keluar += Number(pengeluaran[pk].jumlah) || 0;
+  }
+  var kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
 
-  document.getElementById('modalSummary').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num">${rupiah(kas)}</div><div class="lbl">Saldo Kas</div></div>
-      <div class="stat-card"><div class="num">${rupiah(modal)}</div><div class="lbl">Modal Masuk</div></div>
-      <div class="stat-card"><div class="num">${rupiah(masuk)}</div><div class="lbl">Kas Masuk</div></div>
-      <div class="stat-card"><div class="num">${rupiah(keluar)}</div><div class="lbl">Kas Keluar</div></div>
-    </div>
-  `;
+  document.getElementById('modalSummary').innerHTML = 
+    '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(modal) + '</div><div class="lbl">Modal Masuk</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(masuk) + '</div><div class="lbl">Kas Masuk</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(keluar) + '</div><div class="lbl">Kas Keluar</div></div>' +
+    '</div>';
   renderInvestorSummary();
 }
 
 function renderInvestorSummary() {
-  let groups = {};
-  (data.modalTambahan || []).forEach(x => {
-    let name = String(x.pemberi || '').trim();
-    if (!name) return;
-    let key = name.toLocaleLowerCase('id-ID');
+  var groups = {};
+  var tambahan = data.modalTambahan || [];
+  for (var i = 0; i < tambahan.length; i++) {
+    var name = String(tambahan[i].pemberi || '').trim();
+    if (!name) continue;
+    var key = name.toLocaleLowerCase('id-ID');
     if (!groups[key]) groups[key] = { nama: name, total: 0, jumlahTransaksi: 0 };
-    groups[key].total += (Number(x.jumlah) || 0);
+    groups[key].total += (Number(tambahan[i].jumlah) || 0);
     groups[key].jumlahTransaksi++;
-  });
-  let arr = Object.values(groups).sort((a, b) => b.total - a.total);
-  let total = arr.reduce((s, x) => s + x.total, 0);
-  document.getElementById('investorSummary').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num">${arr.length}</div><div class="lbl">Jumlah Investor</div></div>
-      <div class="stat-card"><div class="num">${rupiah(total)}</div><div class="lbl">Total Modal Investor</div></div>
-    </div>
-    <div class="info-card">
-      <div class="flex-between"><b>👤 Ringkasan Investor</b><span class="small">Nama yang sama digabung otomatis</span></div>
-      <div class="table-wrap"><table><thead><tr><th>Investor</th><th>Jumlah Transaksi</th><th>Total Modal</th></tr></thead><tbody>
-        ${arr.map(x => `<tr><td><b>${x.nama}</b></td><td>${x.jumlahTransaksi}</td><td class="money">${rupiah(x.total)}</td></tr>`).join('') || '<tr><td colspan="3">Belum ada modal investor.</td></tr>'}
-      </tbody></table></div>
-    </div>
-  `;
+  }
+  var arr = Object.values(groups).sort(function(a, b) { return b.total - a.total; });
+  var total = 0;
+  for (var a = 0; a < arr.length; a++) {
+    total += arr[a].total;
+  }
+  var html = '<tr>';
+  if (arr.length === 0) {
+    html += '<td colspan="3">Belum ada modal investor.</td>';
+  } else {
+    for (var x = 0; x < arr.length; x++) {
+      html += '<tr><td><b>' + arr[x].nama + '</b></td><td>' + arr[x].jumlahTransaksi + '</td><td class="money">' + rupiah(arr[x].total) + '</td></tr>';
+    }
+  }
+  html += '</tr>';
+  document.getElementById('investorSummary').innerHTML = 
+    '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="num">' + arr.length + '</div><div class="lbl">Jumlah Investor</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(total) + '</div><div class="lbl">Total Modal Investor</div></div>' +
+    '</div>' +
+    '<div class="info-card">' +
+      '<div class="flex-between"><b>👤 Ringkasan Investor</b><span class="small">Nama yang sama digabung otomatis</span></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>Investor</th><th>Jumlah Transaksi</th><th>Total Modal</th></tr></thead><tbody>' + html + '</tbody></table></div>' +
+    '</div>';
 }
 
 function checkWarnings() {
-  let w = [];
-  (data.bahan || []).forEach(b => {
-    if (b.stok <= b.threshold) w.push(`${b.nama}: ${b.stok.toFixed(2)} ${b.satuanDasar}`);
-  });
-  (data.kemasanBeli || []).forEach(k => {
-    if (k.stok <= 5) w.push(`${k.nama}: ${k.stok} unit`);
-  });
-  document.getElementById('stokWarningList').innerHTML = w.length ?
-    `<div class="warning-box"><b>⚠️ Stok menipis</b><ul>${w.map(x => `<li>${x}</li>`).join('')}</ul></div>` : '';
+  var w = [];
+  var bahan = data.bahan || [];
+  for (var i = 0; i < bahan.length; i++) {
+    var b = bahan[i];
+    if (b.stok <= b.threshold) w.push(b.nama + ': ' + b.stok.toFixed(2) + ' ' + b.satuanDasar);
+  }
+  var kem = data.kemasanBeli || [];
+  for (var j = 0; j < kem.length; j++) {
+    var k = kem[j];
+    if (k.stok <= 5) w.push(k.nama + ': ' + k.stok + ' unit');
+  }
+  var html = '';
+  if (w.length) {
+    var items = '';
+    for (var wi = 0; wi < w.length; wi++) {
+      items += '<li>' + w[wi] + '</li>';
+    }
+    html = '<div class="warning-box"><b>⚠️ Stok menipis</b><ul>' + items + '</ul></div>';
+  }
+  document.getElementById('stokWarningList').innerHTML = html;
 }
 
 // ============================================================
-// STOK BAHAN
+// STOK BAHAN - FUNGSI DASAR
 // ============================================================
 function renderBahan() {
-  document.getElementById('bahanTbody').innerHTML = (data.bahan || []).map(b =>
-    `<tr><td>${b.nama}${b.stok <= b.threshold ? ' ⚠️' : ''}</td><td>${b.stok.toFixed(2)} ${b.satuanDasar}</td><td>${b.hargaRataRata ? rupiah(b.hargaRataRata) + '/' + b.satuanDasar : '-'}</td><td><button class="btn btn-warning btn-sm" onclick="editStokBahan('${b.id}')">✏</button> ${userRole === 'admin-full' ? `<button class="btn btn-danger btn-sm" onclick="hapusBahan('${b.id}')">🗑</button>` : ''}</td></tr>`
-  ).join('');
+  var bahan = data.bahan || [];
+  var html = '';
+  for (var i = 0; i < bahan.length; i++) {
+    var b = bahan[i];
+    var warn = b.stok <= b.threshold ? ' ⚠️' : '';
+    var harga = b.hargaRataRata ? rupiah(b.hargaRataRata) + '/' + b.satuanDasar : '-';
+    var aksi = '<button class="btn btn-warning btn-sm" onclick="editStokBahan(\'' + b.id + '\')">✏</button>';
+    if (userRole === 'admin-full') {
+      aksi += ' <button class="btn btn-danger btn-sm" onclick="hapusBahan(\'' + b.id + '\')">🗑</button>';
+    }
+    html += '<tr><td>' + b.nama + warn + '</td><td>' + b.stok.toFixed(2) + ' ' + b.satuanDasar + '</td><td>' + harga + '</td><td>' + aksi + '</td></tr>';
+  }
+  document.getElementById('bahanTbody').innerHTML = html;
 }
 
 function tambahBahanDefault() {
   if (userRole !== 'admin-full') return;
-  defaultBahan().forEach(b => {
-    if (!data.bahan.some(x => x.nama === b.nama)) data.bahan.push({ ...b, id: genId() });
-  });
+  var def = defaultBahan();
+  for (var i = 0; i < def.length; i++) {
+    var b = def[i];
+    if (!data.bahan.some(function(x) { return x.nama === b.nama; })) {
+      data.bahan.push({ id: genId(), nama: b.nama, satuanDasar: b.satuanDasar, stok: b.stok, threshold: b.threshold, hargaRataRata: b.hargaRataRata });
+    }
+  }
   renderAll(true);
   alertx('Bahan default ditambahkan');
 }
@@ -618,16 +678,16 @@ function tambahBahanDefault() {
 function tambahBahan() {
   if (userRole !== 'admin-full') return;
   modal('Tambah Bahan',
-    `<div class="form-group"><label>Nama</label><input id="mNama"></div>
-     <div class="form-group"><label>Satuan</label><select id="mSat"><option>kg</option><option>L</option></select></div>
-     <div class="form-group"><label>Stok Awal</label><input id="mStok" type="number" step=".01"></div>
-     <div class="form-group"><label>Harga Rata-rata</label><input id="mHarga" type="number"></div>`,
-    () => {
-      let nama = document.getElementById('mNama').value.trim();
+    '<div class="form-group"><label>Nama</label><input id="mNama"></div>' +
+    '<div class="form-group"><label>Satuan</label><select id="mSat"><option>kg</option><option>L</option></select></div>' +
+    '<div class="form-group"><label>Stok Awal</label><input id="mStok" type="number" step=".01"></div>' +
+    '<div class="form-group"><label>Harga Rata-rata</label><input id="mHarga" type="number"></div>',
+    function() {
+      var nama = document.getElementById('mNama').value.trim();
       if (!nama) return alertx('Nama wajib', 'error');
       data.bahan.push({
         id: genId(),
-        nama,
+        nama: nama,
         satuanDasar: document.getElementById('mSat').value,
         stok: +document.getElementById('mStok').value || 0,
         threshold: 1,
@@ -641,13 +701,13 @@ function tambahBahan() {
 
 function editStokBahan(id) {
   if (userRole !== 'admin-full') return;
-  let b = getBahan(id);
+  var b = getBahan(id);
   if (!b) return;
   modal('Edit Bahan',
-    `<div class="form-group"><label>Nama</label><input value="${b.nama}" disabled></div>
-     <div class="form-group"><label>Stok</label><input id="mStok" type="number" step=".01" value="${b.stok}"></div>
-     <div class="form-group"><label>Harga Rata-rata</label><input id="mHarga" type="number" value="${b.hargaRataRata || 0}"></div>`,
-    () => {
+    '<div class="form-group"><label>Nama</label><input value="' + b.nama + '" disabled></div>' +
+    '<div class="form-group"><label>Stok</label><input id="mStok" type="number" step=".01" value="' + b.stok + '"></div>' +
+    '<div class="form-group"><label>Harga Rata-rata</label><input id="mHarga" type="number" value="' + (b.hargaRataRata || 0) + '"></div>',
+    function() {
       b.stok = +document.getElementById('mStok').value || 0;
       b.hargaRataRata = +document.getElementById('mHarga').value || 0;
       renderAll(true);
@@ -659,7 +719,7 @@ function editStokBahan(id) {
 function hapusBahan(id) {
   if (userRole !== 'admin-full') return;
   if (confirm('Hapus bahan?')) {
-    data.bahan = data.bahan.filter(x => x.id !== id);
+    data.bahan = data.bahan.filter(function(x) { return x.id !== id; });
     logAudit('delete', 'bahan', id, 'Bahan dihapus');
     renderAll(true);
   }
@@ -670,28 +730,34 @@ function hapusBahan(id) {
 // ============================================================
 function tambahPembelianKemasan() {
   if (userRole !== 'admin-full') return;
+  var options = '';
+  var kem = data.kemasanBeli || [];
+  for (var i = 0; i < kem.length; i++) {
+    options += '<option value="' + kem[i].id + '">' + escapeHtml(kem[i].nama) + '</option>';
+  }
   modal('Pembelian Kemasan',
-    `<div class="small" style="margin-bottom:12px">Ongkos kirim masuk ke harga rata-rata per unit kemasan.</div>
-     <div class="form-group"><label>Kemasan</label><select id="pkNama">${data.kemasanBeli.map(k => `<option value="${k.id}">${escapeHtml(k.nama)}</option>`).join('')}</select></div>
-     <div class="form-group"><label>Jumlah Unit</label><input id="pkQty" type="number" min="1"></div>
-     <div class="form-group"><label>Total Harga Barang (Rp)</label><input id="pkHarga" type="number" min="0"></div>
-     <div class="form-group"><label>Ongkos Kirim (Rp)</label><input id="pkOngkir" type="number" min="0" value="0"></div>
-     <div class="form-group"><label>Keterangan</label><input id="pkKet" placeholder="Supplier / jenis / catatan"></div>
-     <div class="form-group"><label>Tanggal</label><input id="pkTanggal" type="date" value="${todayStr()}"></div>`,
-    () => {
-      const k = getKemasan(document.getElementById('pkNama').value);
-      const q = Number(document.getElementById('pkQty').value) || 0;
-      const harga = Number(document.getElementById('pkHarga').value) || 0;
-      const ongkir = Number(document.getElementById('pkOngkir').value) || 0;
+    '<div class="small" style="margin-bottom:12px">Ongkos kirim masuk ke harga rata-rata per unit kemasan.</div>' +
+    '<div class="form-group"><label>Kemasan</label><select id="pkNama">' + options + '</select></div>' +
+    '<div class="form-group"><label>Jumlah Unit</label><input id="pkQty" type="number" min="1"></div>' +
+    '<div class="form-group"><label>Total Harga Barang (Rp)</label><input id="pkHarga" type="number" min="0"></div>' +
+    '<div class="form-group"><label>Ongkos Kirim (Rp)</label><input id="pkOngkir" type="number" min="0" value="0"></div>' +
+    '<div class="form-group"><label>Keterangan</label><input id="pkKet" placeholder="Supplier / jenis / catatan"></div>' +
+    '<div class="form-group"><label>Tanggal</label><input id="pkTanggal" type="date" value="' + todayStr() + '"></div>',
+    function() {
+      var k = getKemasan(document.getElementById('pkNama').value);
+      var q = Number(document.getElementById('pkQty').value) || 0;
+      var harga = Number(document.getElementById('pkHarga').value) || 0;
+      var ongkir = Number(document.getElementById('pkOngkir').value) || 0;
       if (!k || q <= 0 || harga < 0 || ongkir < 0) return alertx('Data pembelian kemasan belum lengkap', 'error');
-      const total = harga + ongkir;
-      const oldStock = Number(k.stok) || 0;
-      const oldValue = oldStock * (Number(k.hargaPerUnit) || 0);
+      var total = harga + ongkir;
+      var oldStock = Number(k.stok) || 0;
+      var oldValue = oldStock * (Number(k.hargaPerUnit) || 0);
       k.stok = oldStock + q;
       k.hargaPerUnit = k.stok > 0 ? (oldValue + total) / k.stok : 0;
-      const id = genId();
-      const tgl = document.getElementById('pkTanggal').value || todayStr();
-      (data.pembelianKemasan ||= []).push({ id, kemasanId: k.id, qty: q, hargaBarang: harga, ongkosKirim: ongkir, total, keterangan: document.getElementById('pkKet').value.trim(), tanggal: tgl });
+      var id = genId();
+      var tgl = document.getElementById('pkTanggal').value || todayStr();
+      if (!data.pembelianKemasan) data.pembelianKemasan = [];
+      data.pembelianKemasan.push({ id: id, kemasanId: k.id, qty: q, hargaBarang: harga, ongkosKirim: ongkir, total: total, keterangan: document.getElementById('pkKet').value.trim(), tanggal: tgl });
       data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian kemasan - ' + k.nama, jumlah: total, tanggal: tgl });
       renderAll(true);
       alertx('Pembelian kemasan tersimpan');
@@ -700,29 +766,51 @@ function tambahPembelianKemasan() {
 }
 
 function renderPembelianKemasan() {
-  const arr = [...(data.pembelianKemasan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
-  return `<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kemasan</th><th>Qty</th><th>Harga Barang</th><th>Ongkir</th><th>Total</th><th>Keterangan</th></tr></thead><tbody>
-    ${arr.map(p => { const k = getKemasan(p.kemasanId); return `<tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(k?.nama || '-')}</td><td>${Number(p.qty || 0).toLocaleString('id-ID')}</td><td>${rupiah(p.hargaBarang)}</td><td>${rupiah(p.ongkosKirim)}</td><td>${rupiah(p.total)}</td><td>${escapeHtml(p.keterangan || '-')}</td></tr>`; }).join('') || '<tr><td colspan="7">Belum ada pembelian kemasan.</td></tr>'}
-  </tbody></table></div>`;
+  var arr = (data.pembelianKemasan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var html = '';
+  if (arr.length === 0) {
+    html = '<tr><td colspan="7">Belum ada pembelian kemasan.</td></tr>';
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      var p = arr[i];
+      var k = getKemasan(p.kemasanId);
+      html += '<tr><td>' + fmtDate(p.tanggal) + '</td><td>' + escapeHtml(k?.nama || '-') + '</td><td>' + Number(p.qty || 0).toLocaleString('id-ID') + '</td><td>' + rupiah(p.hargaBarang) + '</td><td>' + rupiah(p.ongkosKirim) + '</td><td>' + rupiah(p.total) + '</td><td>' + escapeHtml(p.keterangan || '-') + '</td></tr>';
+    }
+  }
+  return '<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kemasan</th><th>Qty</th><th>Harga Barang</th><th>Ongkir</th><th>Total</th><th>Keterangan</th></tr></thead><tbody>' + html + '</tbody></table></div>';
 }
 
 // ============================================================
 // STOK KEMASAN
 // ============================================================
 function renderKemasanStok() {
-  document.getElementById('kemasanStokTbody').innerHTML = (data.kemasanBeli || []).map(k =>
-    `<tr><td>${k.nama}</td><td>${k.stok}</td><td>${k.volumeMl || 0}</td><td>${rupiah(k.hargaPerUnit)}</td><td><button class="btn btn-warning btn-sm" onclick="editStokKemasan('${k.id}')">✏</button> ${userRole === 'admin-full' ? `<button class="btn btn-danger btn-sm" onclick="hapusKemasanBeli('${k.id}')">🗑</button>` : ''}</td></tr>`
-  ).join('') || '<tr><td colspan="5">Belum ada kemasan.</td></tr>';
+  var kem = data.kemasanBeli || [];
+  var html = '';
+  if (kem.length === 0) {
+    html = '<tr><td colspan="5">Belum ada kemasan.</td></tr>';
+  } else {
+    for (var i = 0; i < kem.length; i++) {
+      var k = kem[i];
+      var aksi = '<button class="btn btn-warning btn-sm" onclick="editStokKemasan(\'' + k.id + '\')">✏</button>';
+      if (userRole === 'admin-full') {
+        aksi += ' <button class="btn btn-danger btn-sm" onclick="hapusKemasanBeli(\'' + k.id + '\')">🗑</button>';
+      }
+      html += '<tr><td>' + k.nama + '</td><td>' + k.stok + '</td><td>' + (k.volumeMl || 0) + '</td><td>' + rupiah(k.hargaPerUnit) + '</td><td>' + aksi + '</td></tr>';
+    }
+  }
+  document.getElementById('kemasanStokTbody').innerHTML = html;
 }
 
 function tambahKemasanStok() {
   if (userRole !== 'admin-full') return;
   modal('Tambah Kemasan',
-    `<div class="form-group"><label>Nama</label><input id="mNama"></div>
-     <div class="form-group"><label>Volume mL</label><input id="mVol" type="number"></div>
-     <div class="form-group"><label>Stok</label><input id="mStok" type="number"></div>
-     <div class="form-group"><label>Harga/unit</label><input id="mHarga" type="number"></div>`,
-    () => {
+    '<div class="form-group"><label>Nama</label><input id="mNama"></div>' +
+    '<div class="form-group"><label>Volume mL</label><input id="mVol" type="number"></div>' +
+    '<div class="form-group"><label>Stok</label><input id="mStok" type="number"></div>' +
+    '<div class="form-group"><label>Harga/unit</label><input id="mHarga" type="number"></div>',
+    function() {
       data.kemasanBeli.push({
         id: genId(),
         nama: document.getElementById('mNama').value.trim(),
@@ -738,12 +826,12 @@ function tambahKemasanStok() {
 
 function editStokKemasan(id) {
   if (userRole !== 'admin-full') return;
-  let k = getKemasan(id);
+  var k = getKemasan(id);
   if (!k) return;
   modal('Edit Kemasan',
-    `<div class="form-group"><label>Stok</label><input id="mStok" type="number" value="${k.stok}"></div>
-     <div class="form-group"><label>Harga/unit</label><input id="mHarga" type="number" value="${k.hargaPerUnit}"></div>`,
-    () => {
+    '<div class="form-group"><label>Stok</label><input id="mStok" type="number" value="' + k.stok + '"></div>' +
+    '<div class="form-group"><label>Harga/unit</label><input id="mHarga" type="number" value="' + k.hargaPerUnit + '"></div>',
+    function() {
       k.stok = +document.getElementById('mStok').value || 0;
       k.hargaPerUnit = +document.getElementById('mHarga').value || 0;
       renderAll(true);
@@ -754,96 +842,127 @@ function editStokKemasan(id) {
 function hapusKemasanBeli(id) {
   if (userRole !== 'admin-full') return;
   if (confirm('Hapus kemasan?')) {
-    data.kemasanBeli = data.kemasanBeli.filter(x => x.id !== id);
+    data.kemasanBeli = data.kemasanBeli.filter(function(x) { return x.id !== id; });
     logAudit('delete', 'kemasan', id, 'Kemasan dihapus');
     renderAll(true);
   }
 }
 
 // ============================================================
-// PEMBELIAN BAHAN (multi-item) - disederhanakan tampilannya
+// PEMBELIAN BAHAN (SEDERHANA)
 // ============================================================
 function purchaseShippingBasis(item) {
-  const b = getBahan(item?.bahanId);
+  var b = getBahan(item?.bahanId);
   if (!b) return 0;
   return Math.max(0, Number(item?.qty) || 0);
 }
 function allocatePurchaseShipping(items, ongkir) {
-  const ship = Math.max(0, Number(ongkir) || 0);
-  const basisTotal = items.reduce((s, i) => s + purchaseShippingBasis(i), 0);
-  return items.map(i => {
-    const basis = purchaseShippingBasis(i);
-    const alloc = basisTotal > 0 ? ship * basis / basisTotal : 0;
-    return { ...i, ongkirAllocated: alloc };
-  });
+  var ship = Math.max(0, Number(ongkir) || 0);
+  var basisTotal = 0;
+  for (var i = 0; i < items.length; i++) {
+    basisTotal += purchaseShippingBasis(items[i]);
+  }
+  var result = [];
+  for (var j = 0; j < items.length; j++) {
+    var basis = purchaseShippingBasis(items[j]);
+    var alloc = basisTotal > 0 ? ship * basis / basisTotal : 0;
+    result.push({ ...items[j], ongkirAllocated: alloc });
+  }
+  return result;
 }
-function purchaseRowHtml(index = 1, item = null) {
-  const bahanId = item?.bahanId || data.bahan[0]?.id || '';
-  const ket = item?.keterangan || '';
-  const bahan = data.bahan.find(b => b.id === bahanId);
-  const unit = bahan?.satuanDasar || 'unit';
-  return `<div class="purchase-row" style="border:2px solid #d7e6e4;border-radius:14px;padding:14px;margin-bottom:12px;background:#f8fcfb;box-shadow:0 2px 8px rgba(0,0,0,.04)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <b style="color:#126f69">🧪 BAHAN ${index}</b>
-      ${index > 1 ? `<button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.purchase-row').remove();renumberPurchaseRows()">Hapus bahan</button>` : ''}
-    </div>
-    <div class="form-group"><label>Bahan</label><select class="pb" onchange="updatePurchaseUnit(this)">${data.bahan.map(b => `<option value="${b.id}" ${b.id === bahanId ? 'selected' : ''}>${escapeHtml(b.nama)} (${escapeHtml(b.satuanDasar || 'unit')})</option>`).join('')}</select></div>
-    <div class="form-group"><label>Qty <span class="purchase-unit-label">(${escapeHtml(unit)})</span></label><div style="display:flex;gap:8px;align-items:center"><input class="pq" type="number" step=".01" value="${item ? Number(item.qty) || '' : ''}" style="flex:1" oninput="renderShippingPreview()"><b class="purchase-unit-badge" style="min-width:42px;text-align:center;color:#126f69;background:#e8f5f3;border-radius:8px;padding:9px 8px">${escapeHtml(unit)}</b></div></div>
-    <div class="form-group"><label>Harga Bahan Total (Rp)</label><input class="ph" type="number" step="1" value="${item ? Number(item.harga) || '' : ''}"></div>
-    <div class="form-group"><label>Keterangan / Supplier / Jenis</label><input class="pket" type="text" value="${escapeHtml(ket)}" placeholder="Contoh: Supplier ABC / Texapon KAO / Grade tertentu"></div>
-  </div>`;
+function purchaseRowHtml(index, item) {
+  index = index || 1;
+  item = item || null;
+  var bahanId = item?.bahanId || data.bahan[0]?.id || '';
+  var ket = item?.keterangan || '';
+  var bahan = data.bahan.find(function(b) { return b.id === bahanId; });
+  var unit = bahan?.satuanDasar || 'unit';
+  var opts = '';
+  var bahanList = data.bahan || [];
+  for (var i = 0; i < bahanList.length; i++) {
+    var b = bahanList[i];
+    var sel = b.id === bahanId ? 'selected' : '';
+    opts += '<option value="' + b.id + '" ' + sel + '>' + escapeHtml(b.nama) + ' (' + escapeHtml(b.satuanDasar || 'unit') + ')</option>';
+  }
+  var qtyVal = item ? Number(item.qty) || '' : '';
+  var hargaVal = item ? Number(item.harga) || '' : '';
+  var hapusBtn = index > 1 ? '<button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'.purchase-row\').remove();renumberPurchaseRows()">Hapus bahan</button>' : '';
+  return '<div class="purchase-row" style="border:2px solid #d7e6e4;border-radius:14px;padding:14px;margin-bottom:12px;background:#f8fcfb;box-shadow:0 2px 8px rgba(0,0,0,.04)">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+      '<b style="color:#126f69">🧪 BAHAN ' + index + '</b>' +
+      hapusBtn +
+    '</div>' +
+    '<div class="form-group"><label>Bahan</label><select class="pb" onchange="updatePurchaseUnit(this)">' + opts + '</select></div>' +
+    '<div class="form-group"><label>Qty <span class="purchase-unit-label">(' + escapeHtml(unit) + ')</span></label><div style="display:flex;gap:8px;align-items:center"><input class="pq" type="number" step=".01" value="' + qtyVal + '" style="flex:1" oninput="renderShippingPreview()"><b class="purchase-unit-badge" style="min-width:42px;text-align:center;color:#126f69;background:#e8f5f3;border-radius:8px;padding:9px 8px">' + escapeHtml(unit) + '</b></div></div>' +
+    '<div class="form-group"><label>Harga Bahan Total (Rp)</label><input class="ph" type="number" step="1" value="' + hargaVal + '"></div>' +
+    '<div class="form-group"><label>Keterangan / Supplier / Jenis</label><input class="pket" type="text" value="' + escapeHtml(ket) + '" placeholder="Contoh: Supplier ABC / Texapon KAO / Grade tertentu"></div>' +
+  '</div>';
 }
 function updatePurchaseUnit(select) {
-  const row = select.closest('.purchase-row');
-  const b = data.bahan.find(x => x.id === select.value);
-  const unit = b?.satuanDasar || 'unit';
-  const label = row?.querySelector('.purchase-unit-label');
-  const badge = row?.querySelector('.purchase-unit-badge');
-  if (label) label.textContent = `(${unit})`;
+  var row = select.closest('.purchase-row');
+  var b = data.bahan.find(function(x) { return x.id === select.value; });
+  var unit = b?.satuanDasar || 'unit';
+  var label = row?.querySelector('.purchase-unit-label');
+  var badge = row?.querySelector('.purchase-unit-badge');
+  if (label) label.textContent = '(' + unit + ')';
   if (badge) badge.textContent = unit;
 }
 function readPurchaseRows() {
-  return [...document.querySelectorAll('#purchaseItems .purchase-row')].map(r => ({
-    bahanId: r.querySelector('.pb')?.value || '',
-    qty: Math.max(0, Number(r.querySelector('.pq')?.value) || 0),
-    harga: Math.max(0, Number(r.querySelector('.ph')?.value) || 0),
-    keterangan: r.querySelector('.pket')?.value.trim() || ''
-  })).filter(x => x.bahanId && x.qty > 0);
+  var rows = document.querySelectorAll('#purchaseItems .purchase-row');
+  var result = [];
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var bahanId = r.querySelector('.pb')?.value || '';
+    var qty = Math.max(0, Number(r.querySelector('.pq')?.value) || 0);
+    var harga = Math.max(0, Number(r.querySelector('.ph')?.value) || 0);
+    var ket = r.querySelector('.pket')?.value.trim() || '';
+    if (bahanId && qty > 0) {
+      result.push({ bahanId: bahanId, qty: qty, harga: harga, keterangan: ket });
+    }
+  }
+  return result;
 }
 function renderShippingPreview() {
-  const box = document.getElementById('purchaseShippingPreview');
-  const input = document.getElementById('pOngkir');
+  var box = document.getElementById('purchaseShippingPreview');
+  var input = document.getElementById('pOngkir');
   if (!box || !input) return;
-  const rows = readPurchaseRows();
-  const ongkir = Math.max(0, Number(input.value) || 0);
+  var rows = readPurchaseRows();
+  var ongkir = Math.max(0, Number(input.value) || 0);
   if (!rows.length || ongkir <= 0) { box.innerHTML = ''; box.style.display = 'none'; return; }
-  const allocated = allocatePurchaseShipping(rows, ongkir);
+  var allocated = allocatePurchaseShipping(rows, ongkir);
   box.style.display = 'block';
-  box.innerHTML = `<div class="small"><b>📦 Pembagian ongkos kirim</b> berdasarkan proporsi jumlah satuan dasar. Total ongkir: <b>${rupiah(ongkir)}</b></div><div class="small" style="margin-top:6px">${allocated.map(i => { const b = getBahan(i.bahanId); return `<div>${escapeHtml(b?.nama || '-')}: <b>${rupiah(i.ongkirAllocated)}</b></div>`; }).join('')}</div>`;
+  var html = '<div class="small"><b>📦 Pembagian ongkos kirim</b> berdasarkan proporsi jumlah satuan dasar. Total ongkir: <b>' + rupiah(ongkir) + '</b></div><div class="small" style="margin-top:6px">';
+  for (var i = 0; i < allocated.length; i++) {
+    var b = getBahan(allocated[i].bahanId);
+    html += '<div>' + escapeHtml(b?.nama || '-') + ': <b>' + rupiah(allocated[i].ongkirAllocated) + '</b></div>';
+  }
+  html += '</div>';
+  box.innerHTML = html;
 }
 function tambahPembelianBahan() {
   modal('Pembelian Bahan',
-    `<div class="small" style="margin-bottom:12px">Kamu bisa membeli beberapa bahan sekaligus. Setiap bahan dipisahkan dalam kotak sendiri agar tidak tertukar.</div><div id="purchaseItems">${purchaseRowHtml(1)}</div><button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button><div class="form-group" style="margin-top:12px"><label>Ongkos Kirim (Rp)</label><input id="pOngkir" type="number" step="1" value="0" oninput="renderShippingPreview()"><div id="purchaseShippingPreview" class="info-card" style="display:none;margin-top:8px;padding:10px"></div></div><div class="form-group"><label>Tanggal Pembelian</label><input id="pt" type="date" value="${todayStr()}"></div>`,
-    () => {
-      const rows = readPurchaseRows();
+    '<div class="small" style="margin-bottom:12px">Kamu bisa membeli beberapa bahan sekaligus. Setiap bahan dipisahkan dalam kotak sendiri agar tidak tertukar.</div><div id="purchaseItems">' + purchaseRowHtml(1) + '</div><button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button><div class="form-group" style="margin-top:12px"><label>Ongkos Kirim (Rp)</label><input id="pOngkir" type="number" step="1" value="0" oninput="renderShippingPreview()"><div id="purchaseShippingPreview" class="info-card" style="display:none;margin-top:8px;padding:10px"></div></div><div class="form-group"><label>Tanggal Pembelian</label><input id="pt" type="date" value="' + todayStr() + '"></div>',
+    function() {
+      var rows = readPurchaseRows();
       if (!rows.length) return alertx('Minimal satu bahan dengan Qty > 0', 'error');
-      const ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
-      const allocated = allocatePurchaseShipping(rows, ongkir);
-      let total = 0;
-      allocated.forEach(i => {
-        const b = getBahan(i.bahanId);
-        if (!b) return;
-        const q = i.qty;
-        const landed = (Number(i.harga) || 0) + (Number(i.ongkirAllocated) || 0);
-        const old = b.stok;
-        const oldVal = old * (b.hargaRataRata || 0);
+      var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
+      var allocated = allocatePurchaseShipping(rows, ongkir);
+      var total = 0;
+      for (var i = 0; i < allocated.length; i++) {
+        var item = allocated[i];
+        var b = getBahan(item.bahanId);
+        if (!b) continue;
+        var q = item.qty;
+        var landed = (Number(item.harga) || 0) + (Number(item.ongkirAllocated) || 0);
+        var old = b.stok;
+        var oldVal = old * (b.hargaRataRata || 0);
         b.stok += q;
         b.hargaRataRata = b.stok > 0 ? (oldVal + landed) / b.stok : 0;
         total += landed;
-      });
-      const id = genId();
-      const tgl = document.getElementById('pt').value || todayStr();
-      data.pembelianBahan.push({ id, tanggal: tgl, total, ongkosKirim: ongkir, items: allocated });
+      }
+      var id = genId();
+      var tgl = document.getElementById('pt').value || todayStr();
+      data.pembelianBahan.push({ id: id, tanggal: tgl, total: total, ongkosKirim: ongkir, items: allocated });
       data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian bahan baku', jumlah: total, tanggal: tgl });
       renderAll(true);
       alertx('Pembelian tersimpan');
@@ -851,100 +970,117 @@ function tambahPembelianBahan() {
   );
 }
 function addPurchaseRow() {
-  let wrap = document.getElementById('purchaseItems');
-  let index = wrap.querySelectorAll('.purchase-row').length + 1;
+  var wrap = document.getElementById('purchaseItems');
+  var index = wrap.querySelectorAll('.purchase-row').length + 1;
   wrap.insertAdjacentHTML('beforeend', purchaseRowHtml(index));
   renumberPurchaseRows();
 }
 function renumberPurchaseRows() {
-  document.querySelectorAll('#purchaseItems .purchase-row').forEach((row, i) => {
-    let title = row.querySelector('b');
+  var rows = document.querySelectorAll('#purchaseItems .purchase-row');
+  for (var i = 0; i < rows.length; i++) {
+    var title = rows[i].querySelector('b');
     if (title) title.textContent = '🧪 BAHAN ' + (i + 1);
-    let btn = row.querySelector('.btn-danger');
+    var btn = rows[i].querySelector('.btn-danger');
     if (btn) btn.style.display = i === 0 ? 'none' : 'inline-block';
-  });
+  }
   renderShippingPreview();
 }
 function hapusPembelianBahan(id) {
   if (userRole !== 'admin-full') return;
-  const p = data.pembelianBahan.find(x => x.id === id);
+  var p = data.pembelianBahan.find(function(x) { return x.id === id; });
   if (!p) return;
-  if (!confirm(`Hapus pembelian ${fmtDate(p.tanggal)} sebesar ${rupiah(p.total)}?\n\nStok bahan dan pengeluaran kas akan dikembalikan.`)) return;
-  (p.items || []).forEach(i => {
-    const b = getBahan(i.bahanId);
-    const q = Number(i.qty) || 0;
-    const h = Number(i.harga) || 0;
-    const ship = Number(i.ongkirAllocated) || 0;
-    if (!b || q <= 0) return;
-    const stokLama = Number(b.stok) || 0;
-    const nilaiLama = stokLama * (Number(b.hargaRataRata) || 0);
-    const stokBaru = Math.max(0, stokLama - q);
-    const nilaiBaru = Math.max(0, nilaiLama - h - ship);
+  if (!confirm('Hapus pembelian ' + fmtDate(p.tanggal) + ' sebesar ' + rupiah(p.total) + '?\n\nStok bahan dan pengeluaran kas akan dikembalikan.')) return;
+  var items = p.items || [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var b = getBahan(item.bahanId);
+    if (!b) continue;
+    var q = Number(item.qty) || 0;
+    var h = Number(item.harga) || 0;
+    var ship = Number(item.ongkirAllocated) || 0;
+    if (q <= 0) continue;
+    var stokLama = Number(b.stok) || 0;
+    var nilaiLama = stokLama * (Number(b.hargaRataRata) || 0);
+    var stokBaru = Math.max(0, stokLama - q);
+    var nilaiBaru = Math.max(0, nilaiLama - h - ship);
     b.stok = stokBaru;
     b.hargaRataRata = stokBaru > 0 ? nilaiBaru / stokBaru : 0;
-  });
-  data.pembelianBahan = data.pembelianBahan.filter(x => x.id !== id);
-  data.keuangan.pengeluaran = (data.keuangan.pengeluaran || []).filter(x => x.sourceId !== id);
-  data.auditLogs.push({ id: genId(), timestamp: new Date().toISOString(), user: currentUser.email, action: 'Hapus pembelian bahan', collection: 'pembelianBahan', docId: id, changes: `Pembelian ${id} dihapus sebesar ${p.total || 0}` });
+  }
+  data.pembelianBahan = data.pembelianBahan.filter(function(x) { return x.id !== id; });
+  data.keuangan.pengeluaran = (data.keuangan.pengeluaran || []).filter(function(x) { return x.sourceId !== id; });
+  data.auditLogs.push({ id: genId(), timestamp: new Date().toISOString(), user: currentUser.email, action: 'Hapus pembelian bahan', collection: 'pembelianBahan', docId: id, changes: 'Pembelian ' + id + ' dihapus sebesar ' + (p.total || 0) });
   renderAll(true);
   alertx('Pembelian dihapus dan stok/kas dikembalikan');
 }
 function editPembelianBahan(id) {
   if (userRole !== 'admin-full') return;
-  const p = data.pembelianBahan.find(x => x.id === id);
+  var p = data.pembelianBahan.find(function(x) { return x.id === id; });
   if (!p) return;
-  const items = p.items || [];
-  const rows = items.map((i, idx) => purchaseRowHtml(idx + 1, i).replace(/class="purchase-row"/, 'class="purchase-row edit-purchase-row"')).join('');
+  var items = p.items || [];
+  var rows = '';
+  for (var i = 0; i < items.length; i++) {
+    rows += purchaseRowHtml(i + 1, items[i]).replace(/class="purchase-row"/, 'class="purchase-row edit-purchase-row"');
+  }
   modal('Edit Pembelian',
-    `<div class="small" style="margin-bottom:12px">Koreksi Qty, harga, keterangan, ongkos kirim, atau tanggal. Ongkos kirim dibagi otomatis sesuai proporsi jumlah satuan dasar.</div><div id="purchaseItems">${rows}</div><button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button><div class="form-group" style="margin-top:12px"><label>Ongkos Kirim (Rp)</label><input id="pOngkir" type="number" step="1" value="${Number(p.ongkosKirim) || 0}" oninput="renderShippingPreview()"><div id="purchaseShippingPreview" class="info-card" style="margin-top:8px;padding:10px"></div></div><div class="form-group"><label>Tanggal Pembelian</label><input id="ept" type="date" value="${p.tanggal || todayStr()}"></div>`,
-    () => {
-      const rowsNow = readPurchaseRows();
+    '<div class="small" style="margin-bottom:12px">Koreksi Qty, harga, keterangan, ongkos kirim, atau tanggal. Ongkos kirim dibagi otomatis sesuai proporsi jumlah satuan dasar.</div><div id="purchaseItems">' + rows + '</div><button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button><div class="form-group" style="margin-top:12px"><label>Ongkos Kirim (Rp)</label><input id="pOngkir" type="number" step="1" value="' + (Number(p.ongkosKirim) || 0) + '" oninput="renderShippingPreview()"><div id="purchaseShippingPreview" class="info-card" style="margin-top:8px;padding:10px"></div></div><div class="form-group"><label>Tanggal Pembelian</label><input id="ept" type="date" value="' + (p.tanggal || todayStr()) + '"></div>',
+    function() {
+      var rowsNow = readPurchaseRows();
       if (!rowsNow.length) return alertx('Minimal satu bahan harus memiliki Qty > 0', 'error');
-      const ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
-      const newItems = allocatePurchaseShipping(rowsNow, ongkir);
+      var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
+      var newItems = allocatePurchaseShipping(rowsNow, ongkir);
 
-      // Rollback stok lama
-      const groupedOld = {};
-      items.forEach(i => {
-        if (!groupedOld[i.bahanId]) groupedOld[i.bahanId] = { qty: 0, harga: 0 };
-        groupedOld[i.bahanId].qty += Number(i.qty) || 0;
-        groupedOld[i.bahanId].harga += (Number(i.harga) || 0) + (Number(i.ongkirAllocated) || 0);
-      });
-      Object.entries(groupedOld).forEach(([bid, v]) => {
-        const b = getBahan(bid);
-        if (!b) return;
-        const stok = Number(b.stok) || 0;
-        const avg = Number(b.hargaRataRata) || 0;
-        const baseStok = Math.max(0, stok - v.qty);
-        const baseValue = Math.max(0, stok * avg - v.harga);
+      var groupedOld = {};
+      var oldItems = p.items || [];
+      for (var i = 0; i < oldItems.length; i++) {
+        var oi = oldItems[i];
+        if (!groupedOld[oi.bahanId]) groupedOld[oi.bahanId] = { qty: 0, harga: 0 };
+        groupedOld[oi.bahanId].qty += Number(oi.qty) || 0;
+        groupedOld[oi.bahanId].harga += (Number(oi.harga) || 0) + (Number(oi.ongkirAllocated) || 0);
+      }
+      var bidList = Object.keys(groupedOld);
+      for (var i = 0; i < bidList.length; i++) {
+        var bid = bidList[i];
+        var v = groupedOld[bid];
+        var b = getBahan(bid);
+        if (!b) continue;
+        var stok = Number(b.stok) || 0;
+        var avg = Number(b.hargaRataRata) || 0;
+        var baseStok = Math.max(0, stok - v.qty);
+        var baseValue = Math.max(0, stok * avg - v.harga);
         b.stok = baseStok;
         b.hargaRataRata = baseStok > 0 ? baseValue / baseStok : 0;
-      });
+      }
 
-      // Apply new items
-      const groupedNew = {};
-      newItems.forEach(i => {
-        if (!groupedNew[i.bahanId]) groupedNew[i.bahanId] = { qty: 0, harga: 0 };
-        groupedNew[i.bahanId].qty += i.qty;
-        groupedNew[i.bahanId].harga += (Number(i.harga) || 0) + (Number(i.ongkirAllocated) || 0);
-      });
-      Object.entries(groupedNew).forEach(([bid, v]) => {
-        const b = getBahan(bid);
-        if (!b) return;
-        const oldStok = Number(b.stok) || 0;
-        const oldValue = oldStok * (Number(b.hargaRataRata) || 0);
-        b.stok = oldStok + v.qty;
-        b.hargaRataRata = b.stok > 0 ? (oldValue + v.harga) / b.stok : 0;
-      });
+      var groupedNew = {};
+      for (var i = 0; i < newItems.length; i++) {
+        var ni = newItems[i];
+        if (!groupedNew[ni.bahanId]) groupedNew[ni.bahanId] = { qty: 0, harga: 0 };
+        groupedNew[ni.bahanId].qty += ni.qty;
+        groupedNew[ni.bahanId].harga += (Number(ni.harga) || 0) + (Number(ni.ongkirAllocated) || 0);
+      }
+      var nbidList = Object.keys(groupedNew);
+      for (var i = 0; i < nbidList.length; i++) {
+        var nbid = nbidList[i];
+        var nv = groupedNew[nbid];
+        var nb = getBahan(nbid);
+        if (!nb) continue;
+        var oldStok = Number(nb.stok) || 0;
+        var oldValue = oldStok * (Number(nb.hargaRataRata) || 0);
+        nb.stok = oldStok + nv.qty;
+        nb.hargaRataRata = nb.stok > 0 ? (oldValue + nv.harga) / nb.stok : 0;
+      }
 
-      const total = newItems.reduce((s, i) => s + (Number(i.harga) || 0) + (Number(i.ongkirAllocated) || 0), 0);
+      var total = 0;
+      for (var i = 0; i < newItems.length; i++) {
+        total += (Number(newItems[i].harga) || 0) + (Number(newItems[i].ongkirAllocated) || 0);
+      }
       p.items = newItems;
       p.total = total;
       p.ongkosKirim = ongkir;
       p.tanggal = document.getElementById('ept').value || todayStr();
-      const out = (data.keuangan.pengeluaran || []).find(x => x.sourceId === id);
+      var out = (data.keuangan.pengeluaran || []).find(function(x) { return x.sourceId === id; });
       if (out) { out.jumlah = total; out.tanggal = p.tanggal; } else data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian bahan baku', jumlah: total, tanggal: p.tanggal });
-      logAudit('edit', 'pembelianBahan', id, `Pembelian diperbarui menjadi ${total}, ongkir ${ongkir}`);
+      logAudit('edit', 'pembelianBahan', id, 'Pembelian diperbarui menjadi ' + total + ', ongkir ' + ongkir);
       renderAll(true);
       alertx('Pembelian berhasil diedit');
     }
@@ -953,93 +1089,153 @@ function editPembelianBahan(id) {
 }
 
 function renderPembelian() {
-  const rows = [...(data.pembelianBahan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || ''))).map(p => {
-    const items = (p.items || []).map(i => {
-      const b = getBahan(i.bahanId);
-      const ship = Number(i.ongkirAllocated) || 0;
-      return `<div style="margin-bottom:7px"><b>${escapeHtml(b?.nama || '-')}</b> — ${Number(i.qty || 0).toLocaleString('id-ID')} ${escapeHtml(b?.satuanDasar || '')}<div class="small">${escapeHtml(i.keterangan || 'Tanpa keterangan')}${ship > 0 ? ` · Alokasi ongkir ${rupiah(ship)}` : ''}</div></div>`;
-    }).join('');
-    const ongkir = Number(p.ongkosKirim) || 0;
-    return `<tr><td>${fmtDate(p.tanggal)}</td><td>${rupiah(p.total)}</td><td>${ongkir > 0 ? rupiah(ongkir) : '-'}</td><td>${items || '-'}</td><td>${userRole === 'admin-full' ? `<button class="btn btn-warning btn-sm" onclick="editPembelianBahan('${p.id}')">✏ Edit</button> <button class="btn btn-danger btn-sm" onclick="hapusPembelianBahan('${p.id}')">🗑 Hapus</button>` : '-'}</td></tr>`;
-  }).join('');
-  document.getElementById('riwayatPembelian').innerHTML = `<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Total</th><th>Ongkir</th><th>Bahan & Keterangan</th><th>Aksi</th></tr></thead><tbody>${rows || '<tr><td colspan="5">Belum ada pembelian.</td></tr>'}</tbody></table></div>`;
+  var arr = (data.pembelianBahan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var html = '';
+  if (arr.length === 0) {
+    html = '<tr><td colspan="5">Belum ada pembelian.</td></tr>';
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      var p = arr[i];
+      var itemsHtml = '';
+      var items = p.items || [];
+      for (var j = 0; j < items.length; j++) {
+        var item = items[j];
+        var b = getBahan(item.bahanId);
+        var ship = Number(item.ongkirAllocated) || 0;
+        itemsHtml += '<div style="margin-bottom:7px"><b>' + escapeHtml(b?.nama || '-') + '</b> — ' + Number(item.qty || 0).toLocaleString('id-ID') + ' ' + escapeHtml(b?.satuanDasar || '') + '<div class="small">' + escapeHtml(item.keterangan || 'Tanpa keterangan') + (ship > 0 ? ' · Alokasi ongkir ' + rupiah(ship) : '') + '</div></div>';
+      }
+      var ongkir = Number(p.ongkosKirim) || 0;
+      var aksi = '-';
+      if (userRole === 'admin-full') {
+        aksi = '<button class="btn btn-warning btn-sm" onclick="editPembelianBahan(\'' + p.id + '\')">✏ Edit</button> <button class="btn btn-danger btn-sm" onclick="hapusPembelianBahan(\'' + p.id + '\')">🗑 Hapus</button>';
+      }
+      html += '<tr><td>' + fmtDate(p.tanggal) + '</td><td>' + rupiah(p.total) + '</td><td>' + (ongkir > 0 ? rupiah(ongkir) : '-') + '</td><td>' + (itemsHtml || '-') + '</td><td>' + aksi + '</td></tr>';
+    }
+  }
+  document.getElementById('riwayatPembelian').innerHTML = '<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Total</th><th>Ongkir</th><th>Bahan & Keterangan</th><th>Aksi</th></tr></thead><tbody>' + html + '</tbody></table></div>';
 }
 
 // ============================================================
 // FORMULASI
 // ============================================================
 function renderFormulasi() {
-  document.getElementById('formTbody').innerHTML = (data.formulasi || []).map(f =>
-    `<tr><td>${f.nama}</td><td>${f.bj}</td><td>${(f.caraPembuatan || '').slice(0, 80)}...</td><td><button class="btn btn-warning btn-sm" onclick="editFormulasi('${f.id}')">✏</button> ${userRole === 'admin-full' ? `<button class="btn btn-danger btn-sm" onclick="hapusFormulasi('${f.id}')">🗑</button>` : ''}</td></tr>`
-  ).join('');
-  document.getElementById('produksiForm').innerHTML = (data.formulasi || []).map(f =>
-    `<option value="${f.id}">${f.nama}</option>`
-  ).join('');
+  var form = data.formulasi || [];
+  var html = '';
+  for (var i = 0; i < form.length; i++) {
+    var f = form[i];
+    var aksi = '<button class="btn btn-warning btn-sm" onclick="editFormulasi(\'' + f.id + '\')">✏</button>';
+    if (userRole === 'admin-full') {
+      aksi += ' <button class="btn btn-danger btn-sm" onclick="hapusFormulasi(\'' + f.id + '\')">🗑</button>';
+    }
+    var cara = (f.caraPembuatan || '').slice(0, 80) + '...';
+    html += '<tr><td>' + f.nama + '</td><td>' + f.bj + '</td><td>' + cara + '</td><td>' + aksi + '</td></tr>';
+  }
+  document.getElementById('formTbody').innerHTML = html;
+  var prodOpts = '';
+  for (var j = 0; j < form.length; j++) {
+    prodOpts += '<option value="' + form[j].id + '">' + form[j].nama + '</option>';
+  }
+  document.getElementById('produksiForm').innerHTML = prodOpts;
 }
 function tambahFormulasiDefault() {
   if (userRole !== 'admin-full') return;
-  let f = defaultFormula()[0];
-  if (!data.formulasi.some(x => x.nama === f.nama)) {
-    data.formulasi.push({ ...f, id: genId() });
+  var f = defaultFormula()[0];
+  if (!data.formulasi.some(function(x) { return x.nama === f.nama; })) {
+    data.formulasi.push({ id: genId(), nama: f.nama, bj: f.bj, caraPembuatan: f.caraPembuatan, items: f.items });
     renderAll(true);
   }
 }
 function formulaItemEditor(items) {
-  let list = Array.isArray(items) ? items : [];
-  let opts = data.bahan.map(b => `<option value="${b.id}">${escapeHtml(b.nama)} (${b.satuanDasar})</option>`).join('');
-  return `<div class="form-group"><label>Komposisi Bahan</label><div id="formulaItemsEditor">${list.length ? list.map((it, i) =>
-    `<div class="formula-item-edit" data-index="${i}" style="display:grid;grid-template-columns:1.7fr .8fr .6fr;gap:8px;align-items:end;margin-bottom:10px;padding:10px;border:1px solid #d7e6e4;border-radius:12px">
-      <div><label>Bahan</label><select class="fi-bahan">${data.bahan.map(b => `<option value="${b.id}" ${b.id === it.bahanId ? 'selected' : ''}>${escapeHtml(b.nama)} (${b.satuanDasar})</option>`).join('')}</select></div>
-      <div><label>Persentase (%)</label><input class="fi-persen" type="number" step="0.001" value="${Number(it.persen) || 0}"></div>
-      <div><label>Langkah</label><input class="fi-step" type="number" min="1" step="1" value="${Number(it.step) || i + 1}"></div>
-      <div style="grid-column:1/3"><label><input class="fi-larutan" type="checkbox" ${it.isLarutan ? 'checked' : ''} onchange="toggleFormulaLarutan(this)"> Bahan berupa larutan</label><div class="fi-konsentrasi-wrap" style="display:${it.isLarutan ? 'block' : 'none'};margin-top:6px"><label>Konsentrasi larutan (%)</label><input class="fi-konsentrasi" type="number" step="0.1" min="0" value="${Number(it.konsentrasiLarutan) || 0}" placeholder="Contoh: 20"></div></div>
-      <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.formula-item-edit').remove()">Hapus</button>
-    </div>`).join('') : '<div id="formulaItemsEmpty" class="small">Belum ada bahan.</div>'}</div><button type="button" class="btn btn-secondary btn-sm" onclick="tambahBarisFormulaItem()">＋ Tambah Bahan</button><div class="small" style="margin-top:6px">Persentase digunakan untuk menghitung kebutuhan batch berdasarkan berat total (BJ × liter).</div></div>`;
+  items = items || [];
+  var opts = '';
+  var bahanList = data.bahan || [];
+  for (var i = 0; i < bahanList.length; i++) {
+    var b = bahanList[i];
+    opts += '<option value="' + b.id + '">' + escapeHtml(b.nama) + ' (' + b.satuanDasar + ')</option>';
+  }
+  var listHtml = '';
+  if (items.length === 0) {
+    listHtml = '<div id="formulaItemsEmpty" class="small">Belum ada bahan.</div>';
+  } else {
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var konsentrasiDisplay = it.isLarutan ? 'block' : 'none';
+      var konsentrasiVal = Number(it.konsentrasiLarutan) || 0;
+      var checked = it.isLarutan ? 'checked' : '';
+      listHtml += '<div class="formula-item-edit" data-index="' + i + '" style="display:grid;grid-template-columns:1.7fr .8fr .6fr;gap:8px;align-items:end;margin-bottom:10px;padding:10px;border:1px solid #d7e6e4;border-radius:12px">' +
+        '<div><label>Bahan</label><select class="fi-bahan">' + opts.replace(/value="[^"]*"/g, function(m) {
+          var val = m.replace('value="', '').replace('"', '');
+          return val === it.bahanId ? 'value="' + val + '" selected' : m;
+        }) + '</select></div>' +
+        '<div><label>Persentase (%)</label><input class="fi-persen" type="number" step="0.001" value="' + (Number(it.persen) || 0) + '"></div>' +
+        '<div><label>Langkah</label><input class="fi-step" type="number" min="1" step="1" value="' + (Number(it.step) || i + 1) + '"></div>' +
+        '<div style="grid-column:1/3"><label><input class="fi-larutan" type="checkbox" ' + checked + ' onchange="toggleFormulaLarutan(this)"> Bahan berupa larutan</label><div class="fi-konsentrasi-wrap" style="display:' + konsentrasiDisplay + ';margin-top:6px"><label>Konsentrasi larutan (%)</label><input class="fi-konsentrasi" type="number" step="0.1" min="0" value="' + konsentrasiVal + '" placeholder="Contoh: 20"></div></div>' +
+        '<button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'.formula-item-edit\').remove()">Hapus</button>' +
+      '</div>';
+    }
+  }
+  return '<div class="form-group"><label>Komposisi Bahan</label><div id="formulaItemsEditor">' + listHtml + '</div><button type="button" class="btn btn-secondary btn-sm" onclick="tambahBarisFormulaItem()">＋ Tambah Bahan</button><div class="small" style="margin-top:6px">Persentase digunakan untuk menghitung kebutuhan batch berdasarkan berat total (BJ × liter).</div></div>';
 }
 function toggleFormulaLarutan(cb) {
-  const row = cb?.closest('.formula-item-edit');
-  const wrap = row?.querySelector('.fi-konsentrasi-wrap');
+  var row = cb?.closest('.formula-item-edit');
+  var wrap = row?.querySelector('.fi-konsentrasi-wrap');
   if (!wrap) return;
   wrap.style.display = cb.checked ? 'block' : 'none';
-  if (!cb.checked) { const input = wrap.querySelector('.fi-konsentrasi'); if (input) input.value = '0'; }
+  if (!cb.checked) { var input = wrap.querySelector('.fi-konsentrasi'); if (input) input.value = '0'; }
 }
 function tambahBarisFormulaItem() {
-  let box = document.getElementById('formulaItemsEditor');
+  var box = document.getElementById('formulaItemsEditor');
   if (!box) return;
-  document.getElementById('formulaItemsEmpty')?.remove();
-  let i = box.querySelectorAll('.formula-item-edit').length;
-  let el = document.createElement('div');
+  var empty = document.getElementById('formulaItemsEmpty');
+  if (empty) empty.remove();
+  var i = box.querySelectorAll('.formula-item-edit').length;
+  var opts = '';
+  var bahanList = data.bahan || [];
+  for (var j = 0; j < bahanList.length; j++) {
+    opts += '<option value="' + bahanList[j].id + '">' + escapeHtml(bahanList[j].nama) + ' (' + bahanList[j].satuanDasar + ')</option>';
+  }
+  var el = document.createElement('div');
   el.className = 'formula-item-edit';
   el.style.cssText = 'display:grid;grid-template-columns:1.7fr .8fr .6fr;gap:8px;align-items:end;margin-bottom:10px;padding:10px;border:1px solid #d7e6e4;border-radius:12px';
-  el.innerHTML = `<div><label>Bahan</label><select class="fi-bahan">${data.bahan.map(b => `<option value="${b.id}">${escapeHtml(b.nama)} (${b.satuanDasar})</option>`).join('')}</select></div>
-    <div><label>Persentase (%)</label><input class="fi-persen" type="number" step="0.001" value="0"></div>
-    <div><label>Langkah</label><input class="fi-step" type="number" min="1" step="1" value="${i + 1}"></div>
-    <div style="grid-column:1/3"><label><input class="fi-larutan" type="checkbox" onchange="toggleFormulaLarutan(this)"> Bahan berupa larutan</label><div class="fi-konsentrasi-wrap" style="display:none;margin-top:6px"><label>Konsentrasi larutan (%)</label><input class="fi-konsentrasi" type="number" step="0.1" min="0" value="0" placeholder="Contoh: 20"></div></div>
-    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.formula-item-edit').remove()">Hapus</button>`;
+  el.innerHTML = '<div><label>Bahan</label><select class="fi-bahan">' + opts + '</select></div>' +
+    '<div><label>Persentase (%)</label><input class="fi-persen" type="number" step="0.001" value="0"></div>' +
+    '<div><label>Langkah</label><input class="fi-step" type="number" min="1" step="1" value="' + (i + 1) + '"></div>' +
+    '<div style="grid-column:1/3"><label><input class="fi-larutan" type="checkbox" onchange="toggleFormulaLarutan(this)"> Bahan berupa larutan</label><div class="fi-konsentrasi-wrap" style="display:none;margin-top:6px"><label>Konsentrasi larutan (%)</label><input class="fi-konsentrasi" type="number" step="0.1" min="0" value="0" placeholder="Contoh: 20"></div></div>' +
+    '<button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'.formula-item-edit\').remove()">Hapus</button>';
   box.appendChild(el);
 }
 function ambilFormulaItems() {
-  return [...document.querySelectorAll('#formulaItemsEditor .formula-item-edit')].map((row, i) => ({
-    bahanId: row.querySelector('.fi-bahan')?.value,
-    persen: Number(row.querySelector('.fi-persen')?.value) || 0,
-    step: Number(row.querySelector('.fi-step')?.value) || i + 1,
-    isLarutan: !!row.querySelector('.fi-larutan')?.checked,
-    konsentrasiLarutan: Number(row.querySelector('.fi-konsentrasi')?.value) || 0
-  })).filter(x => x.bahanId && x.persen > 0).sort((a, b) => a.step - b.step);
+  var rows = document.querySelectorAll('#formulaItemsEditor .formula-item-edit');
+  var result = [];
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var bahanId = row.querySelector('.fi-bahan')?.value;
+    var persen = Number(row.querySelector('.fi-persen')?.value) || 0;
+    var step = Number(row.querySelector('.fi-step')?.value) || i + 1;
+    var isLarutan = !!row.querySelector('.fi-larutan')?.checked;
+    var konsentrasiLarutan = Number(row.querySelector('.fi-konsentrasi')?.value) || 0;
+    if (bahanId && persen > 0) {
+      result.push({ bahanId: bahanId, persen: persen, step: step, isLarutan: isLarutan, konsentrasiLarutan: konsentrasiLarutan });
+    }
+  }
+  result.sort(function(a, b) { return a.step - b.step; });
+  return result;
 }
 function tambahFormulasi() {
   if (userRole !== 'admin-full') return;
   modal('Tambah Formulasi',
-    `<div class="form-group"><label>Nama</label><input id="fNama"></div>
-     <div class="form-group"><label>BJ</label><input id="fBj" type="number" step=".001" value="1.025"></div>
-     ${formulaItemEditor([])}
-     <div class="form-group"><label>Cara Pembuatan</label><textarea id="fCara" rows="8"></textarea></div>`,
-    () => {
-      let nama = document.getElementById('fNama').value.trim();
+    '<div class="form-group"><label>Nama</label><input id="fNama"></div>' +
+    '<div class="form-group"><label>BJ</label><input id="fBj" type="number" step=".001" value="1.025"></div>' +
+    formulaItemEditor([]) +
+    '<div class="form-group"><label>Cara Pembuatan</label><textarea id="fCara" rows="8"></textarea></div>',
+    function() {
+      var nama = document.getElementById('fNama').value.trim();
       if (!nama) return alertx('Nama formulasi wajib diisi', 'error');
       data.formulasi.push({
         id: genId(),
-        nama,
+        nama: nama,
         bj: +document.getElementById('fBj').value || 1.025,
         caraPembuatan: document.getElementById('fCara').value,
         items: ambilFormulaItems()
@@ -1049,18 +1245,18 @@ function tambahFormulasi() {
   );
 }
 function editFormulasi(id) {
-  let f = getForm(id);
+  var f = getForm(id);
   if (!f) return;
   modal('Edit Formulasi',
-    `<div class="form-group"><label>Nama</label><input id="fNama" value="${escapeHtml(f.nama)}"></div>
-     <div class="form-group"><label>BJ</label><input id="fBj" type="number" step=".001" value="${Number(f.bj) || 1.025}"></div>
-     ${formulaItemEditor(f.items || [])}
-     <div class="form-group"><label>Cara Pembuatan</label><textarea id="fCara" rows="8">${escapeHtml(f.caraPembuatan || '')}</textarea></div>
-     <div class="small">Perubahan formulasi berlaku untuk <b>batch yang dibuat setelah disimpan</b>. Batch lama tidak dihitung ulang.</div>`,
-    () => {
-      let nama = document.getElementById('fNama').value.trim();
+    '<div class="form-group"><label>Nama</label><input id="fNama" value="' + escapeHtml(f.nama) + '"></div>' +
+    '<div class="form-group"><label>BJ</label><input id="fBj" type="number" step=".001" value="' + (Number(f.bj) || 1.025) + '"></div>' +
+    formulaItemEditor(f.items || []) +
+    '<div class="form-group"><label>Cara Pembuatan</label><textarea id="fCara" rows="8">' + escapeHtml(f.caraPembuatan || '') + '</textarea></div>' +
+    '<div class="small">Perubahan formulasi berlaku untuk <b>batch yang dibuat setelah disimpan</b>. Batch lama tidak dihitung ulang.</div>',
+    function() {
+      var nama = document.getElementById('fNama').value.trim();
       if (!nama) return alertx('Nama formulasi wajib diisi', 'error');
-      let items = ambilFormulaItems();
+      var items = ambilFormulaItems();
       if (!items.length) return alertx('Minimal satu bahan harus diisi', 'error');
       f.nama = nama;
       f.bj = +document.getElementById('fBj').value || f.bj;
@@ -1074,40 +1270,61 @@ function editFormulasi(id) {
 }
 function hapusFormulasi(id) {
   if (userRole !== 'admin-full') return;
-  if (data.produksi.some(x => x.formulasiId === id)) return alertx('Formulasi sudah dipakai produksi dan tidak boleh dihapus. Edit formulasi jika perlu.', 'error');
+  var used = data.produksi.some(function(x) { return x.formulasiId === id; });
+  if (used) return alertx('Formulasi sudah dipakai produksi dan tidak boleh dihapus. Edit formulasi jika perlu.', 'error');
   if (confirm('Hapus formulasi?')) {
-    data.formulasi = data.formulasi.filter(x => x.id !== id);
+    data.formulasi = data.formulasi.filter(function(x) { return x.id !== id; });
     logAudit('delete', 'formulasi', id, 'Formulasi dihapus');
     renderAll(true);
   }
 }
 
 // ============================================================
-// PRODUKSI (BATCH) - dengan tabel komposisi rapi
+// PRODUKSI (BATCH) - FUNGSI UTAMA
 // ============================================================
 function calcNeeds(f, liter) {
   if (!f) return { totalBerat: 0, items: [], cost: 0, totalPersen: 0, declaredPersen: 0, autoAdjustedWater: false };
-  const totalBerat = Number(liter || 0) * (Number(f.bj) || 1.025);
-  let items = [];
-  let cost = 0;
-  let declaredPersen = (f.items || []).reduce((s, x) => s + (Number(x.persen) || 0), 0);
-  let effectiveItems = [...(f.items || [])];
+  var totalBerat = Number(liter || 0) * (Number(f.bj) || 1.025);
+  var items = [];
+  var cost = 0;
+  var declaredPersen = 0;
+  var fItems = f.items || [];
+  for (var i = 0; i < fItems.length; i++) {
+    declaredPersen += Number(fItems[i].persen) || 0;
+  }
+  var effectiveItems = fItems.slice();
   if (declaredPersen < 99.999999) {
-    const air = f.items?.find(x => getBahan(x.bahanId)?.nama?.trim().toLowerCase() === 'air');
+    var air = null;
+    for (var j = 0; j < fItems.length; j++) {
+      var b = getBahan(fItems[j].bahanId);
+      if (b && b.nama.trim().toLowerCase() === 'air') {
+        air = fItems[j];
+        break;
+      }
+    }
     if (air) {
-      effectiveItems = effectiveItems.map(x => x === air ? { ...x, persen: Number(x.persen || 0) + (100 - declaredPersen), isAdjustment: true } : x);
+      effectiveItems = effectiveItems.map(function(x) {
+        if (x === air) {
+          return { ...x, persen: Number(x.persen || 0) + (100 - declaredPersen), isAdjustment: true };
+        }
+        return x;
+      });
     }
   }
-  const totalPersen = effectiveItems.reduce((s, x) => s + (Number(x.persen) || 0), 0);
-  for (const it of effectiveItems) {
-    const b = getBahan(it.bahanId);
-    if (!b) continue;
-    const qty = totalBerat * (Number(it.persen) || 0) / 100;
-    const costItem = qty * (Number(b.hargaRataRata) || 0);
+  var totalPersen = 0;
+  for (var k = 0; k < effectiveItems.length; k++) {
+    totalPersen += Number(effectiveItems[k].persen) || 0;
+  }
+  for (var m = 0; m < effectiveItems.length; m++) {
+    var it = effectiveItems[m];
+    var bMat = getBahan(it.bahanId);
+    if (!bMat) continue;
+    var qty = totalBerat * (Number(it.persen) || 0) / 100;
+    var costItem = qty * (Number(bMat.hargaRataRata) || 0);
     cost += costItem;
     items.push({
       ...it,
-      bahan: b,
+      bahan: bMat,
       qty: qty,
       qtyLarutan: qty,
       qtyAktif: qty,
@@ -1115,78 +1332,87 @@ function calcNeeds(f, liter) {
       konsentrasiLarutan: it.isLarutan ? Number(it.konsentrasiLarutan) || 0 : 0
     });
   }
-  return { totalBerat, items, cost, totalPersen, declaredPersen, autoAdjustedWater: totalPersen > declaredPersen };
+  return { totalBerat: totalBerat, items: items, cost: cost, totalPersen: totalPersen, declaredPersen: declaredPersen, autoAdjustedWater: totalPersen > declaredPersen };
 }
 
 function batchCode(f, tanggal) {
-  const d = new Date(tanggal + 'T00:00:00');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const yy = String(d.getFullYear()).slice(-2);
-  const initials = (f.nama || 'SB').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase().padEnd(2, 'X');
-  const year = d.getFullYear();
-  const used = (data.produksi || []).filter(p => {
-    const q = new Date(p.tanggalPembuatan || p.createdAt);
+  var d = new Date(tanggal + 'T00:00:00');
+  var dd = String(d.getDate()).padStart(2, '0');
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var yy = String(d.getFullYear()).slice(-2);
+  var initials = (f.nama || 'SB').replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+  if (initials.length < 2) initials = initials + 'X';
+  var year = d.getFullYear();
+  var used = (data.produksi || []).filter(function(p) {
+    var q = new Date(p.tanggalPembuatan || p.createdAt);
     return q.getFullYear() === year && String(p.batchNo || '').toUpperCase().startsWith(initials + '-');
   });
-  const maxSeq = used.reduce((mx, p) => {
-    const m = String(p.batchNo || '').match(/-(\d+)$/);
-    return Math.max(mx, m ? Number(m[1]) : 0);
-  }, 0);
-  return `${initials}-${dd}${mm}${yy}-${String(maxSeq + 1).padStart(2, '0')}`;
+  var maxSeq = 0;
+  for (var i = 0; i < used.length; i++) {
+    var m = String(used[i].batchNo || '').match(/-(\d+)$/);
+    if (m) maxSeq = Math.max(maxSeq, Number(m[1]));
+  }
+  return initials + '-' + dd + mm + yy + '-' + String(maxSeq + 1).padStart(2, '0');
 }
 
 function renderCaraKerjaProduksi(f, l, c) {
-  const box = document.getElementById('produksiPreview');
+  var box = document.getElementById('produksiPreview');
   if (!box || !f || !c) return;
-  const items = (c.items || []).slice().sort((a, b) => (a.step || 0) - (b.step || 0));
+  var items = (c.items || []).slice().sort(function(a, b) { return (a.step || 0) - (b.step || 0); });
   
-  // Tabel komposisi bahan (tanpa kolom konsentrasi, ringkas)
-  let tableRows = items.map(x => {
-    const q = Number(x.qty) || 0;
-    const unit = String(x.bahan?.satuanDasar || '').toLowerCase();
-    const n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
-    const u = unit === 'l' ? 'mL' : 'gram';
-    const label = `${formatAngkaID(n)} ${u}`;
-    const persen = formatAngkaID(Number(x.persen) || 0);
-    const konsentrasi = x.isLarutan && x.konsentrasiLarutan ? ` (${formatAngkaID(x.konsentrasiLarutan)}%)` : '';
-    return `<tr><td>${escapeHtml(x.bahan?.nama || '-')}</td><td>${persen}%${konsentrasi}</td><td><strong>${label}</strong></td></tr>`;
-  }).join('');
+  var tableRows = '';
+  for (var i = 0; i < items.length; i++) {
+    var x = items[i];
+    var q = Number(x.qty) || 0;
+    var unit = String(x.bahan?.satuanDasar || '').toLowerCase();
+    var n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
+    var u = unit === 'l' ? 'mL' : 'gram';
+    var label = formatAngkaID(n) + ' ' + u;
+    var persen = formatAngkaID(Number(x.persen) || 0);
+    var konsentrasi = x.isLarutan && x.konsentrasiLarutan ? ' (' + formatAngkaID(x.konsentrasiLarutan) + '%)' : '';
+    tableRows += '<tr><td>' + escapeHtml(x.bahan?.nama || '-') + '</td><td>' + persen + '%' + konsentrasi + '</td><td><strong>' + label + '</strong></td></tr>';
+  }
 
-  // Instruksi detail
-  let instr = escapeHtml(String(f.caraPembuatan || ''));
-  let idx = 0;
-  instr = instr.replace(/\.\.\./g, () => {
-    const x = items[idx++];
+  var instr = escapeHtml(String(f.caraPembuatan || ''));
+  var idx = 0;
+  instr = instr.replace(/\.\.\./g, function() {
+    var x = items[idx++];
     if (!x) return '...';
-    const q = Number(x.qty) || 0;
-    const unit = String(x.bahan?.satuanDasar || '').toLowerCase();
-    const n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
-    return `<strong>${formatAngkaID(n)}</strong>`;
+    var q = Number(x.qty) || 0;
+    var unit = String(x.bahan?.satuanDasar || '').toLowerCase();
+    var n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
+    return '<strong>' + formatAngkaID(n) + '</strong>';
   });
 
-  box.innerHTML = `
-    <b>📐 Kebutuhan Batch ${formatAngkaID(l)} L — ${escapeHtml(f.nama)}</b>
-    ${c.autoAdjustedWater ? '<div class="small">Air penyesuaian otomatis ditambahkan sampai komposisi efektif 100%.</div>' : ''}
-    <div class="small">BJ ${formatAngkaID(f.bj)} kg/L · berat ${formatAngkaID(c.totalBerat)} kg · biaya bahan ${rupiah(c.cost)}</div>
-    
-    <div style="margin:12px 0;overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:300px">
-      <table class="compact-table" style="min-width:0;width:auto;font-size:0.78rem">
-        <thead><tr><th style="background:#e7f6f3;padding:6px 10px">Bahan</th><th style="background:#e7f6f3;padding:6px 10px">Komposisi</th><th style="background:#e7f6f3;padding:6px 10px">Takaran</th></tr></thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-    </div>
-
-    <div class="cara-buat"><b>CARA KERJA</b><br>${instr.replace(/\n/g, '<br>')}</div>
-  `;
+  box.innerHTML = 
+    '<b>📐 Kebutuhan Batch ' + formatAngkaID(l) + ' L — ' + escapeHtml(f.nama) + '</b>' +
+    (c.autoAdjustedWater ? '<div class="small">Air penyesuaian otomatis ditambahkan sampai komposisi efektif 100%.</div>' : '') +
+    '<div class="small">BJ ' + formatAngkaID(f.bj) + ' kg/L · berat ' + formatAngkaID(c.totalBerat) + ' kg · biaya bahan ' + rupiah(c.cost) + '</div>' +
+    '<div style="margin:12px 0;overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:300px">' +
+      '<table class="compact-table" style="min-width:0;width:auto;font-size:0.78rem">' +
+        '<thead><tr><th style="background:#e7f6f3;padding:6px 10px">Bahan</th><th style="background:#e7f6f3;padding:6px 10px">Komposisi</th><th style="background:#e7f6f3;padding:6px 10px">Takaran</th></tr></thead>' +
+        '<tbody>' + tableRows + '</tbody>' +
+      '</table>' +
+    '</div>' +
+    '<div class="cara-buat"><b>CARA KERJA</b><br>' + instr.replace(/\n/g, '<br>') + '</div>';
   box.style.display = 'block';
 }
 
 function toggleOpsManual() {
-  document.getElementById('opsManualGroup').style.display = document.getElementById('produksiOpsMode').value === 'manual' ? 'block' : 'none';
+  var group = document.getElementById('opsManualGroup');
+  var mode = document.getElementById('produksiOpsMode');
+  if (group && mode) {
+    group.style.display = mode.value === 'manual' ? 'block' : 'none';
+  }
 }
 
+// ============================================================
+// BUAT BATCH - TOMBLOL UTAMA (DIPERBAIKI)
+// ============================================================
 function buatProduksi() {
+  console.log('🚀 buatProduksi() dipanggil');
+  
+  // Cek akses
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) {
     alertx('Akses ditolak', 'error');
     return;
@@ -1196,20 +1422,24 @@ function buatProduksi() {
     return;
   }
 
-  const formSelect = document.getElementById('produksiForm');
-  const literInput = document.getElementById('produksiLiter');
-  const tglInput = document.getElementById('produksiTanggal');
-  const opsModeSelect = document.getElementById('produksiOpsMode');
-  const opsManualInput = document.getElementById('produksiOpsManual');
+  // Ambil elemen form
+  var formSelect = document.getElementById('produksiForm');
+  var literInput = document.getElementById('produksiLiter');
+  var tglInput = document.getElementById('produksiTanggal');
+  var opsModeSelect = document.getElementById('produksiOpsMode');
+  var opsManualInput = document.getElementById('produksiOpsManual');
 
   if (!formSelect || !literInput || !tglInput || !opsModeSelect || !opsManualInput) {
     alertx('Elemen formulir tidak ditemukan', 'error');
+    console.error('Elemen form tidak ditemukan');
     return;
   }
 
-  const fid = formSelect.value;
-  const l = Number(literInput.value) || 0;
-  const tgl = tglInput.value || todayStr();
+  var fid = formSelect.value;
+  var l = Number(literInput.value) || 0;
+  var tgl = tglInput.value || todayStr();
+
+  console.log('fid:', fid, 'l:', l, 'tgl:', tgl);
 
   if (!fid) {
     alertx('Pilih formulasi terlebih dahulu', 'error');
@@ -1220,40 +1450,54 @@ function buatProduksi() {
     return;
   }
 
-  const f = getForm(fid);
+  var f = getForm(fid);
   if (!f) {
     alertx('Formulasi tidak ditemukan', 'error');
     return;
   }
 
-  const c = calcNeeds(f, l);
+  console.log('Formulasi:', f.nama);
+
+  // Hitung kebutuhan
+  var c = calcNeeds(f, l);
+  console.log('Kebutuhan dihitung, totalPersen:', c.totalPersen);
+
   if (c.totalPersen > 100.001) {
-    alertx(`Total formulasi melebihi 100%. Saat ini ${formatAngkaID(c.totalPersen)}%. Periksa komposisi bahan.`, 'error');
+    alertx('Total formulasi melebihi 100%. Saat ini ' + formatAngkaID(c.totalPersen) + '%. Periksa komposisi bahan.', 'error');
     return;
   }
 
-  const bad = c.items.filter(x => x.bahan.stok + 1e-9 < x.qty);
+  // Cek stok
+  var bad = [];
+  for (var i = 0; i < c.items.length; i++) {
+    if (c.items[i].bahan.stok + 1e-9 < c.items[i].qty) {
+      bad.push(c.items[i].bahan.nama);
+    }
+  }
   if (bad.length) {
-    alertx('Stok tidak cukup: ' + bad.map(x => x.bahan.nama).join(', '), 'error');
+    alertx('Stok tidak cukup: ' + bad.join(', '), 'error');
     return;
   }
 
-  c.items.forEach(x => x.bahan.stok -= x.qty);
+  // Kurangi stok
+  for (var j = 0; j < c.items.length; j++) {
+    c.items[j].bahan.stok -= c.items[j].qty;
+  }
 
-  const opsMode = opsModeSelect.value;
-  let ops = 0;
+  // Biaya operasional
+  var opsMode = opsModeSelect.value;
+  var ops = 0;
   if (opsMode === 'manual') {
     ops = Number(opsManualInput.value) || 0;
   } else {
     ops = c.cost * (Number(opsMode) / 100);
   }
 
-  const formulaSnapshot = {
-    nama: f.nama,
-    bj: Number(f.bj) || 1.025,
-    caraPembuatan: f.caraPembuatan || '',
-    totalPersen: c.totalPersen,
-    items: c.items.map(x => ({
+  // Simpan snapshot formulasi
+  var snapshotItems = [];
+  for (var k = 0; k < c.items.length; k++) {
+    var x = c.items[k];
+    snapshotItems.push({
       bahanId: x.bahan.id,
       namaBahan: x.bahan.nama,
       satuanDasar: x.bahan.satuanDasar,
@@ -1264,74 +1508,107 @@ function buatProduksi() {
       qty: Number(x.qty) || 0,
       hargaRataRata: Number(x.bahan.hargaRataRata) || 0,
       cost: Number(x.cost) || 0
-    }))
+    });
+  }
+
+  var formulaSnapshot = {
+    nama: f.nama,
+    bj: Number(f.bj) || 1.025,
+    caraPembuatan: f.caraPembuatan || '',
+    totalPersen: c.totalPersen,
+    items: snapshotItems
   };
 
-  const id = genId();
-  const batchNo = batchCode(f, tgl);
-  data.produksi.push({
-    id,
-    batchNo,
+  var id = genId();
+  var batchNo = batchCode(f, tgl);
+  
+  var produksiEntry = {
+    id: id,
+    batchNo: batchNo,
     formulasiId: fid,
-    formulasiSnapshot,
+    formulasiSnapshot: formulaSnapshot,
     jumlahLiter: l,
     sisaLiter: l,
     bj: f.bj,
     biayaBahan: c.cost,
     biayaOperasional: ops,
-    opsMode,
+    opsMode: opsMode,
     tanggalPembuatan: tgl,
     createdAt: new Date().toISOString(),
     createdBy: currentUser.email
-  });
+  };
+
+  data.produksi.push(produksiEntry);
   logAudit('create', 'produksi', id, 'Batch ' + batchNo);
 
+  // Tampilkan preview
   renderCaraKerjaProduksi(f, l, c);
 
+  // Reset form
   literInput.value = '';
   opsModeSelect.value = '15';
   opsManualInput.value = '';
   toggleOpsManual();
 
   renderAll(true);
-  alertx('Batch berhasil dibuat: ' + batchNo);
+  alertx('✅ Batch berhasil dibuat: ' + batchNo);
+  console.log('✅ Batch berhasil dibuat:', batchNo);
 }
 
+// ============================================================
+// FUNGSI LAINNYA (PENGEMASAN, PENJUALAN, LAPORAN, DLL)
+// ============================================================
 function renderProduksi() {
-  const arr = [...(data.produksi || [])].sort((a, b) =>
-    String(b.tanggalPembuatan || '').localeCompare(String(a.tanggalPembuatan || '')) ||
-    String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
-  );
-  document.getElementById('produksiTbody').innerHTML = arr.map(p => {
-    const f = getForm(p.formulasiId);
-    const used = p.jumlahLiter - (p.sisaLiter || 0);
-    const status = used <= 0.001 ? 'Selesai' : 'Sebagian Dikemas';
-    return `<tr><td><b>${p.batchNo}</b></td><td>${fmtDate(p.tanggalPembuatan)}</td><td>${f?.nama || '-'}</td><td>${p.jumlahLiter}</td><td><span class="badge ${status === 'Selesai' ? 'badge-success' : 'badge-warning'}">${status}</span></td><td>${(p.sisaLiter || 0).toFixed(3)}</td><td>${rupiah((p.biayaBahan || 0) + (p.biayaOperasional || 0))}</td><td><button class="btn btn-danger btn-sm" onclick="hapusProduksi('${p.id}')">🗑</button></td></tr>`;
-  }).join('') || '<tr><td colspan="8">Belum ada produksi.</td></tr>';
+  var arr = (data.produksi || []).slice().sort(function(a, b) {
+    var comp = String(b.tanggalPembuatan || '').localeCompare(String(a.tanggalPembuatan || ''));
+    if (comp === 0) comp = String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+    return comp;
+  });
+  var html = '';
+  if (arr.length === 0) {
+    html = '<tr><td colspan="8">Belum ada produksi.</td></tr>';
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      var p = arr[i];
+      var f = getForm(p.formulasiId);
+      var used = p.jumlahLiter - (p.sisaLiter || 0);
+      var status = used <= 0.001 ? 'Selesai' : 'Sebagian Dikemas';
+      var badge = status === 'Selesai' ? 'badge-success' : 'badge-warning';
+      var hpp = rupiah((p.biayaBahan || 0) + (p.biayaOperasional || 0));
+      html += '<tr><td><b>' + p.batchNo + '</b></td><td>' + fmtDate(p.tanggalPembuatan) + '</td><td>' + (f?.nama || '-') + '</td><td>' + p.jumlahLiter + '</td><td><span class="badge ' + badge + '">' + status + '</span></td><td>' + (p.sisaLiter || 0).toFixed(3) + '</td><td>' + hpp + '</td><td><button class="btn btn-danger btn-sm" onclick="hapusProduksi(\'' + p.id + '\')">🗑</button></td></tr>';
+    }
+  }
+  document.getElementById('produksiTbody').innerHTML = html;
 }
 
 function hapusProduksi(id) {
-  const p = getProd(id);
+  var p = getProd(id);
   if (!p) return;
-  if ((data.pengemasan || []).some(x => (x.allocations || []).some(a => a.produksiId === id))) {
+  var usedInPackaging = (data.pengemasan || []).some(function(x) {
+    return (x.allocations || []).some(function(a) { return a.produksiId === id; });
+  });
+  if (usedInPackaging) {
     alertx('Batch sudah pernah dikemas. Hapus pengemasan terkait terlebih dahulu.', 'error');
     return;
   }
   if (!confirm('Hapus batch dan kembalikan bahan sesuai snapshot batch?')) return;
-  const snap = p.formulasiSnapshot;
-  if (Array.isArray(snap?.items)) {
-    snap.items.forEach(x => {
-      const b = getBahan(x.bahanId);
-      if (b) b.stok += Number(x.qty) || 0;
-    });
+  var snap = p.formulasiSnapshot;
+  if (snap && Array.isArray(snap.items)) {
+    for (var i = 0; i < snap.items.length; i++) {
+      var item = snap.items[i];
+      var b = getBahan(item.bahanId);
+      if (b) b.stok += Number(item.qty) || 0;
+    }
   } else {
-    const f = getForm(p.formulasiId);
+    var f = getForm(p.formulasiId);
     if (f) {
-      const c = calcNeeds(f, p.jumlahLiter);
-      c.items.forEach(x => x.bahan.stok += x.qty);
+      var c = calcNeeds(f, p.jumlahLiter);
+      for (var j = 0; j < c.items.length; j++) {
+        c.items[j].bahan.stok += c.items[j].qty;
+      }
     }
   }
-  data.produksi = data.produksi.filter(x => x.id !== id);
+  data.produksi = data.produksi.filter(function(x) { return x.id !== id; });
   logAudit('delete', 'produksi', id, 'Batch dihapus dan stok bahan dikembalikan');
   renderAll(true);
   alertx('Batch dihapus dan bahan dikembalikan');
@@ -1341,100 +1618,127 @@ function hapusProduksi(id) {
 // PENGEMASAN
 // ============================================================
 function updatePackagingInfo() {
-  const prodSel = document.getElementById('kemasanProduksi');
-  const kemSel = document.getElementById('kemasanNama');
-  const sisaInfo = document.getElementById('sisaProduksiInfo');
-  const stokInfo = document.getElementById('stokKemasanInfo');
-  const preview = document.getElementById('packagingPreview');
+  var prodSel = document.getElementById('kemasanProduksi');
+  var kemSel = document.getElementById('kemasanNama');
+  var sisaInfo = document.getElementById('sisaProduksiInfo');
+  var stokInfo = document.getElementById('stokKemasanInfo');
+  var preview = document.getElementById('packagingPreview');
   if (!prodSel || !kemSel) return;
 
-  const groups = {};
-  (data.produksi || []).forEach(p => {
-    const f = getForm(p.formulasiId);
-    const name = f?.nama || p.formulasiNama || p.jenisSabun || '';
-    if (!name) return;
-    const sisa = Number(p.sisaLiter ?? p.jumlahLiter ?? 0);
+  var groups = {};
+  var produksi = data.produksi || [];
+  for (var i = 0; i < produksi.length; i++) {
+    var p = produksi[i];
+    var f = getForm(p.formulasiId);
+    var name = f?.nama || p.formulasiNama || p.jenisSabun || '';
+    if (!name) continue;
+    var sisa = Number(p.sisaLiter ?? p.jumlahLiter ?? 0);
     if (!groups[name]) groups[name] = { ids: [], sisa: 0, bj: Number(f?.bj || p.bj || 1.025), hasSisa: false };
     groups[name].ids.push(p.id);
     groups[name].sisa += Math.max(0, sisa);
     if (sisa > 0.001) groups[name].hasSisa = true;
-  });
+  }
 
-  const previousName = decodeURIComponent(prodSel.value || '');
-  prodSel.innerHTML = '<option value="">Pilih jenis sabun</option>' +
-    Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0], 'id')).map(([name, g]) => {
-      const label = g.hasSisa ? `${name} — sisa ${g.sisa.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 3 })} L` : `${name} — tidak ada sisa produksi`;
-      return `<option value="${encodeURIComponent(name)}" ${g.hasSisa ? '' : 'disabled'}>${label}</option>`;
-    }).join('');
-  if (!Object.keys(groups).length) prodSel.innerHTML = '<option value="">Belum ada batch produksi</option>';
-  else if (previousName && groups[previousName]?.hasSisa) prodSel.value = encodeURIComponent(previousName);
+  var previousName = decodeURIComponent(prodSel.value || '');
+  var opts = '<option value="">Pilih jenis sabun</option>';
+  var names = Object.keys(groups).sort(function(a, b) { return a.localeCompare(b, 'id'); });
+  for (var j = 0; j < names.length; j++) {
+    var name = names[j];
+    var g = groups[name];
+    var label = g.hasSisa ? name + ' — sisa ' + g.sisa.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 3 }) + ' L' : name + ' — tidak ada sisa produksi';
+    opts += '<option value="' + encodeURIComponent(name) + '" ' + (g.hasSisa ? '' : 'disabled') + '>' + label + '</option>';
+  }
+  if (!Object.keys(groups).length) opts = '<option value="">Belum ada batch produksi</option>';
+  prodSel.innerHTML = opts;
+  if (previousName && groups[previousName]?.hasSisa) prodSel.value = encodeURIComponent(previousName);
 
-  const previousKemasan = kemSel.value;
-  kemSel.innerHTML = '<option value="">Pilih kemasan</option>' +
-    (data.kemasanBeli || []).map(k => `<option value="${k.id}" ${Number(k.stok || 0) <= 0 ? 'disabled' : ''}>${k.nama} (stok ${Number(k.stok || 0).toLocaleString('id-ID')} unit)</option>`).join('');
+  var previousKemasan = kemSel.value;
+  var kemOpts = '<option value="">Pilih kemasan</option>';
+  var kemasan = data.kemasanBeli || [];
+  for (var k = 0; k < kemasan.length; k++) {
+    var km = kemasan[k];
+    var disabled = Number(km.stok || 0) <= 0 ? 'disabled' : '';
+    kemOpts += '<option value="' + km.id + '" ' + disabled + '>' + km.nama + ' (stok ' + Number(km.stok || 0).toLocaleString('id-ID') + ' unit)</option>';
+  }
+  kemSel.innerHTML = kemOpts;
   if (previousKemasan && getKemasan(previousKemasan) && Number(getKemasan(previousKemasan).stok || 0) > 0) kemSel.value = previousKemasan;
 
-  const name = decodeURIComponent(prodSel.value || '');
-  const g = groups[name];
-  sisaInfo.textContent = g ? `Total sisa: ${g.sisa.toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} L` : 'Total sisa: 0 L';
-  const k = getKemasan(kemSel.value);
-  stokInfo.textContent = k ? `Stok: ${Number(k.stok || 0).toLocaleString('id-ID')} unit` : '';
-  preview.innerHTML = g && g.hasSisa ? `<b>FIFO:</b> ${g.ids.filter(id => Number(getProd(id)?.sisaLiter || 0) > 0.001).map(id => getProd(id)?.batchNo || '-').join(' → ')}<br><span class="small">Berat otomatis = volume × BJ. Jika manual, masukkan gram/unit.</span>` : '';
+  var nameSel = decodeURIComponent(prodSel.value || '');
+  var gSel = groups[nameSel];
+  sisaInfo.textContent = gSel ? 'Total sisa: ' + gSel.sisa.toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' L' : 'Total sisa: 0 L';
+  var kSel = getKemasan(kemSel.value);
+  stokInfo.textContent = kSel ? 'Stok: ' + Number(kSel.stok || 0).toLocaleString('id-ID') + ' unit' : '';
+  preview.innerHTML = gSel && gSel.hasSisa ? '<b>FIFO:</b> ' + gSel.ids.filter(function(id) { return Number(getProd(id)?.sisaLiter || 0) > 0.001; }).map(function(id) { return getProd(id)?.batchNo || '-'; }).join(' → ') + '<br><span class="small">Berat otomatis = volume × BJ. Jika manual, masukkan gram/unit.</span>' : '';
 }
 
 function toggleIsiMode() {
-  document.getElementById('kemasanBeratIsi').placeholder = document.querySelector('input[name="isiMode"]:checked').value === 'manual' ? 'Masukkan gram' : 'Otomatis';
+  var input = document.getElementById('kemasanBeratIsi');
+  var mode = document.querySelector('input[name="isiMode"]:checked');
+  if (input && mode) {
+    input.placeholder = mode.value === 'manual' ? 'Masukkan gram' : 'Otomatis';
+  }
 }
 
 function hitungTotalBerat() {
-  let j = +document.getElementById('kemasanJumlah').value || 0;
-  let w = +document.getElementById('kemasanBeratIsi').value || 0;
-  const preview = document.getElementById('packagingPreview');
-  if (j && w) preview.innerHTML += `<br><b>Total:</b> ${(j * w / 1000).toFixed(3)} kg`;
+  var j = +document.getElementById('kemasanJumlah').value || 0;
+  var w = +document.getElementById('kemasanBeratIsi').value || 0;
+  var preview = document.getElementById('packagingPreview');
+  if (j && w && preview) {
+    preview.innerHTML += '<br><b>Total:</b> ' + (j * w / 1000).toFixed(3) + ' kg';
+  }
 }
 
 function tambahKemasan() {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) return alertx('Akses ditolak', 'error');
-  const name = decodeURIComponent(document.getElementById('kemasanProduksi').value || '');
-  const kid = document.getElementById('kemasanNama').value;
-  const j = +document.getElementById('kemasanJumlah').value || 0;
-  const harga = +document.getElementById('kemasanHarga').value || 0;
-  const tgl = document.getElementById('kemasanTanggal').value || todayStr();
-  const k = getKemasan(kid);
+  var name = decodeURIComponent(document.getElementById('kemasanProduksi').value || '');
+  var kid = document.getElementById('kemasanNama').value;
+  var j = +document.getElementById('kemasanJumlah').value || 0;
+  var harga = +document.getElementById('kemasanHarga').value || 0;
+  var tgl = document.getElementById('kemasanTanggal').value || todayStr();
+  var k = getKemasan(kid);
   if (!name || !k || j <= 0 || harga <= 0) return alertx('Isi data pengemasan dengan benar', 'error');
   if (k.stok < j) return alertx('Stok kemasan tidak cukup', 'error');
 
-  const batches = (data.produksi || [])
-    .filter(p => getForm(p.formulasiId)?.nama === name && (p.sisaLiter || 0) > 0.000001)
-    .sort((a, b) => (a.tanggalPembuatan || '').localeCompare(b.tanggalPembuatan || '') || String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+  var batches = (data.produksi || []).filter(function(p) {
+    var f = getForm(p.formulasiId);
+    return f?.nama === name && (p.sisaLiter || 0) > 0.000001;
+  }).sort(function(a, b) {
+    var comp = (a.tanggalPembuatan || '').localeCompare(b.tanggalPembuatan || '');
+    if (comp === 0) comp = String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+    return comp;
+  });
 
-  const f = getForm(batches[0]?.formulasiId);
-  const mode = document.querySelector('input[name="isiMode"]:checked').value;
-  const bj = Number(f?.bj || 1.025);
-  let w = mode === 'otomatis' ? (k.volumeMl || 0) * bj : (+document.getElementById('kemasanBeratIsi').value || 0);
+  var f = getForm(batches[0]?.formulasiId);
+  var mode = document.querySelector('input[name="isiMode"]:checked').value;
+  var bj = Number(f?.bj || 1.025);
+  var w = mode === 'otomatis' ? (k.volumeMl || 0) * bj : (+document.getElementById('kemasanBeratIsi').value || 0);
   if (w <= 0) return alertx('Berat isi harus > 0', 'error');
-  const litersPerUnit = (w / 1000) / bj;
-  const totalL = j * litersPerUnit;
+  var litersPerUnit = (w / 1000) / bj;
+  var totalL = j * litersPerUnit;
 
-  let totalSisa = batches.reduce((s, p) => s + Number(p.sisaLiter || 0), 0);
+  var totalSisa = 0;
+  for (var i = 0; i < batches.length; i++) {
+    totalSisa += Number(batches[i].sisaLiter || 0);
+  }
   if (totalSisa + 1e-6 < totalL) return alertx('Sisa produksi tidak cukup', 'error');
 
-  data.pengemasan = data.pengemasan || [];
-  let remainingUnits = j;
-  let remainingL = totalL;
-  let allocations = [];
+  if (!data.pengemasan) data.pengemasan = [];
+  var remainingUnits = j;
+  var remainingL = totalL;
+  var allocations = [];
 
-  for (const p of batches) {
+  for (var bIdx = 0; bIdx < batches.length; bIdx++) {
     if (remainingUnits <= 0) break;
-    const possible = Math.floor((Number(p.sisaLiter || 0) + 1e-9) / litersPerUnit);
-    const units = Math.min(remainingUnits, possible);
+    var p = batches[bIdx];
+    var possible = Math.floor((Number(p.sisaLiter || 0) + 1e-9) / litersPerUnit);
+    var units = Math.min(remainingUnits, possible);
     if (units <= 0) continue;
-    const volume = units * litersPerUnit;
+    var volume = units * litersPerUnit;
     p.sisaLiter -= volume;
     remainingUnits -= units;
     remainingL -= volume;
-    const hppProdPerL = ((p.biayaBahan || 0) + (p.biayaOperasional || 0)) / Math.max(Number(p.jumlahLiter) || 1, 1e-9);
-    const hppUnit = hppProdPerL * litersPerUnit + (k.hargaPerUnit || 0);
+    var hppProdPerL = ((p.biayaBahan || 0) + (p.biayaOperasional || 0)) / Math.max(Number(p.jumlahLiter) || 1, 1e-9);
+    var hppUnit = hppProdPerL * litersPerUnit + (k.hargaPerUnit || 0);
     allocations.push({
       packagingId: null,
       produksiId: p.id,
@@ -1442,7 +1746,7 @@ function tambahKemasan() {
       jumlahUnit: units,
       volumeLiter: volume,
       beratPerUnit: w,
-      hppUnit,
+      hppUnit: hppUnit,
       biayaKemasan: k.hargaPerUnit || 0
     });
   }
@@ -1450,11 +1754,12 @@ function tambahKemasan() {
   if (remainingUnits > 0) return alertx('Tidak ada cukup produksi untuk memenuhi jumlah unit tanpa membagi satu unit ke dua batch. Kurangi jumlah unit atau buat produksi tambahan.', 'error');
 
   k.stok -= j;
-  const entry = stokEntry(name, kid) || { id: genId(), jenisSabun: name, kemasanId: kid, batchItems: [] };
+  var entry = stokEntry(name, kid) || { id: genId(), jenisSabun: name, kemasanId: kid, batchItems: [] };
   if (!data.stokBarangJadi.includes(entry)) data.stokBarangJadi.push(entry);
 
-  const packagingId = genId();
-  allocations.forEach(a => {
+  var packagingId = genId();
+  for (var aIdx = 0; aIdx < allocations.length; aIdx++) {
+    var a = allocations[aIdx];
     a.packagingId = packagingId;
     entry.batchItems.push({
       produksiId: a.produksiId,
@@ -1465,9 +1770,9 @@ function tambahKemasan() {
       hppUnit: a.hppUnit,
       tanggal: tgl,
       biayaKemasanPerUnit: a.biayaKemasan || 0,
-      packagingId
+      packagingId: packagingId
     });
-  });
+  }
 
   data.pengemasan.push({
     id: packagingId,
@@ -1480,61 +1785,83 @@ function tambahKemasan() {
     modeIsi: mode,
     totalLiter: totalL,
     totalBeratKg: j * w / 1000,
-    allocations
+    allocations: allocations
   });
 
-  logAudit('create', 'pengemasan', packagingId, `${name} ${k.nama} x${j}`);
+  logAudit('create', 'pengemasan', packagingId, name + ' ' + k.nama + ' x' + j);
   renderAll(true);
   document.getElementById('kemasanJumlah').value = '';
   document.getElementById('kemasanHarga').value = '';
   alertx('Pengemasan berhasil');
 }
 
-// RENDER PENGEMASAN + RIWAYAT (hanya di halaman ini)
 function renderPengemasan() {
   updatePackagingInfo();
-  let g = {};
-  (data.stokBarangJadi || []).forEach(e => {
-    let key = e.jenisSabun + '|' + e.kemasanId;
+  var g = {};
+  var stokJadi = data.stokBarangJadi || [];
+  for (var i = 0; i < stokJadi.length; i++) {
+    var e = stokJadi[i];
+    var key = e.jenisSabun + '|' + e.kemasanId;
     if (!g[key]) g[key] = { jenisSabun: e.jenisSabun, kemasanId: e.kemasanId, stok: 0, harga: 0, hpp: 0 };
-    e.batchItems.forEach(i => {
-      g[key].stok += Number(i.jumlahUnit) || 0;
-      g[key].harga = i.hargaJual ?? g[key].harga;
-      g[key].hpp = i.hppUnit ?? g[key].hpp;
-    });
-  });
-  document.getElementById('kemasanTbody').innerHTML = Object.values(g).map(x =>
-    `<tr><td>${escapeHtml(x.jenisSabun)}</td><td>${escapeHtml(getKemasan(x.kemasanId)?.nama || '-')}</td><td><b>${x.stok}</b></td><td>${rupiah(x.harga)}</td><td>${rupiah(x.hpp)}</td><td><button class="btn btn-warning btn-sm" onclick="editKemasanGroup('${encodeURIComponent(x.jenisSabun)}','${x.kemasanId}')">✏</button> <button class="btn btn-danger btn-sm" onclick="hapusKemasanGroup('${encodeURIComponent(x.jenisSabun)}','${x.kemasanId}')">🗑</button></td></tr>`
-  ).join('') || '<tr><td colspan="6">Belum ada stok barang jadi.</td></tr>';
+    var items = e.batchItems || [];
+    for (var j = 0; j < items.length; j++) {
+      g[key].stok += Number(items[j].jumlahUnit) || 0;
+      g[key].harga = items[j].hargaJual || g[key].harga;
+      g[key].hpp = items[j].hppUnit || g[key].hpp;
+    }
+  }
+  var html = '';
+  var vals = Object.values(g);
+  if (vals.length === 0) {
+    html = '<tr><td colspan="6">Belum ada stok barang jadi.</td></tr>';
+  } else {
+    for (var v = 0; v < vals.length; v++) {
+      var x = vals[v];
+      var kem = getKemasan(x.kemasanId);
+      html += '<tr><td>' + escapeHtml(x.jenisSabun) + '</td><td>' + escapeHtml(kem?.nama || '-') + '</td><td><b>' + x.stok + '</b></td><td>' + rupiah(x.harga) + '</td><td>' + rupiah(x.hpp) + '</td><td><button class="btn btn-warning btn-sm" onclick="editKemasanGroup(\'' + encodeURIComponent(x.jenisSabun) + '\',\'' + x.kemasanId + '\')">✏</button> <button class="btn btn-danger btn-sm" onclick="hapusKemasanGroup(\'' + encodeURIComponent(x.jenisSabun) + '\',\'' + x.kemasanId + '\')">🗑</button></td></tr>';
+    }
+  }
+  document.getElementById('kemasanTbody').innerHTML = html;
 
-  // Riwayat Pengemasan di halaman ini saja
-  const hist = [...(data.pengemasan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
-  const container = document.getElementById('riwayatPengemasanContainer');
+  var hist = (data.pengemasan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var histHtml = '';
+  if (hist.length === 0) {
+    histHtml = '<tr><td colspan="7">Belum ada riwayat pengemasan.</td></tr>';
+  } else {
+    for (var h = 0; h < hist.length; h++) {
+      var p = hist[h];
+      histHtml += '<tr><td>' + fmtDate(p.tanggal) + '</td><td>' + escapeHtml(p.jenisSabun) + '</td><td>' + escapeHtml(getKemasan(p.kemasanId)?.nama || '-') + '</td><td>' + p.jumlahUnit + '</td><td>' + formatAngkaID(p.beratPerUnit) + ' g</td><td>' + formatAngkaID(p.totalLiter) + ' L</td><td><button class="btn btn-danger btn-sm" onclick="hapusPengemasan(\'' + p.id + '\')">🗑 Hapus</button></td></tr>';
+    }
+  }
+  var container = document.getElementById('riwayatPengemasanContainer');
   if (container) {
-    container.innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis Sabun</th><th>Kemasan</th><th>Qty</th><th>Isi/unit</th><th>Total Liter</th><th>Aksi</th></tr></thead><tbody>
-      ${hist.map(p => `<tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisSabun)}</td><td>${escapeHtml(getKemasan(p.kemasanId)?.nama || '-')}</td><td>${p.jumlahUnit}</td><td>${formatAngkaID(p.beratPerUnit)} g</td><td>${formatAngkaID(p.totalLiter)} L</td><td><button class="btn btn-danger btn-sm" onclick="hapusPengemasan('${p.id}')">🗑 Hapus</button></td></tr>`).join('') || '<tr><td colspan="7">Belum ada riwayat pengemasan.</td></tr>'}
-    </tbody></table></div>`;
+    container.innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis Sabun</th><th>Kemasan</th><th>Qty</th><th>Isi/unit</th><th>Total Liter</th><th>Aksi</th></tr></thead><tbody>' + histHtml + '</tbody></table></div>';
   }
 }
 
 function hapusPengemasan(id) {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) return alertx('Akses ditolak', 'error');
-  const p = (data.pengemasan || []).find(x => x.id === id);
+  var p = (data.pengemasan || []).find(function(x) { return x.id === id; });
   if (!p) return;
-  if ((data.penjualan || []).some(x => (x.batchDetails || []).some(d => d.packagingId === id))) {
-    return alertx('Pengemasan ini sudah terjual. Hapus penjualan terkait dahulu.', 'error');
-  }
-  if (!confirm(`Hapus pengemasan ${p.jenisSabun} x${p.jumlahUnit} dan kembalikan stok?`)) return;
-  const e = stokEntry(p.jenisSabun, p.kemasanId);
-  (p.allocations || []).forEach(a => {
-    const prod = getProd(a.produksiId);
-    if (prod) prod.sisaLiter += Number(a.volumeLiter) || 0;
-    const k = getKemasan(p.kemasanId);
-    if (k) k.stok += Number(a.jumlahUnit) || 0;
-    if (e) e.batchItems = e.batchItems.filter(x => !(x.packagingId === id && x.produksiId === a.produksiId));
+  var usedInSales = (data.penjualan || []).some(function(x) {
+    return (x.batchDetails || []).some(function(d) { return d.packagingId === id; });
   });
-  if (e && !e.batchItems.length) data.stokBarangJadi = data.stokBarangJadi.filter(x => x !== e);
-  data.pengemasan = data.pengemasan.filter(x => x.id !== id);
+  if (usedInSales) return alertx('Pengemasan ini sudah terjual. Hapus penjualan terkait dahulu.', 'error');
+  if (!confirm('Hapus pengemasan ' + p.jenisSabun + ' x' + p.jumlahUnit + ' dan kembalikan stok?')) return;
+  var e = stokEntry(p.jenisSabun, p.kemasanId);
+  var allocs = p.allocations || [];
+  for (var i = 0; i < allocs.length; i++) {
+    var a = allocs[i];
+    var prod = getProd(a.produksiId);
+    if (prod) prod.sisaLiter += Number(a.volumeLiter) || 0;
+    var k = getKemasan(p.kemasanId);
+    if (k) k.stok += Number(a.jumlahUnit) || 0;
+    if (e) e.batchItems = e.batchItems.filter(function(x) { return !(x.packagingId === id && x.produksiId === a.produksiId); });
+  }
+  if (e && !e.batchItems.length) data.stokBarangJadi = data.stokBarangJadi.filter(function(x) { return x !== e; });
+  data.pengemasan = data.pengemasan.filter(function(x) { return x.id !== id; });
   logAudit('delete', 'pengemasan', id, 'Pengemasan dihapus dan stok dikembalikan');
   renderAll(true);
   alertx('Pengemasan dihapus dan stok dikembalikan');
@@ -1542,19 +1869,22 @@ function hapusPengemasan(id) {
 
 function editKemasanGroup(j, kid) {
   j = decodeURIComponent(j);
-  let e = stokEntry(j, kid);
+  var e = stokEntry(j, kid);
   if (!e || !e.batchItems.length) return;
   modal('Edit Harga Jual',
-    `<div class="form-group"><label>Jenis</label><input value="${escapeHtml(j)}" disabled></div>
-     <div class="form-group"><label>Kemasan</label><input value="${escapeHtml(getKemasan(kid)?.nama || '')}" disabled></div>
-     <div class="form-group"><label>Harga Jual/Unit</label><input id="mHarga" type="number" min="1" value="${e.batchItems[0]?.hargaJual || 0}"></div>`,
-    () => {
-      const h = +document.getElementById('mHarga').value || 0;
+    '<div class="form-group"><label>Jenis</label><input value="' + escapeHtml(j) + '" disabled></div>' +
+    '<div class="form-group"><label>Kemasan</label><input value="' + escapeHtml(getKemasan(kid)?.nama || '') + '" disabled></div>' +
+    '<div class="form-group"><label>Harga Jual/Unit</label><input id="mHarga" type="number" min="1" value="' + (e.batchItems[0]?.hargaJual || 0) + '"></div>',
+    function() {
+      var h = +document.getElementById('mHarga').value || 0;
       if (h <= 0) return alertx('Harga jual harus > 0', 'error');
-      e.batchItems.forEach(x => {
-        const sold = (data.penjualan || []).some(p => (p.batchDetails || []).some(d => d.packagingId === x.packagingId));
-        if (!sold) x.hargaJual = h;
-      });
+      var items = e.batchItems || [];
+      for (var i = 0; i < items.length; i++) {
+        var sold = (data.penjualan || []).some(function(p) {
+          return (p.batchDetails || []).some(function(d) { return d.packagingId === items[i].packagingId; });
+        });
+        if (!sold) items[i].hargaJual = h;
+      }
       renderAll(true);
     }
   );
@@ -1562,19 +1892,21 @@ function editKemasanGroup(j, kid) {
 
 function hapusKemasanGroup(j, kid) {
   j = decodeURIComponent(j);
-  let e = stokEntry(j, kid);
+  var e = stokEntry(j, kid);
   if (!e) return;
-  if ((data.penjualan || []).some(x => x.jenisSabun === j && x.kemasanId === kid)) return alertx('Hapus penjualan terkait dahulu', 'error');
+  var used = (data.penjualan || []).some(function(x) { return x.jenisSabun === j && x.kemasanId === kid; });
+  if (used) return alertx('Hapus penjualan terkait dahulu', 'error');
   if (!confirm('Hapus seluruh stok kemasan ini dan kembalikan ke produksi?')) return;
-  for (const i of e.batchItems) {
-    let p = getProd(i.produksiId);
-    if (p) p.sisaLiter += Number(i.volumeLiter) || 0;
-    let k = getKemasan(kid);
-    if (k) k.stok += Number(i.jumlahUnit) || 0;
+  var items = e.batchItems || [];
+  for (var i = 0; i < items.length; i++) {
+    var p = getProd(items[i].produksiId);
+    if (p) p.sisaLiter += Number(items[i].volumeLiter) || 0;
+    var k = getKemasan(kid);
+    if (k) k.stok += Number(items[i].jumlahUnit) || 0;
   }
-  data.pengemasan = (data.pengemasan || []).filter(x => x.jenisSabun !== j || x.kemasanId !== kid);
-  data.stokBarangJadi = data.stokBarangJadi.filter(x => !(x.jenisSabun === j && x.kemasanId === kid));
-  logAudit('delete', 'pengemasan', 'group', `${j} ${kid} dihapus`);
+  data.pengemasan = (data.pengemasan || []).filter(function(x) { return x.jenisSabun !== j || x.kemasanId !== kid; });
+  data.stokBarangJadi = data.stokBarangJadi.filter(function(x) { return !(x.jenisSabun === j && x.kemasanId === kid); });
+  logAudit('delete', 'pengemasan', 'group', j + ' ' + kid + ' dihapus');
   renderAll(true);
   alertx('Stok dikembalikan ke produksi dan kemasan');
 }
@@ -1583,40 +1915,77 @@ function hapusKemasanGroup(j, kid) {
 // PENJUALAN
 // ============================================================
 function renderPenjualan() {
-  const sel = document.getElementById('jualStokSelect');
-  sel.innerHTML = '<option value="">Pilih stok</option>' + (data.stokBarangJadi || []).map(e => {
-    let q = e.batchItems.reduce((s, i) => s + i.jumlahUnit, 0);
-    return q ? `<option value="${encodeURIComponent(e.jenisSabun)}|${e.kemasanId}">${e.jenisSabun} - ${getKemasan(e.kemasanId)?.nama || '-'} (${q})</option>` : '';
-  }).join('');
-  document.getElementById('jualTanggal').value ||= todayStr();
-  document.getElementById('jualTbody').innerHTML = [...(data.penjualan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || ''))).map(j =>
-    `<tr><td>${j.jenisSabun}</td><td>${getKemasan(j.kemasanId)?.nama || '-'}</td><td>${j.jumlahTerjual}</td><td>${rupiah(j.total)}</td><td>${rupiah(j.hppTotal || 0)}</td><td class="${j.laba >= 0 ? 'green' : 'red'}">${rupiah(j.laba || 0)}</td><td><span class="badge ${j.status === 'Lunas' ? 'badge-success' : 'badge-warning'}">${j.status}</span></td><td>${fmtDate(j.tanggal)}</td><td>${j.status === 'Hutang' ? `<button class="btn btn-success btn-sm" onclick="bayarHutang('${j.id}')">💰</button>` : ''} <button class="btn btn-danger btn-sm" onclick="hapusJual('${j.id}')">🗑</button></td></tr>`
-  ).join('') || '<tr><td colspan="9">Belum ada penjualan.</td></tr>';
+  var sel = document.getElementById('jualStokSelect');
+  var opts = '<option value="">Pilih stok</option>';
+  var stok = data.stokBarangJadi || [];
+  for (var i = 0; i < stok.length; i++) {
+    var e = stok[i];
+    var q = 0;
+    var items = e.batchItems || [];
+    for (var j = 0; j < items.length; j++) {
+      q += items[j].jumlahUnit;
+    }
+    if (q > 0) {
+      var kem = getKemasan(e.kemasanId);
+      opts += '<option value="' + encodeURIComponent(e.jenisSabun) + '|' + e.kemasanId + '">' + e.jenisSabun + ' - ' + (kem?.nama || '-') + ' (' + q + ')</option>';
+    }
+  }
+  sel.innerHTML = opts;
+  var tglInput = document.getElementById('jualTanggal');
+  if (tglInput && !tglInput.value) tglInput.value = todayStr();
+
+  var rows = (data.penjualan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var html = '';
+  if (rows.length === 0) {
+    html = '<tr><td colspan="9">Belum ada penjualan.</td></tr>';
+  } else {
+    for (var r = 0; r < rows.length; r++) {
+      var jual = rows[r];
+      var kem = getKemasan(jual.kemasanId);
+      var badge = jual.status === 'Lunas' ? 'badge-success' : 'badge-warning';
+      var aksi = '<button class="btn btn-danger btn-sm" onclick="hapusJual(\'' + jual.id + '\')">🗑</button>';
+      if (jual.status === 'Hutang') {
+        aksi = '<button class="btn btn-success btn-sm" onclick="bayarHutang(\'' + jual.id + '\')">💰</button> ' + aksi;
+      }
+      html += '<tr><td>' + jual.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + jual.jumlahTerjual + '</td><td>' + rupiah(jual.total) + '</td><td>' + rupiah(jual.hppTotal || 0) + '</td><td class="' + (jual.laba >= 0 ? 'green' : 'red') + '">' + rupiah(jual.laba || 0) + '</td><td><span class="badge ' + badge + '">' + jual.status + '</span></td><td>' + fmtDate(jual.tanggal) + '</td><td>' + aksi + '</td></tr>';
+    }
+  }
+  document.getElementById('jualTbody').innerHTML = html;
 }
 
 function catatJual() {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) return alertx('Akses ditolak', 'error');
-  let [ej, kid] = (document.getElementById('jualStokSelect').value || '|').split('|');
-  let j = +document.getElementById('jualJumlah').value || 0;
-  let h = +document.getElementById('jualHarga').value || 0;
-  let status = document.getElementById('jualStatus').value;
-  let tgl = document.getElementById('jualTanggal').value || todayStr();
-  let name = decodeURIComponent(ej || '');
+  var val = document.getElementById('jualStokSelect').value || '|';
+  var parts = val.split('|');
+  var ej = parts[0] || '';
+  var kid = parts[1] || '';
+  var j = +document.getElementById('jualJumlah').value || 0;
+  var h = +document.getElementById('jualHarga').value || 0;
+  var status = document.getElementById('jualStatus').value;
+  var tgl = document.getElementById('jualTanggal').value || todayStr();
+  var name = decodeURIComponent(ej || '');
   if (!name || !j || !h) return alertx('Isi penjualan dengan benar', 'error');
-  let e = stokEntry(name, kid);
+  var e = stokEntry(name, kid);
   if (!e) return alertx('Stok tidak ditemukan', 'error');
-  let totalStock = e.batchItems.reduce((s, x) => s + x.jumlahUnit, 0);
+  var totalStock = 0;
+  var batchItems = e.batchItems || [];
+  for (var i = 0; i < batchItems.length; i++) {
+    totalStock += batchItems[i].jumlahUnit;
+  }
   if (totalStock < j) return alertx('Stok tidak cukup', 'error');
-  e.batchItems.sort((a, b) => (a.tanggal || '').localeCompare(b.tanggal || ''));
-  let remain = j;
-  let details = [];
-  let hppTotal = 0;
-  for (let item of e.batchItems) {
+  batchItems.sort(function(a, b) { return (a.tanggal || '').localeCompare(b.tanggal || ''); });
+  var remain = j;
+  var details = [];
+  var hppTotal = 0;
+  for (var idx = 0; idx < batchItems.length; idx++) {
     if (remain <= 0) break;
-    let take = Math.min(item.jumlahUnit, remain);
+    var item = batchItems[idx];
+    var take = Math.min(item.jumlahUnit, remain);
     item.jumlahUnit -= take;
     remain -= take;
-    let hpp = (item.hppUnit || 0);
+    var hpp = (item.hppUnit || 0);
     hppTotal += take * hpp;
     details.push({
       produksiId: item.produksiId,
@@ -1630,93 +1999,119 @@ function catatJual() {
       packagingId: item.packagingId || null
     });
   }
-  e.batchItems = e.batchItems.filter(x => x.jumlahUnit > 0);
-  if (!e.batchItems.length) data.stokBarangJadi = data.stokBarangJadi.filter(x => x.id !== e.id);
-  let total = j * h;
-  let laba = total - hppTotal;
-  let id = genId();
+  e.batchItems = batchItems.filter(function(x) { return x.jumlahUnit > 0; });
+  if (!e.batchItems.length) data.stokBarangJadi = data.stokBarangJadi.filter(function(x) { return x.id !== e.id; });
+  var total = j * h;
+  var laba = total - hppTotal;
+  var id = genId();
   data.penjualan.push({
-    id,
+    id: id,
     jenisSabun: name,
     kemasanId: kid,
     jumlahTerjual: j,
     hargaPerUnit: h,
-    total,
-    status,
+    total: total,
+    status: status,
     tanggal: tgl,
-    hppTotal,
-    laba,
+    hppTotal: hppTotal,
+    laba: laba,
     batchDetails: details
   });
-  if (status === 'Lunas') data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Penjualan', jumlah: total, tanggal: tgl });
+  if (status === 'Lunas') {
+    data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Penjualan', jumlah: total, tanggal: tgl });
+  }
   renderAll(true);
   alertx('Penjualan dicatat');
 }
 
 function hapusJual(id) {
   if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
-  let j = data.penjualan.find(x => x.id === id);
-  if (!j || !confirm('Hapus penjualan dan kembalikan stok?')) return;
-  let e = stokEntry(j.jenisSabun, j.kemasanId);
+  var jual = data.penjualan.find(function(x) { return x.id === id; });
+  if (!jual || !confirm('Hapus penjualan dan kembalikan stok?')) return;
+  var e = stokEntry(jual.jenisSabun, jual.kemasanId);
   if (!e) {
-    e = { id: genId(), jenisSabun: j.jenisSabun, kemasanId: j.kemasanId, batchItems: [] };
+    e = { id: genId(), jenisSabun: jual.jenisSabun, kemasanId: jual.kemasanId, batchItems: [] };
     data.stokBarangJadi.push(e);
   }
-  j.batchDetails.forEach(b => {
-    let ex = e.batchItems.find(x => x.produksiId === b.produksiId);
-    if (ex) ex.jumlahUnit += b.jumlah;
-    else e.batchItems.push({
-      produksiId: b.produksiId,
-      batchNo: b.batchNo,
-      jumlahUnit: b.jumlah,
-      beratPerUnit: b.beratPerUnit || 0,
-      hargaJual: b.hargaJual,
-      hppUnit: b.hppUnit || 0,
-      biayaKemasanPerUnit: b.biayaKemasan || 0,
-      tanggal: b.tanggal,
-      packagingId: b.packagingId || null
-    });
-  });
-  if (j.status === 'Lunas') data.keuangan.pemasukan = data.keuangan.pemasukan.filter(x => x.sourceId !== id);
-  data.penjualan = data.penjualan.filter(x => x.id !== id);
+  var details = jual.batchDetails || [];
+  for (var i = 0; i < details.length; i++) {
+    var b = details[i];
+    var ex = e.batchItems.find(function(x) { return x.produksiId === b.produksiId; });
+    if (ex) {
+      ex.jumlahUnit += b.jumlah;
+    } else {
+      e.batchItems.push({
+        produksiId: b.produksiId,
+        batchNo: b.batchNo,
+        jumlahUnit: b.jumlah,
+        beratPerUnit: b.beratPerUnit || 0,
+        hargaJual: b.hargaJual,
+        hppUnit: b.hppUnit || 0,
+        biayaKemasanPerUnit: b.biayaKemasan || 0,
+        tanggal: b.tanggal,
+        packagingId: b.packagingId || null
+      });
+    }
+  }
+  if (jual.status === 'Lunas') {
+    data.keuangan.pemasukan = data.keuangan.pemasukan.filter(function(x) { return x.sourceId !== id; });
+  }
+  data.penjualan = data.penjualan.filter(function(x) { return x.id !== id; });
   renderAll(true);
   alertx('Penjualan dihapus dan stok dikembalikan');
 }
 
 function bayarHutang(id) {
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) return alertx('Akses ditolak', 'error');
-  let j = data.penjualan.find(x => x.id === id);
-  if (!j || j.status !== 'Hutang') return;
+  var jual = data.penjualan.find(function(x) { return x.id === id; });
+  if (!jual || jual.status !== 'Hutang') return;
   if (!confirm('Catat pelunasan?')) return;
-  j.status = 'Lunas';
-  data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Pelunasan piutang', jumlah: j.total, tanggal: todayStr() });
+  jual.status = 'Lunas';
+  data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Pelunasan piutang', jumlah: jual.total, tanggal: todayStr() });
   renderAll(true);
   alertx('Piutang dilunasi');
 }
 
 // ============================================================
-// LAPORAN (singkat)
+// LAPORAN
 // ============================================================
 function renderLaporan() {
-  let totalJ = (data.penjualan || []).reduce((s, x) => s + x.total, 0);
-  let lunas = (data.penjualan || []).filter(x => x.status === 'Lunas').reduce((s, x) => s + x.total, 0);
-  let piutang = totalJ - lunas;
-  let hpp = (data.penjualan || []).reduce((s, x) => s + x.hppTotal, 0);
-  let laba = totalJ - hpp;
-  let masuk = (data.keuangan.pemasukan || []).reduce((s, x) => s + x.jumlah, 0);
-  let keluar = (data.keuangan.pengeluaran || []).reduce((s, x) => s + x.jumlah, 0);
-  let kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
+  var penjualan = data.penjualan || [];
+  var totalJ = 0, lunas = 0, hpp = 0, laba = 0;
+  for (var i = 0; i < penjualan.length; i++) {
+    var j = penjualan[i];
+    totalJ += j.total;
+    if (j.status === 'Lunas') lunas += j.total;
+    hpp += j.hppTotal || 0;
+    laba += j.laba || 0;
+  }
+  var piutang = totalJ - lunas;
+  var modal = 0;
+  var tambahan = data.modalTambahan || [];
+  for (var m = 0; m < tambahan.length; m++) {
+    modal += Number(tambahan[m].jumlah) || 0;
+  }
+  var masuk = 0;
+  var pemasukan = data.keuangan.pemasukan || [];
+  for (var pm = 0; pm < pemasukan.length; pm++) {
+    masuk += Number(pemasukan[pm].jumlah) || 0;
+  }
+  var keluar = 0;
+  var pengeluaran = data.keuangan.pengeluaran || [];
+  for (var pk = 0; pk < pengeluaran.length; pk++) {
+    keluar += Number(pengeluaran[pk].jumlah) || 0;
+  }
+  var kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
 
-  document.getElementById('laporanRingkasan').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num">${rupiah(kas)}</div><div class="lbl">Saldo Kas</div></div>
-      <div class="stat-card"><div class="num">${rupiah(totalJ)}</div><div class="lbl">Omzet Penjualan</div></div>
-      <div class="stat-card"><div class="num">${rupiah(hpp)}</div><div class="lbl">HPP Terjual</div></div>
-      <div class="stat-card"><div class="num ${laba >= 0 ? 'green' : 'red'}">${rupiah(laba)}</div><div class="lbl">Laba Kotor</div></div>
-      <div class="stat-card"><div class="num">${rupiah(piutang)}</div><div class="lbl">Piutang</div></div>
-    </div>
-    <div class="financial-note">Modal bukan pendapatan usaha. Pembelian bahan/peralatan mengurangi kas, sedangkan pemakaian bahan saat produksi hanya membentuk HPP/persediaan dan tidak mengurangi kas untuk kedua kalinya.</div>
-  `;
+  document.getElementById('laporanRingkasan').innerHTML = 
+    '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(totalJ) + '</div><div class="lbl">Omzet Penjualan</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(hpp) + '</div><div class="lbl">HPP Terjual</div></div>' +
+      '<div class="stat-card"><div class="num ' + (laba >= 0 ? 'green' : 'red') + '">' + rupiah(laba) + '</div><div class="lbl">Laba Kotor</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(piutang) + '</div><div class="lbl">Piutang</div></div>' +
+    '</div>' +
+    '<div class="financial-note">Modal bukan pendapatan usaha. Pembelian bahan/peralatan mengurangi kas, sedangkan pemakaian bahan saat produksi hanya membentuk HPP/persediaan dan tidak mengurangi kas untuk kedua kalinya.</div>';
   renderLaporanProduksi();
   renderLaporanPenjualan();
   renderArusKas();
@@ -1724,32 +2119,61 @@ function renderLaporan() {
 }
 
 function renderLaporanProduksi() {
-  let rows = [...(data.produksi || [])].sort((a, b) => String(b.tanggalPembuatan || '').localeCompare(String(a.tanggalPembuatan || ''))).map(p => {
-    let f = getForm(p.formulasiId);
-    let terjual = (data.penjualan || []).reduce((s, j) => s + (j.batchDetails || []).filter(b => b.produksiId === p.id).reduce((q, b) => q + b.jumlah, 0), 0);
-    let omzet = (data.penjualan || []).reduce((s, j) => s + (j.batchDetails || []).filter(b => b.produksiId === p.id).reduce((q, b) => q + b.jumlah * b.hargaJual, 0), 0);
-    let hppTerjual = (data.penjualan || []).reduce((s, j) => s + (j.batchDetails || []).filter(b => b.produksiId === p.id).reduce((q, b) => q + b.jumlah * (b.hppUnit || 0), 0), 0);
-    let hpp = (p.biayaBahan || 0) + (p.biayaOperasional || 0);
-    return `<tr><td><b>${p.batchNo}</b></td><td>${fmtDate(p.tanggalPembuatan)}</td><td>${f?.nama || '-'}</td><td>${p.jumlahLiter}</td><td>${rupiah(hpp)}</td><td>${rupiah(p.biayaOperasional || 0)} <button class="btn btn-warning btn-sm" onclick="editBiayaOperasionalProduksi('${p.id}')">✏</button></td><td>${terjual}</td><td>${rupiah(omzet)}</td><td>${rupiah(hppTerjual)}</td><td class="${omzet - hppTerjual >= 0 ? 'green' : 'red'}">${rupiah(omzet - hppTerjual)}</td></tr>`;
-  }).join('');
-  document.getElementById('laporanKeuanganProduksi').innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Batch</th><th>Tanggal</th><th>Jenis</th><th>Liter</th><th>HPP Produksi</th><th>Biaya Operasional</th><th>Terjual</th><th>Omzet</th><th>HPP Terjual</th><th>Laba</th></tr></thead><tbody>${rows || '<tr><td colspan="10">Belum ada data.</td></tr>'}</tbody></table></div>`;
+  var produksi = (data.produksi || []).slice().sort(function(a, b) {
+    return String(b.tanggalPembuatan || '').localeCompare(String(a.tanggalPembuatan || ''));
+  });
+  var html = '';
+  if (produksi.length === 0) {
+    html = '<tr><td colspan="10">Belum ada data.</td></tr>';
+  } else {
+    for (var i = 0; i < produksi.length; i++) {
+      var p = produksi[i];
+      var f = getForm(p.formulasiId);
+      var terjual = 0, omzet = 0, hppTerjual = 0;
+      var penjualan = data.penjualan || [];
+      for (var j = 0; j < penjualan.length; j++) {
+        var batchDetails = penjualan[j].batchDetails || [];
+        for (var b = 0; b < batchDetails.length; b++) {
+          if (batchDetails[b].produksiId === p.id) {
+            terjual += batchDetails[b].jumlah;
+            omzet += batchDetails[b].jumlah * batchDetails[b].hargaJual;
+            hppTerjual += batchDetails[b].jumlah * (batchDetails[b].hppUnit || 0);
+          }
+        }
+      }
+      var hpp = (p.biayaBahan || 0) + (p.biayaOperasional || 0);
+      var labaBatch = omzet - hppTerjual;
+      html += '<tr><td><b>' + p.batchNo + '</b></td><td>' + fmtDate(p.tanggalPembuatan) + '</td><td>' + (f?.nama || '-') + '</td><td>' + p.jumlahLiter + '</td><td>' + rupiah(hpp) + '</td><td>' + rupiah(p.biayaOperasional || 0) + ' <button class="btn btn-warning btn-sm" onclick="editBiayaOperasionalProduksi(\'' + p.id + '\')">✏</button></td><td>' + terjual + '</td><td>' + rupiah(omzet) + '</td><td>' + rupiah(hppTerjual) + '</td><td class="' + (labaBatch >= 0 ? 'green' : 'red') + '">' + rupiah(labaBatch) + '</td></tr>';
+    }
+  }
+  document.getElementById('laporanKeuanganProduksi').innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Batch</th><th>Tanggal</th><th>Jenis</th><th>Liter</th><th>HPP Produksi</th><th>Biaya Operasional</th><th>Terjual</th><th>Omzet</th><th>HPP Terjual</th><th>Laba</th></tr></thead><tbody>' + html + '</tbody></table></div>';
 }
 
 function renderLaporanPenjualan() {
-  let rows = [...(data.penjualan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || ''))).map(j =>
-    `<tr><td>${fmtDate(j.tanggal)}</td><td>${j.jenisSabun}</td><td>${getKemasan(j.kemasanId)?.nama || '-'}</td><td>${j.jumlahTerjual}</td><td>${rupiah(j.total)}</td><td>${rupiah(j.hppTotal)}</td><td>${rupiah(j.laba)}</td><td>${j.status}</td></tr>`
-  ).join('');
-  document.getElementById('laporanPenjualan').innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Kemasan</th><th>Qty</th><th>Omzet</th><th>HPP</th><th>Laba</th><th>Status</th></tr></thead><tbody>${rows || '<tr><td colspan="8">Belum ada.</td></tr>'}</tbody></table></div>`;
+  var rows = (data.penjualan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var html = '';
+  if (rows.length === 0) {
+    html = '<tr><td colspan="8">Belum ada.</td></tr>';
+  } else {
+    for (var i = 0; i < rows.length; i++) {
+      var j = rows[i];
+      var kem = getKemasan(j.kemasanId);
+      html += '<tr><td>' + fmtDate(j.tanggal) + '</td><td>' + j.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + j.jumlahTerjual + '</td><td>' + rupiah(j.total) + '</td><td>' + rupiah(j.hppTotal) + '</td><td>' + rupiah(j.laba) + '</td><td>' + j.status + '</td></tr>';
+    }
+  }
+  document.getElementById('laporanPenjualan').innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Kemasan</th><th>Qty</th><th>Omzet</th><th>HPP</th><th>Laba</th><th>Status</th></tr></thead><tbody>' + html + '</tbody></table></div>';
 }
 
 function editBiayaOperasionalProduksi(id) {
-  let p = getProd(id);
+  var p = getProd(id);
   if (!p) return;
   modal('Edit Biaya Operasional',
-    `<div class="form-group"><label>Batch</label><input value="${p.batchNo}" disabled></div>
-     <div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="${p.biayaOperasional || 0}"></div>`,
-    () => {
-      let v = +document.getElementById('mOps').value;
+    '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
+    '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>',
+    function() {
+      var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
       p.biayaOperasional = v;
       logAudit('update', 'produksi', id, 'Biaya operasional diubah menjadi ' + rupiah(v));
@@ -1760,187 +2184,259 @@ function editBiayaOperasionalProduksi(id) {
 }
 
 function renderArusKas() {
-  let rows = [
-    ...(data.keuangan.pemasukan || []).map(x => ({ ...x, tipe: 'Masuk' })),
-    ...(data.keuangan.pengeluaran || []).map(x => ({ ...x, tipe: 'Keluar' }))
-  ].sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
-  document.getElementById('laporanArusKas').innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Tipe</th><th>Sumber</th><th>Jumlah</th></tr></thead><tbody>
-    ${rows.map(x => `<tr><td>${fmtDate(x.tanggal)}</td><td><span class="badge ${x.tipe === 'Masuk' ? 'badge-success' : 'badge-warning'}">${x.tipe}</span></td><td>${x.sumber}</td><td>${rupiah(x.jumlah)}</td></tr>`).join('') || '<tr><td colspan="4">Belum ada transaksi.</td></tr>'}
-  </tbody></table></div>`;
+  var rows = [];
+  var pemasukan = data.keuangan.pemasukan || [];
+  for (var i = 0; i < pemasukan.length; i++) {
+    rows.push({ ...pemasukan[i], tipe: 'Masuk' });
+  }
+  var pengeluaran = data.keuangan.pengeluaran || [];
+  for (var j = 0; j < pengeluaran.length; j++) {
+    rows.push({ ...pengeluaran[j], tipe: 'Keluar' });
+  }
+  rows.sort(function(a, b) { return (b.tanggal || '').localeCompare(a.tanggal || ''); });
+  var html = '';
+  if (rows.length === 0) {
+    html = '<tr><td colspan="4">Belum ada transaksi.</td></tr>';
+  } else {
+    for (var r = 0; r < rows.length; r++) {
+      var x = rows[r];
+      var badge = x.tipe === 'Masuk' ? 'badge-success' : 'badge-warning';
+      html += '<tr><td>' + fmtDate(x.tanggal) + '</td><td><span class="badge ' + badge + '">' + x.tipe + '</span></td><td>' + x.sumber + '</td><td>' + rupiah(x.jumlah) + '</td></tr>';
+    }
+  }
+  document.getElementById('laporanArusKas').innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Tipe</th><th>Sumber</th><th>Jumlah</th></tr></thead><tbody>' + html + '</tbody></table></div>';
 }
 
 function renderLabaRugi() {
-  let omzet = (data.penjualan || []).reduce((s, x) => s + x.total, 0);
-  let hpp = (data.penjualan || []).reduce((s, x) => s + x.hppTotal, 0);
-  let laba = omzet - hpp;
-  let margin = omzet ? laba / omzet * 100 : 0;
-  document.getElementById('laporanLabaRugi').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num">${rupiah(omzet)}</div><div class="lbl">Pendapatan Usaha</div></div>
-      <div class="stat-card"><div class="num">${rupiah(hpp)}</div><div class="lbl">HPP Penjualan</div></div>
-      <div class="stat-card"><div class="num ${laba >= 0 ? 'green' : 'red'}">${rupiah(laba)}</div><div class="lbl">Laba</div></div>
-      <div class="stat-card"><div class="num">${margin.toFixed(1)}%</div><div class="lbl">Margin</div></div>
-    </div>
-    <div class="financial-note">Margin = Laba ÷ Penjualan × 100%. Sistem tidak menggunakan markup.</div>
-  `;
+  var omzet = 0, hpp = 0;
+  var penjualan = data.penjualan || [];
+  for (var i = 0; i < penjualan.length; i++) {
+    omzet += penjualan[i].total;
+    hpp += penjualan[i].hppTotal || 0;
+  }
+  var laba = omzet - hpp;
+  var margin = omzet ? laba / omzet * 100 : 0;
+  document.getElementById('laporanLabaRugi').innerHTML = 
+    '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="num">' + rupiah(omzet) + '</div><div class="lbl">Pendapatan Usaha</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(hpp) + '</div><div class="lbl">HPP Penjualan</div></div>' +
+      '<div class="stat-card"><div class="num ' + (laba >= 0 ? 'green' : 'red') + '">' + rupiah(laba) + '</div><div class="lbl">Laba</div></div>' +
+      '<div class="stat-card"><div class="num">' + margin.toFixed(1) + '%</div><div class="lbl">Margin</div></div>' +
+    '</div>' +
+    '<div class="financial-note">Margin = Laba ÷ Penjualan × 100%. Sistem tidak menggunakan markup.</div>';
 }
 
 // ============================================================
-// SIMULASI, PERALATAN, AUDIT, DLL (tetap sama)
+// SIMULASI, PERALATAN, AUDIT, DLL
 // ============================================================
 function renderSimDropdown() {
-  document.getElementById('simulasiForm').innerHTML = (data.formulasi || []).map(f => `<option value="${f.id}">${f.nama}</option>`).join('');
-  document.getElementById('simulasiKemasan').innerHTML = (data.kemasanBeli || []).map(k => `<option value="${k.id}">${k.nama} (${k.volumeMl}mL)</option>`).join('');
+  var formOpts = '';
+  var formulasi = data.formulasi || [];
+  for (var i = 0; i < formulasi.length; i++) {
+    formOpts += '<option value="' + formulasi[i].id + '">' + formulasi[i].nama + '</option>';
+  }
+  document.getElementById('simulasiForm').innerHTML = formOpts;
+  var kemOpts = '';
+  var kemasan = data.kemasanBeli || [];
+  for (var j = 0; j < kemasan.length; j++) {
+    kemOpts += '<option value="' + kemasan[j].id + '">' + kemasan[j].nama + ' (' + kemasan[j].volumeMl + 'mL)</option>';
+  }
+  document.getElementById('simulasiKemasan').innerHTML = kemOpts;
 }
+
 function hitungSimulasi() {
-  let f = getForm(document.getElementById('simulasiForm').value);
-  let k = getKemasan(document.getElementById('simulasiKemasan').value);
-  let l = +document.getElementById('simulasiLiter').value || 0;
-  let j = +document.getElementById('simulasiJmlUnit').value || 0;
-  let h = +document.getElementById('simulasiHargaJual').value || 0;
-  if (!f || !k || l <= 0 || j <= 0 || h <= 0) { document.getElementById('simulasiHasil').innerHTML = ''; return; }
-  let c = calcNeeds(f, l);
-  let ops = document.getElementById('simulasiOps').value === 'manual' ? (+document.getElementById('simulasiOpsManual').value || 0) : c.cost * (+document.getElementById('simulasiOps').value / 100);
-  let w = (k.volumeMl || 0) * (f.bj || 1.025);
-  let hppProd = c.cost + ops;
-  let totalHpp = hppProd + (k.hargaPerUnit || 0) * j;
-  let omzet = h * j;
-  let laba = omzet - totalHpp;
-  let margin = laba / omzet * 100;
-  document.getElementById('simulasiHasil').innerHTML = `<div class="info-card"><h3>📊 Hasil Simulasi</h3><p>Bahan: <b>${rupiah(c.cost)}</b></p><p>Operasional: <b>${rupiah(ops)}</b></p><p>Kemasan: <b>${rupiah((k.hargaPerUnit || 0) * j)}</b></p><p>Total HPP: <b>${rupiah(totalHpp)}</b></p><p>HPP/unit: <b>${rupiah(totalHpp / j)}</b></p><p>Omzet: <b>${rupiah(omzet)}</b></p><p class="${laba >= 0 ? 'green' : 'red'}">Laba: <b>${rupiah(laba)}</b></p><p>Margin: <b>${margin.toFixed(1)}%</b></p></div>`;
+  var f = getForm(document.getElementById('simulasiForm').value);
+  var k = getKemasan(document.getElementById('simulasiKemasan').value);
+  var l = +document.getElementById('simulasiLiter').value || 0;
+  var j = +document.getElementById('simulasiJmlUnit').value || 0;
+  var h = +document.getElementById('simulasiHargaJual').value || 0;
+  var hasil = document.getElementById('simulasiHasil');
+  if (!f || !k || l <= 0 || j <= 0 || h <= 0) { hasil.innerHTML = ''; return; }
+  var c = calcNeeds(f, l);
+  var opsMode = document.getElementById('simulasiOps').value;
+  var ops = opsMode === 'manual' ? (+document.getElementById('simulasiOpsManual').value || 0) : c.cost * (Number(opsMode) / 100);
+  var w = (k.volumeMl || 0) * (f.bj || 1.025);
+  var hppProd = c.cost + ops;
+  var totalHpp = hppProd + (k.hargaPerUnit || 0) * j;
+  var omzet = h * j;
+  var laba = omzet - totalHpp;
+  var margin = laba / omzet * 100;
+  hasil.innerHTML = '<div class="info-card"><h3>📊 Hasil Simulasi</h3><p>Bahan: <b>' + rupiah(c.cost) + '</b></p><p>Operasional: <b>' + rupiah(ops) + '</b></p><p>Kemasan: <b>' + rupiah((k.hargaPerUnit || 0) * j) + '</b></p><p>Total HPP: <b>' + rupiah(totalHpp) + '</b></p><p>HPP/unit: <b>' + rupiah(totalHpp / j) + '</b></p><p>Omzet: <b>' + rupiah(omzet) + '</b></p><p class="' + (laba >= 0 ? 'green' : 'red') + '">Laba: <b>' + rupiah(laba) + '</b></p><p>Margin: <b>' + margin.toFixed(1) + '%</b></p></div>';
 }
+
 function renderPeralatan() {
-  const arr = [...(data.peralatan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
-  document.getElementById('peralatanTbody').innerHTML = arr.map(p =>
-    `<tr><td>${escapeHtml(p.nama)}</td><td>${p.qty}</td><td>${rupiah(p.hargaUnit)}</td><td>${rupiah(p.total)}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.keterangan || '-')}</td><td><button class="btn btn-danger btn-sm" onclick="hapusPeralatan('${p.id}')">🗑</button></td></tr>`
-  ).join('') || '<tr><td colspan="7">Belum ada peralatan.</td></tr>';
+  var arr = (data.peralatan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var html = '';
+  if (arr.length === 0) {
+    html = '<tr><td colspan="7">Belum ada peralatan.</td></tr>';
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      var p = arr[i];
+      html += '<tr><td>' + escapeHtml(p.nama) + '</td><td>' + p.qty + '</td><td>' + rupiah(p.hargaUnit) + '</td><td>' + rupiah(p.total) + '</td><td>' + fmtDate(p.tanggal) + '</td><td>' + escapeHtml(p.keterangan || '-') + '</td><td><button class="btn btn-danger btn-sm" onclick="hapusPeralatan(\'' + p.id + '\')">🗑</button></td></tr>';
+    }
+  }
+  document.getElementById('peralatanTbody').innerHTML = html;
 }
+
 function tambahPeralatan() {
   modal('Tambah Peralatan',
-    `<div class="form-group"><label>Nama</label><input id="pNama"></div>
-     <div class="form-group"><label>Qty</label><input id="pQty" type="number"></div>
-     <div class="form-group"><label>Harga/unit</label><input id="pHarga" type="number"></div>
-     <div class="form-group"><label>Tanggal</label><input id="pTanggal" type="date" value="${todayStr()}"></div>
-     <div class="form-group"><label>Keterangan</label><input id="pKet"></div>`,
-    () => {
-      let q = +document.getElementById('pQty').value || 0;
-      let h = +document.getElementById('pHarga').value || 0;
-      if (!document.getElementById('pNama').value || q <= 0 || h <= 0) return alertx('Data belum lengkap', 'error');
-      let id = genId();
-      let total = q * h;
-      data.peralatan.push({ id, nama: document.getElementById('pNama').value, qty: q, hargaUnit: h, total, tanggal: document.getElementById('pTanggal').value, keterangan: document.getElementById('pKet').value });
-      data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian peralatan ' + document.getElementById('pNama').value, jumlah: total, tanggal: document.getElementById('pTanggal').value });
+    '<div class="form-group"><label>Nama</label><input id="pNama"></div>' +
+    '<div class="form-group"><label>Qty</label><input id="pQty" type="number"></div>' +
+    '<div class="form-group"><label>Harga/unit</label><input id="pHarga" type="number"></div>' +
+    '<div class="form-group"><label>Tanggal</label><input id="pTanggal" type="date" value="' + todayStr() + '"></div>' +
+    '<div class="form-group"><label>Keterangan</label><input id="pKet"></div>',
+    function() {
+      var q = +document.getElementById('pQty').value || 0;
+      var h = +document.getElementById('pHarga').value || 0;
+      var nama = document.getElementById('pNama').value.trim();
+      if (!nama || q <= 0 || h <= 0) return alertx('Data belum lengkap', 'error');
+      var id = genId();
+      var total = q * h;
+      data.peralatan.push({ id: id, nama: nama, qty: q, hargaUnit: h, total: total, tanggal: document.getElementById('pTanggal').value, keterangan: document.getElementById('pKet').value });
+      data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian peralatan ' + nama, jumlah: total, tanggal: document.getElementById('pTanggal').value });
       renderAll(true);
       alertx('Peralatan dicatat');
     }
   );
 }
+
 function hapusPeralatan(id) {
   if (userRole !== 'admin-full') return;
-  let p = data.peralatan.find(x => x.id === id);
+  var p = data.peralatan.find(function(x) { return x.id === id; });
   if (!p || !confirm('Hapus peralatan?')) return;
-  data.keuangan.pengeluaran = data.keuangan.pengeluaran.filter(x => x.sourceId !== id);
-  data.peralatan = data.peralatan.filter(x => x.id !== id);
+  data.keuangan.pengeluaran = data.keuangan.pengeluaran.filter(function(x) { return x.sourceId !== id; });
+  data.peralatan = data.peralatan.filter(function(x) { return x.id !== id; });
   logAudit('delete', 'peralatan', id, 'Peralatan dihapus');
   renderAll(true);
 }
+
 function renderAudit() {
-  let c = document.getElementById('auditLogContainer');
+  var c = document.getElementById('auditLogContainer');
   if (userRole !== 'admin-full') { c.innerHTML = '<p class="small">Akses terbatas.</p>'; return; }
-  c.innerHTML = (data.auditLogs || []).slice(-100).reverse().map(x =>
-    `<div style="padding:8px;border-bottom:1px solid #e5efee"><b>${x.action}</b> · ${x.user} · ${fmtDate(x.timestamp)} · ${x.collection} · ${x.changes}</div>`
-  ).join('') || '<p class="small">Belum ada aktivitas.</p>';
+  var logs = (data.auditLogs || []).slice(-100).reverse();
+  var html = '';
+  if (logs.length === 0) {
+    html = '<p class="small">Belum ada aktivitas.</p>';
+  } else {
+    for (var i = 0; i < logs.length; i++) {
+      var x = logs[i];
+      html += '<div style="padding:8px;border-bottom:1px solid #e5efee"><b>' + x.action + '</b> · ' + x.user + ' · ' + fmtDate(x.timestamp) + ' · ' + x.collection + ' · ' + x.changes + '</div>';
+    }
+  }
+  c.innerHTML = html;
 }
+
 function tambahModal() {
   if (userRole !== 'admin-full') return;
   modal('Tambah Modal',
-    `<div class="form-group"><label>Nama Pemberi Modal</label><input id="mPemberi"></div>
-     <div class="form-group"><label>Jumlah</label><input id="mJumlah" type="number" min="1"></div>
-     <div class="form-group"><label>Tanggal</label><input id="mTanggal" type="date" value="${todayStr()}"></div>`,
-    () => {
-      const pemberi = document.getElementById('mPemberi').value.trim();
-      const q = Number(document.getElementById('mJumlah').value) || 0;
-      const tgl = document.getElementById('mTanggal').value || todayStr();
+    '<div class="form-group"><label>Nama Pemberi Modal</label><input id="mPemberi"></div>' +
+    '<div class="form-group"><label>Jumlah</label><input id="mJumlah" type="number" min="1"></div>' +
+    '<div class="form-group"><label>Tanggal</label><input id="mTanggal" type="date" value="' + todayStr() + '"></div>',
+    function() {
+      var pemberi = document.getElementById('mPemberi').value.trim();
+      var q = Number(document.getElementById('mJumlah').value) || 0;
+      var tgl = document.getElementById('mTanggal').value || todayStr();
       if (!pemberi || q <= 0) return alertx('Nama pemberi dan jumlah modal wajib diisi', 'error');
-      const id = genId();
-      (data.modalTambahan ||= []).push({ id, pemberi, jumlah: q, tanggal: tgl });
+      var id = genId();
+      if (!data.modalTambahan) data.modalTambahan = [];
+      data.modalTambahan.push({ id: id, pemberi: pemberi, jumlah: q, tanggal: tgl });
       data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Modal dari ' + pemberi, jumlah: q, tanggal: tgl });
       renderAll(true);
       alertx('Modal berhasil dicatat');
     }
   );
 }
+
 function backupData() {
-  let a = document.createElement('a');
+  var a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = 'sibersih_backup_' + todayStr() + '.json';
   a.click();
 }
+
 function restoreData(e) {
-  const f = e.target.files[0];
+  var f = e.target.files[0];
   if (!f) return;
-  const r = new FileReader();
-  r.onload = () => {
+  var r = new FileReader();
+  r.onload = function() {
     try {
-      const x = JSON.parse(r.result);
+      var x = JSON.parse(r.result);
       if (!x || !Array.isArray(x.bahan) || !Array.isArray(x.formulasi)) throw Error('File tidak valid');
       if (confirm('Restore semua data? Data saat ini akan diganti.')) {
-        const d = defaults();
+        var d = defaults();
         data = { ...d, ...x };
         data.keuangan = { ...d.keuangan, ...(x.keuangan || {}) };
-        Object.keys(d).forEach(k => { if (data[k] === undefined) data[k] = d[k]; });
+        var keys = Object.keys(d);
+        for (var i = 0; i < keys.length; i++) {
+          if (data[keys[i]] === undefined) data[keys[i]] = d[keys[i]];
+        }
         logAudit('restore', 'backup', '-', 'Restore data');
         renderAll(true);
         alertx('Restore berhasil');
       }
-    } catch (x) { alertx(x.message || 'File tidak valid', 'error'); }
+    } catch (err) { alertx(err.message || 'File tidak valid', 'error'); }
   };
   r.readAsText(f);
   e.target.value = '';
 }
+
 function resetTransaksi() {
   if (userRole !== 'admin-full') return;
   if (!confirm('Reset semua transaksi? Formulasi tetap dipertahankan.')) return;
-  const typed = prompt('Untuk konfirmasi, ketik RESET');
+  var typed = prompt('Untuk konfirmasi, ketik RESET');
   if (typed !== 'RESET') return alertx('Reset dibatalkan', 'warning');
-  const bahan = data.bahan.map(x => ({ ...x, stok: 0, hargaRataRata: 0 }));
-  const kem = data.kemasanBeli.map(x => ({ ...x, stok: 0 }));
-  const form = data.formulasi;
-  data = { ...defaults(), bahan, kemasanBeli: kem, formulasi: form };
+  var bahan = data.bahan.map(function(x) { return { ...x, stok: 0, hargaRataRata: 0 }; });
+  var kem = data.kemasanBeli.map(function(x) { return { ...x, stok: 0 }; });
+  var form = data.formulasi;
+  data = { ...defaults(), bahan: bahan, kemasanBeli: kem, formulasi: form };
   logAudit('reset', 'database', '-', 'Semua transaksi direset, master formulasi dipertahankan');
   renderAll(true);
   alertx('Semua transaksi direset');
 }
+
+// ============================================================
+// MODAL, FILTER, FONT
+// ============================================================
 function modal(title, html, cb) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('open');
   modalCallback = cb;
-  document.getElementById('modalConfirmBtn').onclick = () => {
+  document.getElementById('modalConfirmBtn').onclick = function() {
     if (modalCallback) modalCallback();
     closeModal();
   };
 }
+
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
   modalCallback = null;
 }
+
 function filterTable(tid, sid) {
-  let q = (document.getElementById(sid).value || '').toLowerCase();
-  document.querySelectorAll('#' + tid + ' tr').forEach(r => r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none');
+  var q = (document.getElementById(sid).value || '').toLowerCase();
+  var rows = document.querySelectorAll('#' + tid + ' tr');
+  for (var i = 0; i < rows.length; i++) {
+    rows[i].style.display = rows[i].textContent.toLowerCase().includes(q) ? '' : 'none';
+  }
 }
-let fs = +localStorage.getItem('sibersih-font') || 16;
+
+var fs = +localStorage.getItem('sibersih-font') || 16;
 document.documentElement.style.fontSize = fs + 'px';
-document.getElementById('fontInc').onclick = () => {
+document.getElementById('fontInc').onclick = function() {
   fs = Math.min(24, fs + 1);
   document.documentElement.style.fontSize = fs + 'px';
   localStorage.setItem('sibersih-font', fs);
 };
-document.getElementById('fontDec').onclick = () => {
+document.getElementById('fontDec').onclick = function() {
   fs = Math.max(12, fs - 1);
   document.documentElement.style.fontSize = fs + 'px';
   localStorage.setItem('sibersih-font', fs);
 };
+
+// Set default tanggal
 document.getElementById('produksiTanggal').value = todayStr();
 document.getElementById('kemasanTanggal').value = todayStr();
 document.getElementById('jualTanggal').value = todayStr();
@@ -1951,27 +2447,46 @@ document.getElementById('jualTanggal').value = todayStr();
 (function() {
   function dateValue(v) {
     v = String(v || '').trim();
-    let m = v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
+    var m = v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
     if (m) return new Date(+m[3], +m[2] - 1, +m[1]).getTime();
     m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
     if (m) return new Date(+m[1], +m[2] - 1, +m[3]).getTime();
     return 0;
   }
   window.sortDatedTables = function() {
-    document.querySelectorAll('table').forEach(function(t) {
-      if (!t.tBodies.length) return;
-      const heads = [...t.querySelectorAll('thead th')];
-      const idx = heads.findIndex(h => /tanggal|tgl|date|waktu/i.test(h.textContent.trim()));
-      if (idx < 0) return;
-      const body = t.tBodies[0];
-      const rows = [...body.rows];
-      const dated = rows.map((row, n) => ({ row, n, time: dateValue(row.cells[idx]?.textContent) }));
-      if (!dated.some(x => x.time)) return;
-      dated.sort((a, b) => b.time - a.time || a.n - b.n);
-      dated.forEach(x => body.appendChild(x.row));
-    });
+    var tables = document.querySelectorAll('table');
+    for (var t = 0; t < tables.length; t++) {
+      var table = tables[t];
+      if (!table.tBodies.length) continue;
+      var heads = [...table.querySelectorAll('thead th')];
+      var idx = -1;
+      for (var h = 0; h < heads.length; h++) {
+        if (/tanggal|tgl|date|waktu/i.test(heads[h].textContent.trim())) {
+          idx = h;
+          break;
+        }
+      }
+      if (idx < 0) continue;
+      var body = table.tBodies[0];
+      var rows = [...body.rows];
+      var dated = [];
+      for (var r = 0; r < rows.length; r++) {
+        var time = dateValue(rows[r].cells[idx]?.textContent);
+        dated.push({ row: rows[r], n: r, time: time });
+      }
+      var hasTime = false;
+      for (var d = 0; d < dated.length; d++) {
+        if (dated[d].time) { hasTime = true; break; }
+      }
+      if (!hasTime) continue;
+      dated.sort(function(a, b) { return b.time - a.time || a.n - b.n; });
+      for (var s = 0; s < dated.length; s++) {
+        body.appendChild(dated[s].row);
+      }
+    }
   };
 })();
+
 setTimeout(sortDatedTables, 500);
 console.log('✅ SI.BERSIH siap digunakan!');
 </script>
