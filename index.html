@@ -1126,15 +1126,22 @@ function batchCode(f, tanggal) {
 function renderCaraKerjaProduksi(f, l, c) {
   const box = document.getElementById('produksiPreview');
   if (!box || !f || !c) return;
+
+  // Siapkan data untuk tabel komposisi
   const items = (c.items || []).slice().sort((a, b) => (a.step || 0) - (b.step || 0));
-  const steps = items.map((x, i) => {
+
+  // Buat tabel komposisi
+  let tableRows = items.map(x => {
     const q = Number(x.qty) || 0;
     const unit = String(x.bahan?.satuanDasar || '').toLowerCase();
     const n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
     const u = unit === 'l' ? 'mL' : 'gram';
-    const sol = x.isLarutan && x.konsentrasiLarutan ? ` <span class="small">(${formatAngkaID(x.konsentrasiLarutan)}% larutan)</span>` : '';
-    return `<div><b>${escapeHtml(x.bahan?.nama || 'Bahan')}</b> — <strong>${formatAngkaID(n)} ${u}</strong>${sol}</div>`;
+    const persen = (x.persen || 0).toFixed(2);
+    const konsentrasi = x.isLarutan && x.konsentrasiLarutan ? ` (${x.konsentrasiLarutan}%)` : '';
+    return `<tr><td>${escapeHtml(x.bahan?.nama || 'Bahan')}</td><td>${persen}%</td><td>${konsentrasi || '-'}</td><td>${formatAngkaID(n)} ${u}</td></tr>`;
   }).join('');
+
+  // Buat preview
   let instr = escapeHtml(String(f.caraPembuatan || ''));
   let idx = 0;
   instr = instr.replace(/\.\.\./g, () => {
@@ -1145,7 +1152,24 @@ function renderCaraKerjaProduksi(f, l, c) {
     const n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
     return `<strong>${formatAngkaID(n)}</strong>`;
   });
-  box.innerHTML = `<b>📐 Kebutuhan Batch ${formatAngkaID(l)} L — ${escapeHtml(f.nama)}</b>${c.autoAdjustedWater ? '<div class="small">Air penyesuaian otomatis ditambahkan sampai komposisi efektif 100%.</div>' : ''}<div class="small">BJ ${formatAngkaID(f.bj)} kg/L · berat ${formatAngkaID(c.totalBerat)} kg · biaya bahan ${rupiah(c.cost)}</div><div class="cara-buat"><b>CARA KERJA + TAKARAN BATCH</b><br>${steps}<br><hr><b>Instruksi:</b><br>${instr.replace(/\n/g, '<br>')}</div>`;
+
+  box.innerHTML = `
+    <b>📐 Kebutuhan Batch ${formatAngkaID(l)} L — ${escapeHtml(f.nama)}</b>
+    ${c.autoAdjustedWater ? '<div class="small">Air penyesuaian otomatis ditambahkan sampai komposisi efektif 100%.</div>' : ''}
+    <div class="small">BJ ${formatAngkaID(f.bj)} kg/L · berat ${formatAngkaID(c.totalBerat)} kg · biaya bahan ${rupiah(c.cost)}</div>
+    
+    <h4 style="margin:12px 0 8px">📊 Komposisi Bahan</h4>
+    <div class="table-wrap" style="max-height:300px">
+      <table>
+        <thead><tr><th>Bahan</th><th>Persentase</th><th>Konsentrasi</th><th>Jumlah</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+
+    <div class="cara-buat"><b>🧪 CARA KERJA + TAKARAN BATCH</b><br>
+    ${instr.replace(/\n/g, '<br>')}
+    </div>
+  `;
   box.style.display = 'block';
 }
 
@@ -1154,7 +1178,6 @@ function toggleOpsManual() {
 }
 
 function buatProduksi() {
-  // Validasi akses
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) {
     alertx('Akses ditolak', 'error');
     return;
@@ -1164,7 +1187,6 @@ function buatProduksi() {
     return;
   }
 
-  // Ambil elemen
   const formSelect = document.getElementById('produksiForm');
   const literInput = document.getElementById('produksiLiter');
   const tglInput = document.getElementById('produksiTanggal');
@@ -1195,7 +1217,6 @@ function buatProduksi() {
     return;
   }
 
-  // Hitung kebutuhan
   const c = calcNeeds(f, l);
   if (c.totalPersen > 100.001) {
     alertx(`Total formulasi melebihi 100%. Saat ini ${formatAngkaID(c.totalPersen)}%. Periksa komposisi bahan.`, 'error');
