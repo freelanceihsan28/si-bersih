@@ -39,7 +39,9 @@ th{position:sticky;top:0;z-index:3;background:#e7f6f3;color:#244e4a;text-align:l
 td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;background:#fff}tr:hover td{background:#f7fcfb}
 .badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:.68rem;font-weight:800}.badge-success{background:#dcfce7;color:#166534}.badge-danger{background:#fee2e2;color:#991b1b}.badge-warning{background:#fef3c7;color:#92400e}.badge-info{background:#dbeafe;color:#1e40af}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:12px 0}.stat-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;text-align:center}.stat-card .num{font-size:1.35rem;font-weight:850;color:var(--teal)}.stat-card .lbl{font-size:.75rem;color:var(--muted);margin-top:3px}
-.info-card{background:#f2fbfa;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}.cara-buat{white-space:pre-wrap;line-height:1.8;background:#fff;border-left:4px solid var(--teal);padding:14px;border-radius:10px;margin-top:10px}.cara-buat strong{font-weight:900;color:#115e59}
+.info-card{background:#f2fbfa;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.cara-buat{white-space:pre-wrap;line-height:1.8;background:#fff;border-left:4px solid var(--teal);padding:14px;border-radius:10px;margin-top:10px}
+.cara-buat strong{font-weight:900;color:#115e59}
 .history-table-scroll{overflow:auto;max-height:500px;border-radius:14px}.history-table-scroll table{min-width:950px}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(7,45,42,.48);z-index:3000;align-items:center;justify-content:center;padding:15px}.modal-overlay.open{display:flex}.modal-box{background:#fff;border-radius:20px;padding:22px;max-width:600px;width:96%;max-height:88vh;overflow:auto}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 .alert-toast{display:none;position:fixed;right:18px;top:18px;z-index:5000;background:#fff;border-left:5px solid var(--teal);padding:14px 18px;border-radius:12px;box-shadow:0 12px 35px rgba(0,0,0,.15);max-width:380px}.alert-toast.error{border-color:var(--red)}.alert-toast.warning{border-color:var(--amber)}
@@ -48,6 +50,16 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 .small{font-size:.75rem;color:var(--muted)}.right{text-align:right}.money{font-weight:800}.green{color:var(--green)}.red{color:var(--red)}
 .font-control{position:fixed;right:14px;bottom:14px;z-index:1000;background:#fff;padding:5px;border-radius:30px;box-shadow:0 4px 18px rgba(0,0,0,.12)}.font-control button{border:0;background:var(--teal);color:#fff;width:34px;height:34px;border-radius:50%;margin:2px;font-weight:800}
 @media(max-width:650px){body{padding:6px}.app{padding:8px;border-radius:18px}.user-info #userEmail{display:none}.form-group{flex-basis:100%}.tab-bar button{flex-basis:45%}.table-wrap{max-height:460px}table{font-size:.74rem}.menu-dropdown{min-width:210px}.stat-grid{grid-template-columns:1fr 1fr}}
+
+/* Tabel komposisi bahan yang rapi */
+.compact-table td, .compact-table th {
+  padding: 6px 8px !important;
+  font-size: 0.75rem !important;
+}
+.compact-table th {
+  background: #e7f6f3;
+  font-weight: 700;
+}
 </style>
 </head>
 <body>
@@ -127,9 +139,9 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 </div>
 <div class="tab-content" id="tab-prod-buat">
 <div class="form-row">
-<div class="form-group"><label>Formulasi</label><select id="produksiForm" ></select></div>
+<div class="form-group"><label>Formulasi</label><select id="produksiForm"></select></div>
 <div class="form-group"><label>Tanggal</label><input id="produksiTanggal" type="date"></div>
-<div class="form-group"><label>Liter</label><input id="produksiLiter" type="number" step=".1" ></div>
+<div class="form-group"><label>Liter</label><input id="produksiLiter" type="number" step=".1"></div>
 <div class="form-group"><label>Biaya Operasional</label><select id="produksiOpsMode" onchange="toggleOpsManual()"><option value="15">15%</option><option value="20">20%</option><option value="manual">Manual</option></select></div>
 <div class="form-group" id="opsManualGroup" style="display:none"><label>Manual (Rp)</label><input id="produksiOpsManual" type="number"></div>
 </div>
@@ -157,6 +169,10 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div id="packagingPreview" class="info-card"></div>
 <div class="search-box"><input id="searchKemasanJadi" placeholder="🔍 Cari..." oninput="filterTable('kemasanTbody','searchKemasanJadi')"></div>
 <div class="history-table-scroll"><table><thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Stok</th><th>Harga Jual</th><th>HPP/Unit</th><th>Aksi</th></tr></thead><tbody id="kemasanTbody"></tbody></table></div>
+
+<!-- Riwayat Pengemasan hanya di halaman ini -->
+<h3 style="margin-top:24px">🕘 Riwayat Pengemasan</h3>
+<div id="riwayatPengemasanContainer"></div>
 </div>
 
 <div class="page" id="page-penjualan">
@@ -446,9 +462,8 @@ function loadData() {
       const doc = s.docs[0];
       data = { ...defaults(), ...doc.data() };
       dataDocId = doc.id;
-      // Ensure all arrays exist
-      ['bahan', 'kemasanBeli', 'formulasi', 'produksi', 'pengemasan', 'stokBarangJadi',
-       'penjualan', 'peralatan', 'pembelianBahan', 'pembelianKemasan', 'modalTambahan',
+      ['bahan','kemasanBeli','formulasi','produksi','pengemasan','stokBarangJadi',
+       'penjualan','peralatan','pembelianBahan','pembelianKemasan','modalTambahan',
        'auditLogs'].forEach(k => { if (!data[k]) data[k] = []; });
       if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
       if (!data.keuangan.pemasukan) data.keuangan.pemasukan = [];
@@ -746,7 +761,7 @@ function hapusKemasanBeli(id) {
 }
 
 // ============================================================
-// PEMBELIAN BAHAN (multi-item)
+// PEMBELIAN BAHAN (multi-item) - disederhanakan tampilannya
 // ============================================================
 function purchaseShippingBasis(item) {
   const b = getBahan(item?.bahanId);
@@ -1068,7 +1083,7 @@ function hapusFormulasi(id) {
 }
 
 // ============================================================
-// PRODUKSI (BATCH)
+// PRODUKSI (BATCH) - dengan tabel komposisi rapi
 // ============================================================
 function calcNeeds(f, liter) {
   if (!f) return { totalBerat: 0, items: [], cost: 0, totalPersen: 0, declaredPersen: 0, autoAdjustedWater: false };
@@ -1077,7 +1092,6 @@ function calcNeeds(f, liter) {
   let cost = 0;
   let declaredPersen = (f.items || []).reduce((s, x) => s + (Number(x.persen) || 0), 0);
   let effectiveItems = [...(f.items || [])];
-  // Auto adjust with air if total < 100%
   if (declaredPersen < 99.999999) {
     const air = f.items?.find(x => getBahan(x.bahanId)?.nama?.trim().toLowerCase() === 'air');
     if (air) {
@@ -1089,7 +1103,6 @@ function calcNeeds(f, liter) {
     const b = getBahan(it.bahanId);
     if (!b) continue;
     const qty = totalBerat * (Number(it.persen) || 0) / 100;
-    const konsentrasi = it.isLarutan ? Number(it.konsentrasiLarutan) || 0 : 0;
     const costItem = qty * (Number(b.hargaRataRata) || 0);
     cost += costItem;
     items.push({
@@ -1097,9 +1110,9 @@ function calcNeeds(f, liter) {
       bahan: b,
       qty: qty,
       qtyLarutan: qty,
-      qtyAktif: it.isLarutan && konsentrasi > 0 ? qty * konsentrasi / 100 : qty,
-      konsentrasiLarutan: konsentrasi,
-      cost: costItem
+      qtyAktif: qty,
+      cost: costItem,
+      konsentrasiLarutan: it.isLarutan ? Number(it.konsentrasiLarutan) || 0 : 0
     });
   }
   return { totalBerat, items, cost, totalPersen, declaredPersen, autoAdjustedWater: totalPersen > declaredPersen };
@@ -1126,22 +1139,21 @@ function batchCode(f, tanggal) {
 function renderCaraKerjaProduksi(f, l, c) {
   const box = document.getElementById('produksiPreview');
   if (!box || !f || !c) return;
-
-  // Siapkan data untuk tabel komposisi
   const items = (c.items || []).slice().sort((a, b) => (a.step || 0) - (b.step || 0));
-
-  // Buat tabel komposisi
+  
+  // Tabel komposisi bahan (tanpa kolom konsentrasi, ringkas)
   let tableRows = items.map(x => {
     const q = Number(x.qty) || 0;
     const unit = String(x.bahan?.satuanDasar || '').toLowerCase();
     const n = (unit === 'kg' || unit === 'l') ? q * 1000 : q;
     const u = unit === 'l' ? 'mL' : 'gram';
-    const persen = (x.persen || 0).toFixed(2);
-    const konsentrasi = x.isLarutan && x.konsentrasiLarutan ? ` (${x.konsentrasiLarutan}%)` : '';
-    return `<tr><td>${escapeHtml(x.bahan?.nama || 'Bahan')}</td><td>${persen}%</td><td>${konsentrasi || '-'}</td><td>${formatAngkaID(n)} ${u}</td></tr>`;
+    const label = `${formatAngkaID(n)} ${u}`;
+    const persen = formatAngkaID(Number(x.persen) || 0);
+    const konsentrasi = x.isLarutan && x.konsentrasiLarutan ? ` (${formatAngkaID(x.konsentrasiLarutan)}%)` : '';
+    return `<tr><td>${escapeHtml(x.bahan?.nama || '-')}</td><td>${persen}%${konsentrasi}</td><td><strong>${label}</strong></td></tr>`;
   }).join('');
 
-  // Buat preview
+  // Instruksi detail
   let instr = escapeHtml(String(f.caraPembuatan || ''));
   let idx = 0;
   instr = instr.replace(/\.\.\./g, () => {
@@ -1158,17 +1170,14 @@ function renderCaraKerjaProduksi(f, l, c) {
     ${c.autoAdjustedWater ? '<div class="small">Air penyesuaian otomatis ditambahkan sampai komposisi efektif 100%.</div>' : ''}
     <div class="small">BJ ${formatAngkaID(f.bj)} kg/L · berat ${formatAngkaID(c.totalBerat)} kg · biaya bahan ${rupiah(c.cost)}</div>
     
-    <h4 style="margin:12px 0 8px">📊 Komposisi Bahan</h4>
-    <div class="table-wrap" style="max-height:300px">
-      <table>
-        <thead><tr><th>Bahan</th><th>Persentase</th><th>Konsentrasi</th><th>Jumlah</th></tr></thead>
+    <div style="margin:12px 0;overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:300px">
+      <table class="compact-table" style="min-width:0;width:auto;font-size:0.78rem">
+        <thead><tr><th style="background:#e7f6f3;padding:6px 10px">Bahan</th><th style="background:#e7f6f3;padding:6px 10px">Komposisi</th><th style="background:#e7f6f3;padding:6px 10px">Takaran</th></tr></thead>
         <tbody>${tableRows}</tbody>
       </table>
     </div>
 
-    <div class="cara-buat"><b>🧪 CARA KERJA + TAKARAN BATCH</b><br>
-    ${instr.replace(/\n/g, '<br>')}
-    </div>
+    <div class="cara-buat"><b>CARA KERJA</b><br>${instr.replace(/\n/g, '<br>')}</div>
   `;
   box.style.display = 'block';
 }
@@ -1223,17 +1232,14 @@ function buatProduksi() {
     return;
   }
 
-  // Cek stok
   const bad = c.items.filter(x => x.bahan.stok + 1e-9 < x.qty);
   if (bad.length) {
     alertx('Stok tidak cukup: ' + bad.map(x => x.bahan.nama).join(', '), 'error');
     return;
   }
 
-  // Kurangi stok
   c.items.forEach(x => x.bahan.stok -= x.qty);
 
-  // Biaya operasional
   const opsMode = opsModeSelect.value;
   let ops = 0;
   if (opsMode === 'manual') {
@@ -1242,7 +1248,6 @@ function buatProduksi() {
     ops = c.cost * (Number(opsMode) / 100);
   }
 
-  // Simpan snapshot formulasi
   const formulaSnapshot = {
     nama: f.nama,
     bj: Number(f.bj) || 1.025,
@@ -1264,11 +1269,11 @@ function buatProduksi() {
 
   const id = genId();
   const batchNo = batchCode(f, tgl);
-  const produksiEntry = {
+  data.produksi.push({
     id,
     batchNo,
     formulasiId: fid,
-    formulasiSnapshot: formulaSnapshot,
+    formulasiSnapshot,
     jumlahLiter: l,
     sisaLiter: l,
     bj: f.bj,
@@ -1278,15 +1283,11 @@ function buatProduksi() {
     tanggalPembuatan: tgl,
     createdAt: new Date().toISOString(),
     createdBy: currentUser.email
-  };
-
-  data.produksi.push(produksiEntry);
+  });
   logAudit('create', 'produksi', id, 'Batch ' + batchNo);
 
-  // Tampilkan preview
   renderCaraKerjaProduksi(f, l, c);
 
-  // Reset form
   literInput.value = '';
   opsModeSelect.value = '15';
   opsManualInput.value = '';
@@ -1489,6 +1490,7 @@ function tambahKemasan() {
   alertx('Pengemasan berhasil');
 }
 
+// RENDER PENGEMASAN + RIWAYAT (hanya di halaman ini)
 function renderPengemasan() {
   updatePackagingInfo();
   let g = {};
@@ -1505,17 +1507,11 @@ function renderPengemasan() {
     `<tr><td>${escapeHtml(x.jenisSabun)}</td><td>${escapeHtml(getKemasan(x.kemasanId)?.nama || '-')}</td><td><b>${x.stok}</b></td><td>${rupiah(x.harga)}</td><td>${rupiah(x.hpp)}</td><td><button class="btn btn-warning btn-sm" onclick="editKemasanGroup('${encodeURIComponent(x.jenisSabun)}','${x.kemasanId}')">✏</button> <button class="btn btn-danger btn-sm" onclick="hapusKemasanGroup('${encodeURIComponent(x.jenisSabun)}','${x.kemasanId}')">🗑</button></td></tr>`
   ).join('') || '<tr><td colspan="6">Belum ada stok barang jadi.</td></tr>';
 
+  // Riwayat Pengemasan di halaman ini saja
   const hist = [...(data.pengemasan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
-  const box = document.getElementById('riwayatPengemasan') || (() => {
-    const host = document.getElementById('kemasanTbody')?.closest('.history-table-scroll')?.parentElement;
-    if (host) {
-      host.insertAdjacentHTML('afterend', '<h3 style="margin-top:18px">🕘 Riwayat Pengemasan</h3><div id="riwayatPengemasan"></div>');
-      return document.getElementById('riwayatPengemasan');
-    }
-    return null;
-  })();
-  if (box) {
-    box.innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis Sabun</th><th>Kemasan</th><th>Qty</th><th>Isi/unit</th><th>Total Liter</th><th>Aksi</th></tr></thead><tbody>
+  const container = document.getElementById('riwayatPengemasanContainer');
+  if (container) {
+    container.innerHTML = `<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis Sabun</th><th>Kemasan</th><th>Qty</th><th>Isi/unit</th><th>Total Liter</th><th>Aksi</th></tr></thead><tbody>
       ${hist.map(p => `<tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisSabun)}</td><td>${escapeHtml(getKemasan(p.kemasanId)?.nama || '-')}</td><td>${p.jumlahUnit}</td><td>${formatAngkaID(p.beratPerUnit)} g</td><td>${formatAngkaID(p.totalLiter)} L</td><td><button class="btn btn-danger btn-sm" onclick="hapusPengemasan('${p.id}')">🗑 Hapus</button></td></tr>`).join('') || '<tr><td colspan="7">Belum ada riwayat pengemasan.</td></tr>'}
     </tbody></table></div>`;
   }
@@ -1699,7 +1695,7 @@ function bayarHutang(id) {
 }
 
 // ============================================================
-// LAPORAN
+// LAPORAN (singkat)
 // ============================================================
 function renderLaporan() {
   let totalJ = (data.penjualan || []).reduce((s, x) => s + x.total, 0);
@@ -1707,7 +1703,6 @@ function renderLaporan() {
   let piutang = totalJ - lunas;
   let hpp = (data.penjualan || []).reduce((s, x) => s + x.hppTotal, 0);
   let laba = totalJ - hpp;
-  let modal = (data.modalTambahan || []).reduce((s, x) => s + x.jumlah, 0);
   let masuk = (data.keuangan.pemasukan || []).reduce((s, x) => s + x.jumlah, 0);
   let keluar = (data.keuangan.pengeluaran || []).reduce((s, x) => s + x.jumlah, 0);
   let kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
@@ -1791,13 +1786,12 @@ function renderLabaRugi() {
 }
 
 // ============================================================
-// SIMULASI
+// SIMULASI, PERALATAN, AUDIT, DLL (tetap sama)
 // ============================================================
 function renderSimDropdown() {
   document.getElementById('simulasiForm').innerHTML = (data.formulasi || []).map(f => `<option value="${f.id}">${f.nama}</option>`).join('');
   document.getElementById('simulasiKemasan').innerHTML = (data.kemasanBeli || []).map(k => `<option value="${k.id}">${k.nama} (${k.volumeMl}mL)</option>`).join('');
 }
-
 function hitungSimulasi() {
   let f = getForm(document.getElementById('simulasiForm').value);
   let k = getKemasan(document.getElementById('simulasiKemasan').value);
@@ -1815,17 +1809,12 @@ function hitungSimulasi() {
   let margin = laba / omzet * 100;
   document.getElementById('simulasiHasil').innerHTML = `<div class="info-card"><h3>📊 Hasil Simulasi</h3><p>Bahan: <b>${rupiah(c.cost)}</b></p><p>Operasional: <b>${rupiah(ops)}</b></p><p>Kemasan: <b>${rupiah((k.hargaPerUnit || 0) * j)}</b></p><p>Total HPP: <b>${rupiah(totalHpp)}</b></p><p>HPP/unit: <b>${rupiah(totalHpp / j)}</b></p><p>Omzet: <b>${rupiah(omzet)}</b></p><p class="${laba >= 0 ? 'green' : 'red'}">Laba: <b>${rupiah(laba)}</b></p><p>Margin: <b>${margin.toFixed(1)}%</b></p></div>`;
 }
-
-// ============================================================
-// PERALATAN
-// ============================================================
 function renderPeralatan() {
   const arr = [...(data.peralatan || [])].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
   document.getElementById('peralatanTbody').innerHTML = arr.map(p =>
     `<tr><td>${escapeHtml(p.nama)}</td><td>${p.qty}</td><td>${rupiah(p.hargaUnit)}</td><td>${rupiah(p.total)}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.keterangan || '-')}</td><td><button class="btn btn-danger btn-sm" onclick="hapusPeralatan('${p.id}')">🗑</button></td></tr>`
   ).join('') || '<tr><td colspan="7">Belum ada peralatan.</td></tr>';
 }
-
 function tambahPeralatan() {
   modal('Tambah Peralatan',
     `<div class="form-group"><label>Nama</label><input id="pNama"></div>
@@ -1846,7 +1835,6 @@ function tambahPeralatan() {
     }
   );
 }
-
 function hapusPeralatan(id) {
   if (userRole !== 'admin-full') return;
   let p = data.peralatan.find(x => x.id === id);
@@ -1856,10 +1844,6 @@ function hapusPeralatan(id) {
   logAudit('delete', 'peralatan', id, 'Peralatan dihapus');
   renderAll(true);
 }
-
-// ============================================================
-// AUDIT
-// ============================================================
 function renderAudit() {
   let c = document.getElementById('auditLogContainer');
   if (userRole !== 'admin-full') { c.innerHTML = '<p class="small">Akses terbatas.</p>'; return; }
@@ -1867,10 +1851,6 @@ function renderAudit() {
     `<div style="padding:8px;border-bottom:1px solid #e5efee"><b>${x.action}</b> · ${x.user} · ${fmtDate(x.timestamp)} · ${x.collection} · ${x.changes}</div>`
   ).join('') || '<p class="small">Belum ada aktivitas.</p>';
 }
-
-// ============================================================
-// MODAL, FILTER, FONT, DLL
-// ============================================================
 function tambahModal() {
   if (userRole !== 'admin-full') return;
   modal('Tambah Modal',
@@ -1890,14 +1870,12 @@ function tambahModal() {
     }
   );
 }
-
 function backupData() {
   let a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = 'sibersih_backup_' + todayStr() + '.json';
   a.click();
 }
-
 function restoreData(e) {
   const f = e.target.files[0];
   if (!f) return;
@@ -1920,7 +1898,6 @@ function restoreData(e) {
   r.readAsText(f);
   e.target.value = '';
 }
-
 function resetTransaksi() {
   if (userRole !== 'admin-full') return;
   if (!confirm('Reset semua transaksi? Formulasi tetap dipertahankan.')) return;
@@ -1934,7 +1911,6 @@ function resetTransaksi() {
   renderAll(true);
   alertx('Semua transaksi direset');
 }
-
 function modal(title, html, cb) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = html;
@@ -1945,18 +1921,14 @@ function modal(title, html, cb) {
     closeModal();
   };
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
   modalCallback = null;
 }
-
 function filterTable(tid, sid) {
   let q = (document.getElementById(sid).value || '').toLowerCase();
   document.querySelectorAll('#' + tid + ' tr').forEach(r => r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none');
 }
-
-// Font size
 let fs = +localStorage.getItem('sibersih-font') || 16;
 document.documentElement.style.fontSize = fs + 'px';
 document.getElementById('fontInc').onclick = () => {
@@ -1969,14 +1941,12 @@ document.getElementById('fontDec').onclick = () => {
   document.documentElement.style.fontSize = fs + 'px';
   localStorage.setItem('sibersih-font', fs);
 };
-
-// Set default tanggal
 document.getElementById('produksiTanggal').value = todayStr();
 document.getElementById('kemasanTanggal').value = todayStr();
 document.getElementById('jualTanggal').value = todayStr();
 
 // ============================================================
-// AUTO SORT TABLE BY DATE (jika diperlukan)
+// AUTO SORT TABLE BY DATE
 // ============================================================
 (function() {
   function dateValue(v) {
@@ -2002,10 +1972,7 @@ document.getElementById('jualTanggal').value = todayStr();
     });
   };
 })();
-
-// Panggil sort setelah render
 setTimeout(sortDatedTables, 500);
-
 console.log('✅ SI.BERSIH siap digunakan!');
 </script>
 </body>
