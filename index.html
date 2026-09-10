@@ -381,18 +381,23 @@ function computeHppPerUnit(item) {
 }
 
 // ============================================================
-// ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS (termasuk biaya ops) ⭐⭐⭐
+// ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS (REAL-TIME) ⭐⭐⭐
+// INPUT: Invest + Penjualan Lunas
+// OUTPUT: Beli Bahan + Beli Kemasan + Peralatan
+// (Biaya ops TIDAK mengurangi kas — hanya untuk HPP)
 // ============================================================
 function hitungSaldoKas() {
   var saldo = Number(data.keuangan?.saldoAwal) || 0;
   
-  // Pemasukan dari modal
+  // ==================== INPUT ====================
+  
+  // 1. Invest (Modal)
   var tambahan = data.modalTambahan || [];
   for (var i = 0; i < tambahan.length; i++) {
     saldo += Number(tambahan[i].jumlah) || 0;
   }
   
-  // Pemasukan dari penjualan Lunas
+  // 2. Penjualan LUNAS saja
   var penjualan = data.penjualan || [];
   for (var j = 0; j < penjualan.length; j++) {
     if (penjualan[j].status === 'Lunas') {
@@ -400,28 +405,24 @@ function hitungSaldoKas() {
     }
   }
   
-  // Pengeluaran dari pembelian bahan baku
+  // ==================== OUTPUT ====================
+  
+  // 3. Beli Bahan Baku
   var beliBahan = data.pembelianBahan || [];
   for (var k = 0; k < beliBahan.length; k++) {
     saldo -= Number(beliBahan[k].total) || 0;
   }
   
-  // Pengeluaran dari pembelian kemasan
+  // 4. Beli Kemasan
   var beliKemasan = data.pembelianKemasan || [];
   for (var l = 0; l < beliKemasan.length; l++) {
     saldo -= Number(beliKemasan[l].total) || 0;
   }
   
-  // Pengeluaran dari pembelian peralatan
+  // 5. Beli Peralatan
   var peralatan = data.peralatan || [];
   for (var m = 0; m < peralatan.length; m++) {
     saldo -= Number(peralatan[m].total) || 0;
-  }
-  
-  // ⭐ PENGELUARAN: biaya operasional produksi
-  var produksi = data.produksi || [];
-  for (var p = 0; p < produksi.length; p++) {
-    saldo -= Number(produksi[p].biayaOperasional) || 0;
   }
   
   return saldo;
@@ -437,7 +438,7 @@ function getArusKasDetail() {
     rows.push({
       tanggal: tambahan[i].tanggal,
       tipe: 'Masuk',
-      sumber: '💰 Modal dari ' + tambahan[i].pemberi,
+      sumber: '💰 Invest dari ' + tambahan[i].pemberi,
       jumlah: Number(tambahan[i].jumlah) || 0
     });
   }
@@ -452,21 +453,6 @@ function getArusKasDetail() {
         tipe: 'Masuk',
         sumber: '🛒 Penjualan ' + p.jenisSabun + ' x' + p.jumlahTerjual,
         jumlah: Number(p.total) || 0
-      });
-    }
-  }
-  
-  // ⭐ Biaya operasional produksi
-  var produksi = data.produksi || [];
-  for (var pr = 0; pr < produksi.length; pr++) {
-    var pd = produksi[pr];
-    var ops = Number(pd.biayaOperasional) || 0;
-    if (ops > 0) {
-      rows.push({
-        tanggal: pd.tanggalPembuatan,
-        tipe: 'Keluar',
-        sumber: '⚙️ Biaya ops batch ' + pd.batchNo,
-        jumlah: ops
       });
     }
   }
@@ -778,16 +764,14 @@ function renderDashboard() {
   for (var bk = 0; bk < beliKem.length; bk++) kasKeluar += Number(beliKem[bk].total) || 0;
   var peralatan = data.peralatan || [];
   for (var pr = 0; pr < peralatan.length; pr++) kasKeluar += Number(peralatan[pr].total) || 0;
-  var produksi = data.produksi || [];
-  for (var po = 0; po < produksi.length; po++) kasKeluar += Number(produksi[po].biayaOperasional) || 0;
   
   var kas = hitungSaldoKas();
 
   document.getElementById('modalSummary').innerHTML = 
     '<div class="stat-grid">' +
       '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(modal) + '</div><div class="lbl">Modal Masuk</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(kasMasuk) + '</div><div class="lbl">Kas Masuk (Lunas)</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(modal) + '</div><div class="lbl">Invest Masuk</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(kasMasuk) + '</div><div class="lbl">Penjualan Lunas</div></div>' +
       '<div class="stat-card"><div class="num">' + rupiah(kasKeluar) + '</div><div class="lbl">Kas Keluar</div></div>' +
     '</div>';
   renderInvestorSummary();
@@ -975,7 +959,7 @@ function tambahPembelianKemasan() {
       if (!data.pembelianKemasan) data.pembelianKemasan = [];
       data.pembelianKemasan.push({ id: id, kemasanId: k.id, qty: q, hargaBarang: harga, ongkosKirim: ongkir, total: total, keterangan: document.getElementById('pkKet').value.trim(), tanggal: tgl });
       renderAll(true);
-      alertx('Pembelian kemasan tersimpan. Saldo kas otomatis berkurang ' + rupiah(total) + '.');
+      alertx('Pembelian kemasan tersimpan. Kas berkurang ' + rupiah(total) + '.');
     }
   );
 }
@@ -1196,7 +1180,7 @@ function tambahPembelianBahan() {
       var tgl = document.getElementById('pt').value || todayStr();
       data.pembelianBahan.push({ id: id, tanggal: tgl, total: total, ongkosKirim: ongkir, items: allocated });
       renderAll(true);
-      alertx('Pembelian tersimpan. Saldo kas otomatis berkurang ' + rupiah(total) + '.');
+      alertx('Pembelian tersimpan. Kas berkurang ' + rupiah(total) + '.');
     }
   );
 }
@@ -1795,7 +1779,7 @@ function buatProduksi() {
   toggleOpsManual();
 
   renderAll(true);
-  alertx('✅ Batch ' + batchNo + ' dibuat. Saldo kas berkurang ' + rupiah(ops) + ' (biaya ops).');
+  alertx('✅ Batch ' + batchNo + ' berhasil dibuat.');
 }
 
 function renderProduksi() {
@@ -1836,7 +1820,7 @@ function hapusProduksi(id) {
     alertx('Batch sudah pernah dikemas. Hapus pengemasan terkait terlebih dahulu.', 'error');
     return;
   }
-  if (!confirm('Hapus batch ' + p.batchNo + '?\n\nStok bahan & biaya ops ' + rupiah(p.biayaOperasional || 0) + ' akan dikembalikan ke kas.')) return;
+  if (!confirm('Hapus batch ' + p.batchNo + '? Stok bahan akan dikembalikan.')) return;
   var snap = p.formulasiSnapshot;
   if (snap && Array.isArray(snap.items)) {
     for (var k = 0; k < snap.items.length; k++) {
@@ -1858,9 +1842,9 @@ function hapusProduksi(id) {
     if (data.produksi[n].id !== id) newProd.push(data.produksi[n]);
   }
   data.produksi = newProd;
-  logAudit('delete', 'produksi', id, 'Batch ' + p.batchNo + ' dihapus. Stok bahan & biaya ops dikembalikan.');
+  logAudit('delete', 'produksi', id, 'Batch ' + p.batchNo + ' dihapus. Stok bahan dikembalikan.');
   renderAll(true);
-  alertx('Batch dihapus. Stok bahan & biaya ops ' + rupiah(p.biayaOperasional || 0) + ' dikembalikan ke kas.');
+  alertx('Batch dihapus. Stok bahan dikembalikan.');
 }
 
 // ============================================================
@@ -2327,7 +2311,7 @@ function catatJual() {
   });
   renderAll(true);
   if (status === 'Lunas') {
-    alertx('Penjualan dicatat. Saldo kas otomatis bertambah ' + rupiah(total) + '.');
+    alertx('Penjualan dicatat. Kas bertambah ' + rupiah(total) + '.');
   } else {
     alertx('Penjualan dicatat sebagai Hutang (belum masuk kas).');
   }
@@ -2386,7 +2370,7 @@ function bayarHutang(id) {
   if (!confirm('Catat pelunasan sebesar ' + rupiah(jual.total) + '?\n\nSaldo kas akan bertambah otomatis.')) return;
   jual.status = 'Lunas';
   renderAll(true);
-  alertx('✅ Piutang dilunasi. Saldo kas bertambah ' + rupiah(jual.total) + '.');
+  alertx('✅ Piutang dilunasi. Kas bertambah ' + rupiah(jual.total) + '.');
 }
 
 // ============================================================
@@ -2424,8 +2408,8 @@ function renderLaporan() {
     '</div>' +
     '<div class="financial-note">' +
       '<b>ℹ️ Saldo Kas (real-time):</b><br>' +
-      '💰 Modal + Penjualan Lunas<br>' +
-      '− Pembelian bahan − Pembelian kemasan − Pembelian peralatan − Biaya ops produksi' +
+      '💰 Invest + Penjualan Lunas<br>' +
+      '− Beli Bahan − Beli Kemasan − Beli Peralatan' +
     '</div>' +
     invHtml;
   
@@ -2584,23 +2568,15 @@ function editBiayaOperasionalProduksi(id) {
   modal('Edit Biaya Operasional',
     '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
     '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>' +
-    '<div class="small">✅ Perubahan akan otomatis meng-update:<br>' +
-    '• HPP/unit & HPP terjual<br>' +
-    '• Laba di semua laporan<br>' +
-    '• <b>Saldo kas</b> (biaya ops = pengeluaran kas)</div>',
+    '<div class="small">✅ Perubahan akan otomatis meng-update HPP/unit, HPP terjual, dan Laba di semua laporan.</div>',
     function() {
       var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
       var oldValue = Number(p.biayaOperasional) || 0;
-      var selisih = v - oldValue;
       p.biayaOperasional = v;
       logAudit('update', 'produksi', id, 'Biaya ops ' + rupiah(oldValue) + ' → ' + rupiah(v));
       renderAll(true);
-      var pesan = '✅ Biaya ops diperbarui. ';
-      if (selisih > 0) pesan += 'Saldo kas berkurang ' + rupiah(selisih) + '. ';
-      else if (selisih < 0) pesan += 'Saldo kas bertambah ' + rupiah(Math.abs(selisih)) + '. ';
-      pesan += 'HPP & Laba di semua laporan sudah disesuaikan.';
-      alertx(pesan);
+      alertx('✅ Biaya ops diperbarui. HPP & Laba di semua laporan sudah disesuaikan.');
     }
   );
 }
@@ -2708,7 +2684,7 @@ function tambahPeralatan() {
       var total = q * h;
       data.peralatan.push({ id: id, nama: nama, qty: q, hargaUnit: h, total: total, tanggal: document.getElementById('pTanggal').value, keterangan: document.getElementById('pKet').value });
       renderAll(true);
-      alertx('Peralatan dicatat. Saldo kas otomatis berkurang ' + rupiah(total) + '.');
+      alertx('Peralatan dicatat. Kas berkurang ' + rupiah(total) + '.');
     }
   );
 }
@@ -2763,7 +2739,7 @@ function tambahModal() {
       if (!data.modalTambahan) data.modalTambahan = [];
       data.modalTambahan.push({ id: id, pemberi: pemberi, jumlah: q, tanggal: tgl, keterangan: ket });
       renderAll(true);
-      alertx('Investasi dicatat. Saldo kas otomatis bertambah ' + rupiah(q) + '.');
+      alertx('Investasi dicatat. Saldo kas bertambah ' + rupiah(q) + '.');
     }
   );
 }
