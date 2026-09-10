@@ -381,8 +381,7 @@ function computeHppPerUnit(item) {
 }
 
 // ============================================================
-// ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS TERPADU (REAL-TIME) ⭐⭐⭐
-// Sekarang termasuk biaya operasional produksi!
+// ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS (termasuk biaya ops) ⭐⭐⭐
 // ============================================================
 function hitungSaldoKas() {
   var saldo = Number(data.keuangan?.saldoAwal) || 0;
@@ -399,12 +398,6 @@ function hitungSaldoKas() {
     if (penjualan[j].status === 'Lunas') {
       saldo += Number(penjualan[j].total) || 0;
     }
-  }
-  
-  // ⭐ PENGELUARAN: biaya operasional produksi
-  var produksi = data.produksi || [];
-  for (var p = 0; p < produksi.length; p++) {
-    saldo -= Number(produksi[p].biayaOperasional) || 0;
   }
   
   // Pengeluaran dari pembelian bahan baku
@@ -425,10 +418,16 @@ function hitungSaldoKas() {
     saldo -= Number(peralatan[m].total) || 0;
   }
   
+  // ⭐ PENGELUARAN: biaya operasional produksi
+  var produksi = data.produksi || [];
+  for (var p = 0; p < produksi.length; p++) {
+    saldo -= Number(produksi[p].biayaOperasional) || 0;
+  }
+  
   return saldo;
 }
 
-// Rincian untuk arus kas (transparansi)
+// Rincian arus kas
 function getArusKasDetail() {
   var rows = [];
   
@@ -1786,7 +1785,7 @@ function buatProduksi() {
     createdAt: new Date().toISOString(),
     createdBy: currentUser.email
   });
-  logAudit('create', 'produksi', id, 'Batch ' + batchNo + ' dengan biaya ops ' + rupiah(ops));
+  logAudit('create', 'produksi', id, 'Batch ' + batchNo);
 
   renderCaraKerjaProduksi(f, l, c);
 
@@ -1837,7 +1836,7 @@ function hapusProduksi(id) {
     alertx('Batch sudah pernah dikemas. Hapus pengemasan terkait terlebih dahulu.', 'error');
     return;
   }
-  if (!confirm('Hapus batch ' + p.batchNo + '?\n\nStok bahan akan dikembalikan dan biaya ops ' + rupiah(p.biayaOperasional || 0) + ' akan dikembalikan ke kas.')) return;
+  if (!confirm('Hapus batch ' + p.batchNo + '?\n\nStok bahan & biaya ops ' + rupiah(p.biayaOperasional || 0) + ' akan dikembalikan ke kas.')) return;
   var snap = p.formulasiSnapshot;
   if (snap && Array.isArray(snap.items)) {
     for (var k = 0; k < snap.items.length; k++) {
@@ -2426,8 +2425,7 @@ function renderLaporan() {
     '<div class="financial-note">' +
       '<b>ℹ️ Saldo Kas (real-time):</b><br>' +
       '💰 Modal + Penjualan Lunas<br>' +
-      '− Pembelian bahan − Pembelian kemasan − Pembelian peralatan<br>' +
-      '<b>− Biaya operasional produksi</b> (listrik, tenaga kerja, dll.)' +
+      '− Pembelian bahan − Pembelian kemasan − Pembelian peralatan − Biaya ops produksi' +
     '</div>' +
     invHtml;
   
@@ -2586,25 +2584,22 @@ function editBiayaOperasionalProduksi(id) {
   modal('Edit Biaya Operasional',
     '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
     '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>' +
-    '<div class="small">✅ Perubahan biaya ops akan <b>otomatis meng-update</b>:<br>' +
+    '<div class="small">✅ Perubahan akan otomatis meng-update:<br>' +
     '• HPP/unit & HPP terjual<br>' +
     '• Laba di semua laporan<br>' +
-    '• <b>Saldo kas</b> (karena biaya ops adalah pengeluaran kas aktual)</div>',
+    '• <b>Saldo kas</b> (biaya ops = pengeluaran kas)</div>',
     function() {
       var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
       var oldValue = Number(p.biayaOperasional) || 0;
       var selisih = v - oldValue;
       p.biayaOperasional = v;
-      logAudit('update', 'produksi', id, 'Biaya ops ' + rupiah(oldValue) + ' → ' + rupiah(v) + ' (selisih ' + rupiah(selisih) + ')');
+      logAudit('update', 'produksi', id, 'Biaya ops ' + rupiah(oldValue) + ' → ' + rupiah(v));
       renderAll(true);
       var pesan = '✅ Biaya ops diperbarui. ';
-      if (selisih > 0) {
-        pesan += 'Saldo kas berkurang ' + rupiah(selisih) + '. ';
-      } else if (selisih < 0) {
-        pesan += 'Saldo kas bertambah ' + rupiah(Math.abs(selisih)) + '. ';
-      }
-      pesan += 'Semua laporan (HPP, Laba) sudah disesuaikan.';
+      if (selisih > 0) pesan += 'Saldo kas berkurang ' + rupiah(selisih) + '. ';
+      else if (selisih < 0) pesan += 'Saldo kas bertambah ' + rupiah(Math.abs(selisih)) + '. ';
+      pesan += 'HPP & Laba di semua laporan sudah disesuaikan.';
       alertx(pesan);
     }
   );
