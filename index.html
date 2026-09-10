@@ -249,7 +249,6 @@ var currentUser = null;
 var userRole = 'admin-full';
 var unsubscribeSnapshot = null;
 var modalCallback = null;
-var modalTotalPriceUpdate = null;
 
 // ============================================================
 // FUNGSI BANTU
@@ -332,16 +331,6 @@ function escapeHtml(s) {
 }
 function formatAngkaID(n) {
   return Number(n || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-}
-function numberFromInput(id) {
-  var el = document.getElementById(id);
-  if (!el) return 0;
-  return Number(el.value) || 0;
-}
-function valueFromInput(id) {
-  var el = document.getElementById(id);
-  if (!el) return '';
-  return el.value;
 }
 
 // ============================================================
@@ -633,15 +622,14 @@ function renderInvestorSummary() {
   for (var a = 0; a < arr.length; a++) {
     total += arr[a].total;
   }
-  var html = '<tr>';
+  var html = '';
   if (arr.length === 0) {
-    html += '<td colspan="3">Belum ada modal investor.</td>';
+    html = '<tr><td colspan="3">Belum ada modal investor.</td></tr>';
   } else {
     for (var x = 0; x < arr.length; x++) {
       html += '<tr><td><b>' + arr[x].nama + '</b></td><td>' + arr[x].jumlahTransaksi + '</td><td class="money">' + rupiah(arr[x].total) + '</td></tr>';
     }
   }
-  html += '</tr>';
   document.getElementById('investorSummary').innerHTML = 
     '<div class="stat-grid">' +
       '<div class="stat-card"><div class="num">' + arr.length + '</div><div class="lbl">Jumlah Investor</div></div>' +
@@ -894,7 +882,7 @@ function hapusKemasanBeli(id) {
 }
 
 // ============================================================
-// PEMBELIAN BAHAN - DENGAN TOTAL HARGA DI MODAL
+// PEMBELIAN BAHAN - DENGAN TOTAL HARGA
 // ============================================================
 function purchaseShippingBasis(item) {
   var b = getBahan(item?.bahanId);
@@ -967,10 +955,6 @@ function readPurchaseRows() {
   }
   return result;
 }
-
-// ============================================================
-// UPDATE TOTAL HARGA DI MODAL
-// ============================================================
 function updateModalTotal() {
   var rows = readPurchaseRows();
   var totalHarga = 0;
@@ -990,12 +974,9 @@ function updateModalTotal() {
     }
   }
 }
-
 function tambahPembelianBahan() {
   if (userRole !== 'admin-full') return;
-  
-  // Buat modal dengan ID khusus untuk total harga
-  var modalHtml = 
+  modalWithTotal('Pembelian Bahan',
     '<div class="small" style="margin-bottom:12px">Kamu bisa membeli beberapa bahan sekaligus. Setiap bahan dipisahkan dalam kotak sendiri agar tidak tertukar.</div>' +
     '<div id="purchaseItems">' + purchaseRowHtml(1) + '</div>' +
     '<button type="button" class="btn btn-outline btn-sm" onclick="addPurchaseRow()">➕ Tambah Bahan</button>' +
@@ -1006,36 +987,34 @@ function tambahPembelianBahan() {
     '<div class="form-group">' +
       '<label>Tanggal Pembelian</label>' +
       '<input id="pt" type="date" value="' + todayStr() + '">' +
-    '</div>';
-  
-  // Panggil modal dengan fungsi callback
-  modalWithTotal('Pembelian Bahan', modalHtml, function() {
-    var rows = readPurchaseRows();
-    if (!rows.length) return alertx('Minimal satu bahan dengan Qty > 0', 'error');
-    var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
-    var allocated = allocatePurchaseShipping(rows, ongkir);
-    var total = 0;
-    for (var i = 0; i < allocated.length; i++) {
-      var item = allocated[i];
-      var b = getBahan(item.bahanId);
-      if (!b) continue;
-      var q = item.qty;
-      var landed = (Number(item.harga) || 0) + (Number(item.ongkirAllocated) || 0);
-      var old = b.stok;
-      var oldVal = old * (b.hargaRataRata || 0);
-      b.stok += q;
-      b.hargaRataRata = b.stok > 0 ? (oldVal + landed) / b.stok : 0;
-      total += landed;
+    '</div>',
+    function() {
+      var rows = readPurchaseRows();
+      if (!rows.length) return alertx('Minimal satu bahan dengan Qty > 0', 'error');
+      var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
+      var allocated = allocatePurchaseShipping(rows, ongkir);
+      var total = 0;
+      for (var i = 0; i < allocated.length; i++) {
+        var item = allocated[i];
+        var b = getBahan(item.bahanId);
+        if (!b) continue;
+        var q = item.qty;
+        var landed = (Number(item.harga) || 0) + (Number(item.ongkirAllocated) || 0);
+        var old = b.stok;
+        var oldVal = old * (b.hargaRataRata || 0);
+        b.stok += q;
+        b.hargaRataRata = b.stok > 0 ? (oldVal + landed) / b.stok : 0;
+        total += landed;
+      }
+      var id = genId();
+      var tgl = document.getElementById('pt').value || todayStr();
+      data.pembelianBahan.push({ id: id, tanggal: tgl, total: total, ongkosKirim: ongkir, items: allocated });
+      data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian bahan baku', jumlah: total, tanggal: tgl });
+      renderAll(true);
+      alertx('Pembelian tersimpan');
     }
-    var id = genId();
-    var tgl = document.getElementById('pt').value || todayStr();
-    data.pembelianBahan.push({ id: id, tanggal: tgl, total: total, ongkosKirim: ongkir, items: allocated });
-    data.keuangan.pengeluaran.push({ id: genId(), sourceId: id, sumber: 'Pembelian bahan baku', jumlah: total, tanggal: tgl });
-    renderAll(true);
-    alertx('Pembelian tersimpan');
-  });
+  );
 }
-
 function addPurchaseRow() {
   var wrap = document.getElementById('purchaseItems');
   var index = wrap.querySelectorAll('.purchase-row').length + 1;
@@ -1043,7 +1022,6 @@ function addPurchaseRow() {
   renumberPurchaseRows();
   updateModalTotal();
 }
-
 function renumberPurchaseRows() {
   var rows = document.querySelectorAll('#purchaseItems .purchase-row');
   for (var i = 0; i < rows.length; i++) {
@@ -1054,7 +1032,6 @@ function renumberPurchaseRows() {
   }
   updateModalTotal();
 }
-
 function hapusPembelianBahan(id) {
   if (userRole !== 'admin-full') return;
   var p = null;
@@ -1093,7 +1070,6 @@ function hapusPembelianBahan(id) {
   renderAll(true);
   alertx('Pembelian dihapus dan stok/kas dikembalikan');
 }
-
 function editPembelianBahan(id) {
   if (userRole !== 'admin-full') return;
   var p = null;
@@ -1123,8 +1099,6 @@ function editPembelianBahan(id) {
       if (!rowsNow.length) return alertx('Minimal satu bahan harus memiliki Qty > 0', 'error');
       var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
       var newItems = allocatePurchaseShipping(rowsNow, ongkir);
-
-      // Rollback stok lama
       var groupedOld = {};
       var oldItems = p.items || [];
       for (var a = 0; a < oldItems.length; a++) {
@@ -1146,8 +1120,6 @@ function editPembelianBahan(id) {
         b.stok = baseStok;
         b.hargaRataRata = baseStok > 0 ? baseValue / baseStok : 0;
       }
-
-      // Apply new items
       var groupedNew = {};
       for (var c = 0; c < newItems.length; c++) {
         var ni = newItems[c];
@@ -1166,7 +1138,6 @@ function editPembelianBahan(id) {
         nb.stok = oldStok + nv.qty;
         nb.hargaRataRata = nb.stok > 0 ? (oldValue + nv.harga) / nb.stok : 0;
       }
-
       var total = 0;
       for (var e = 0; e < newItems.length; e++) {
         total += (Number(newItems[e].harga) || 0) + (Number(newItems[e].ongkirAllocated) || 0);
@@ -1255,12 +1226,7 @@ function tambahFormulasiDefault() {
 
 function formulaItemEditor(items) {
   items = items || [];
-  var opts = '';
   var bahanList = data.bahan || [];
-  for (var i = 0; i < bahanList.length; i++) {
-    var b = bahanList[i];
-    opts += '<option value="' + b.id + '">' + escapeHtml(b.nama) + ' (' + b.satuanDasar + ')</option>';
-  }
   var listHtml = '';
   if (items.length === 0) {
     listHtml = '<div id="formulaItemsEmpty" class="small">Belum ada bahan.</div>';
@@ -1270,18 +1236,14 @@ function formulaItemEditor(items) {
       var konsentrasiDisplay = it.isLarutan ? 'block' : 'none';
       var konsentrasiVal = Number(it.konsentrasiLarutan) || 0;
       var checked = it.isLarutan ? 'checked' : '';
+      var opts2 = '';
+      for (var j = 0; j < bahanList.length; j++) {
+        var b2 = bahanList[j];
+        var sel = b2.id === it.bahanId ? 'selected' : '';
+        opts2 += '<option value="' + b2.id + '" ' + sel + '>' + escapeHtml(b2.nama) + ' (' + b2.satuanDasar + ')</option>';
+      }
       listHtml += '<div class="formula-item-edit" data-index="' + i + '" style="display:grid;grid-template-columns:1.7fr .8fr .6fr;gap:8px;align-items:end;margin-bottom:10px;padding:10px;border:1px solid #d7e6e4;border-radius:12px">' +
-        '<div><label>Bahan</label><select class="fi-bahan">' + 
-          (function() {
-            var opts2 = '';
-            for (var j = 0; j < bahanList.length; j++) {
-              var b2 = bahanList[j];
-              var sel = b2.id === it.bahanId ? 'selected' : '';
-              opts2 += '<option value="' + b2.id + '" ' + sel + '>' + escapeHtml(b2.nama) + ' (' + b2.satuanDasar + ')</option>';
-            }
-            return opts2;
-          })() +
-        '</select></div>' +
+        '<div><label>Bahan</label><select class="fi-bahan">' + opts2 + '</select></div>' +
         '<div><label>Persentase (%)</label><input class="fi-persen" type="number" step="0.001" value="' + (Number(it.persen) || 0) + '"></div>' +
         '<div><label>Langkah</label><input class="fi-step" type="number" min="1" step="1" value="' + (Number(it.step) || i + 1) + '"></div>' +
         '<div style="grid-column:1/3"><label><input class="fi-larutan" type="checkbox" ' + checked + ' onchange="toggleFormulaLarutan(this)"> Bahan berupa larutan</label><div class="fi-konsentrasi-wrap" style="display:' + konsentrasiDisplay + ';margin-top:6px"><label>Konsentrasi larutan (%)</label><input class="fi-konsentrasi" type="number" step="0.1" min="0" value="' + konsentrasiVal + '" placeholder="Contoh: 20"></div></div>' +
@@ -1406,7 +1368,7 @@ function hapusFormulasi(id) {
 }
 
 // ============================================================
-// PRODUKSI (BATCH)
+// PRODUKSI
 // ============================================================
 function calcNeeds(f, liter) {
   if (!f) return { totalBerat: 0, items: [], cost: 0, totalPersen: 0, declaredPersen: 0, autoAdjustedWater: false };
@@ -1537,8 +1499,6 @@ function toggleOpsManual() {
 }
 
 function buatProduksi() {
-  console.log('🚀 buatProduksi() dipanggil');
-  
   if (!['admin-full', 'operasional', 'atasan'].includes(userRole)) {
     alertx('Akses ditolak', 'error');
     return;
@@ -1729,7 +1689,7 @@ function hapusProduksi(id) {
 }
 
 // ============================================================
-// PENGEMASAN, PENJUALAN, LAPORAN, DLL (disingkat)
+// PENGEMASAN
 // ============================================================
 function updatePackagingInfo() {
   var prodSel = document.getElementById('kemasanProduksi');
@@ -1855,20 +1815,20 @@ function tambahKemasan() {
 
   for (var bIdx = 0; bIdx < batches.length; bIdx++) {
     if (remainingUnits <= 0) break;
-    var p = batches[bIdx];
-    var possible = Math.floor((Number(p.sisaLiter || 0) + 1e-9) / litersPerUnit);
+    var pb = batches[bIdx];
+    var possible = Math.floor((Number(pb.sisaLiter || 0) + 1e-9) / litersPerUnit);
     var units = Math.min(remainingUnits, possible);
     if (units <= 0) continue;
     var volume = units * litersPerUnit;
-    p.sisaLiter -= volume;
+    pb.sisaLiter -= volume;
     remainingUnits -= units;
     remainingL -= volume;
-    var hppProdPerL = ((p.biayaBahan || 0) + (p.biayaOperasional || 0)) / Math.max(Number(p.jumlahLiter) || 1, 1e-9);
+    var hppProdPerL = ((pb.biayaBahan || 0) + (pb.biayaOperasional || 0)) / Math.max(Number(pb.jumlahLiter) || 1, 1e-9);
     var hppUnit = hppProdPerL * litersPerUnit + (k.hargaPerUnit || 0);
     allocations.push({
       packagingId: null,
-      produksiId: p.id,
-      batchNo: p.batchNo,
+      produksiId: pb.id,
+      batchNo: pb.batchNo,
       jumlahUnit: units,
       volumeLiter: volume,
       beratPerUnit: w,
@@ -2272,8 +2232,58 @@ function bayarHutang(id) {
 }
 
 // ============================================================
-// LAPORAN (disingkat)
+// LAPORAN KEUANGAN
 // ============================================================
+
+// Helper: hitung ulang HPP per batch (untuk memastikan perubahan biaya operasional tercermin)
+function recalcBatchHpp(batchId) {
+  // Karena HPP di batchItems disimpan saat pengemasan, kita perlu recalculate
+  // HPP/unit berdasarkan biaya bahan + biaya operasional terbaru
+  var p = getProd(batchId);
+  if (!p) return;
+  var totalBiaya = (p.biayaBahan || 0) + (p.biayaOperasional || 0);
+  var hargaPerLiter = totalBiaya / Math.max(Number(p.jumlahLiter) || 1, 1e-9);
+  
+  // Update semua batchItems yang berasal dari batch ini
+  for (var i = 0; i < data.stokBarangJadi.length; i++) {
+    var e = data.stokBarangJadi[i];
+    var items = e.batchItems || [];
+    for (var j = 0; j < items.length; j++) {
+      if (items[j].produksiId === batchId) {
+        // Hitung ulang HPP/unit berdasarkan berat per unit
+        var beratPerUnit = Number(items[j].beratPerUnit) || 0;
+        var bj = Number(p.bj) || 1.025;
+        var literPerUnit = (beratPerUnit / 1000) / bj;
+        var biayaKemasan = Number(items[j].biayaKemasanPerUnit) || 0;
+        items[j].hppUnit = hargaPerLiter * literPerUnit + biayaKemasan;
+      }
+    }
+  }
+  
+  // Update juga HPP di penjualan yang sudah terjadi (untuk kalkulasi ulang laba)
+  for (var k = 0; k < data.penjualan.length; k++) {
+    var penjualan = data.penjualan[k];
+    var details = penjualan.batchDetails || [];
+    var hppTotalBaru = 0;
+    for (var l = 0; l < details.length; l++) {
+      var d = details[l];
+      if (d.produksiId === batchId) {
+        var beratPerUnitD = Number(d.beratPerUnit) || 0;
+        var bjD = Number(p.bj) || 1.025;
+        var literPerUnitD = (beratPerUnitD / 1000) / bjD;
+        var biayaKemasanD = Number(d.biayaKemasan) || 0;
+        var hppUnitBaru = hargaPerLiter * literPerUnitD + biayaKemasanD;
+        d.hppUnit = hppUnitBaru;
+        hppTotalBaru += d.jumlah * hppUnitBaru;
+      } else {
+        hppTotalBaru += d.jumlah * (Number(d.hppUnit) || 0);
+      }
+    }
+    penjualan.hppTotal = hppTotalBaru;
+    penjualan.laba = penjualan.total - hppTotalBaru;
+  }
+}
+
 function renderLaporan() {
   var penjualan = data.penjualan || [];
   var totalJ = 0, lunas = 0, hpp = 0, laba = 0;
@@ -2302,6 +2312,9 @@ function renderLaporan() {
   }
   var kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
 
+  // Tabel investor dengan edit/hapus
+  var invHtml = renderInvestorTable();
+
   document.getElementById('laporanRingkasan').innerHTML = 
     '<div class="stat-grid">' +
       '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
@@ -2310,13 +2323,130 @@ function renderLaporan() {
       '<div class="stat-card"><div class="num ' + (laba >= 0 ? 'green' : 'red') + '">' + rupiah(laba) + '</div><div class="lbl">Laba Kotor</div></div>' +
       '<div class="stat-card"><div class="num">' + rupiah(piutang) + '</div><div class="lbl">Piutang</div></div>' +
     '</div>' +
-    '<div class="financial-note">Modal bukan pendapatan usaha. Pembelian bahan/peralatan mengurangi kas, sedangkan pemakaian bahan saat produksi hanya membentuk HPP/persediaan dan tidak mengurangi kas untuk kedua kalinya.</div>';
+    '<div class="financial-note">Modal bukan pendapatan usaha. Pembelian bahan/peralatan mengurangi kas, sedangkan pemakaian bahan saat produksi hanya membentuk HPP/persediaan dan tidak mengurangi kas untuk kedua kalinya.</div>' +
+    invHtml;
   
-  // Panggil sub laporan
   renderLaporanProduksi();
   renderLaporanPenjualan();
   renderArusKas();
   renderLabaRugi();
+}
+
+function renderInvestorTable() {
+  var arr = (data.modalTambahan || []).slice().sort(function(a, b) {
+    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+  });
+  var total = 0;
+  for (var t = 0; t < arr.length; t++) {
+    total += Number(arr[t].jumlah) || 0;
+  }
+  var rowsHtml = '';
+  if (arr.length === 0) {
+    rowsHtml = '<tr><td colspan="5">Belum ada data investasi.</td></tr>';
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      var x = arr[i];
+      rowsHtml += '<tr>' +
+        '<td><b>' + escapeHtml(x.pemberi) + '</b></td>' +
+        '<td class="money">' + rupiah(x.jumlah) + '</td>' +
+        '<td>' + fmtDate(x.tanggal) + '</td>' +
+        '<td>' + (x.keterangan ? escapeHtml(x.keterangan) : '-') + '</td>' +
+        '<td>' +
+          '<button class="btn btn-warning btn-sm" onclick="editInvestasi(\'' + x.id + '\')">✏ Edit</button> ' +
+          '<button class="btn btn-danger btn-sm" onclick="hapusInvestasi(\'' + x.id + '\')">🗑 Hapus</button>' +
+        '</td>' +
+      '</tr>';
+    }
+  }
+  return '<div class="info-card" style="margin-top:16px">' +
+    '<div class="flex-between" style="margin-bottom:10px">' +
+      '<b>💰 Tabel Investasi / Modal Masuk</b>' +
+      '<span class="small">Total: <b>' + rupiah(total) + '</b> dari ' + arr.length + ' transaksi</span>' +
+    '</div>' +
+    '<div class="table-wrap">' +
+      '<table>' +
+        '<thead><tr><th>Investor</th><th>Jumlah</th><th>Tanggal</th><th>Keterangan</th><th>Aksi</th></tr></thead>' +
+        '<tbody>' + rowsHtml + '</tbody>' +
+      '</table>' +
+    '</div>' +
+    '<button class="btn btn-info btn-sm" style="margin-top:8px" onclick="tambahModal()">➕ Tambah Investasi</button>' +
+  '</div>';
+}
+
+function editInvestasi(id) {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
+  var item = null;
+  for (var i = 0; i < data.modalTambahan.length; i++) {
+    if (data.modalTambahan[i].id === id) { item = data.modalTambahan[i]; break; }
+  }
+  if (!item) return;
+  modal('Edit Investasi',
+    '<div class="form-group"><label>Nama Investor</label><input id="eInvNama" value="' + escapeHtml(item.pemberi) + '"></div>' +
+    '<div class="form-group"><label>Jumlah (Rp)</label><input id="eInvJumlah" type="number" min="1" value="' + (Number(item.jumlah) || 0) + '"></div>' +
+    '<div class="form-group"><label>Tanggal</label><input id="eInvTanggal" type="date" value="' + (item.tanggal || todayStr()) + '"></div>' +
+    '<div class="form-group"><label>Keterangan (opsional)</label><input id="eInvKet" value="' + escapeHtml(item.keterangan || '') + '"></div>',
+    function() {
+      var nama = document.getElementById('eInvNama').value.trim();
+      var jml = Number(document.getElementById('eInvJumlah').value) || 0;
+      var tgl = document.getElementById('eInvTanggal').value || todayStr();
+      var ket = document.getElementById('eInvKet').value.trim();
+      if (!nama || jml <= 0) return alertx('Nama dan jumlah wajib diisi', 'error');
+      var oldJumlah = Number(item.jumlah) || 0;
+      var oldNama = item.pemberi;
+      item.pemberi = nama;
+      item.jumlah = jml;
+      item.tanggal = tgl;
+      item.keterangan = ket;
+      
+      // Update di keuangan.pemasukan juga
+      var pemasukanRef = null;
+      for (var j = 0; j < data.keuangan.pemasukan.length; j++) {
+        if (data.keuangan.pemasukan[j].sourceId === id) {
+          pemasukanRef = data.keuangan.pemasukan[j];
+          break;
+        }
+      }
+      if (pemasukanRef) {
+        pemasukanRef.sumber = 'Modal dari ' + nama;
+        pemasukanRef.jumlah = jml;
+        pemasukanRef.tanggal = tgl;
+      } else {
+        data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Modal dari ' + nama, jumlah: jml, tanggal: tgl });
+      }
+      
+      logAudit('edit', 'modalTambahan', id, 'Investasi ' + oldNama + ' (' + oldJumlah + ') → ' + nama + ' (' + jml + ')');
+      renderAll(true);
+      alertx('Investasi diperbarui');
+    }
+  );
+}
+
+function hapusInvestasi(id) {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
+  var item = null;
+  for (var i = 0; i < data.modalTambahan.length; i++) {
+    if (data.modalTambahan[i].id === id) { item = data.modalTambahan[i]; break; }
+  }
+  if (!item) return;
+  if (!confirm('Hapus investasi dari ' + item.pemberi + ' sebesar ' + rupiah(item.jumlah) + '?\n\nData kas masuk terkait juga akan dihapus.')) return;
+  
+  // Hapus dari modalTambahan
+  var newModal = [];
+  for (var j = 0; j < data.modalTambahan.length; j++) {
+    if (data.modalTambahan[j].id !== id) newModal.push(data.modalTambahan[j]);
+  }
+  data.modalTambahan = newModal;
+  
+  // Hapus dari keuangan.pemasukan
+  var newPemasukan = [];
+  for (var k = 0; k < data.keuangan.pemasukan.length; k++) {
+    if (data.keuangan.pemasukan[k].sourceId !== id) newPemasukan.push(data.keuangan.pemasukan[k]);
+  }
+  data.keuangan.pemasukan = newPemasukan;
+  
+  logAudit('delete', 'modalTambahan', id, 'Investasi dihapus: ' + item.pemberi + ' ' + rupiah(item.jumlah));
+  renderAll(true);
+  alertx('Investasi dihapus dan kas disesuaikan');
 }
 
 function renderLaporanProduksi() {
@@ -2344,7 +2474,7 @@ function renderLaporanProduksi() {
       }
       var hpp = (p.biayaBahan || 0) + (p.biayaOperasional || 0);
       var labaBatch = omzet - hppTerjual;
-      html += '<tr><td><b>' + p.batchNo + '</b></td><td>' + fmtDate(p.tanggalPembuatan) + '</td><td>' + (f?.nama || '-') + '</td><td>' + p.jumlahLiter + '</td><td>' + rupiah(hpp) + '</td><td>' + rupiah(p.biayaOperasional || 0) + ' <button class="btn btn-warning btn-sm" onclick="editBiayaOperasionalProduksi(\'' + p.id + '\')">✏</button></td><td>' + terjual + '</td><td>' + rupiah(omzet) + '</td><td>' + rupiah(hppTerjual) + '</td><td class="' + (labaBatch >= 0 ? 'green' : 'red') + '">' + rupiah(labaBatch) + '</td></tr>';
+      html += '<tr><td><b>' + p.batchNo + '</b></td><td>' + fmtDate(p.tanggalPembuatan) + '</td><td>' + (f?.nama || '-') + '</td><td>' + p.jumlahLiter + '</td><td>' + rupiah(hpp) + '</td><td>' + rupiah(p.biayaOperasional || 0) + ' <button class="btn btn-warning btn-sm" onclick="editBiayaOperasionalProduksi(\'' + p.id + '\')" title="Edit biaya ops">✏</button></td><td>' + terjual + '</td><td>' + rupiah(omzet) + '</td><td>' + rupiah(hppTerjual) + '</td><td class="' + (labaBatch >= 0 ? 'green' : 'red') + '">' + rupiah(labaBatch) + '</td></tr>';
     }
   }
   document.getElementById('laporanKeuanganProduksi').innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Batch</th><th>Tanggal</th><th>Jenis</th><th>Liter</th><th>HPP Produksi</th><th>Biaya Operasional</th><th>Terjual</th><th>Omzet</th><th>HPP Terjual</th><th>Laba</th></tr></thead><tbody>' + html + '</tbody></table></div>';
@@ -2372,14 +2502,18 @@ function editBiayaOperasionalProduksi(id) {
   if (!p) return;
   modal('Edit Biaya Operasional',
     '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
-    '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>',
+    '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>' +
+    '<div class="small">Perubahan biaya ops akan otomatis meng-update HPP/unit, HPP terjual, dan laba di semua laporan.</div>',
     function() {
       var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
+      var oldValue = p.biayaOperasional || 0;
       p.biayaOperasional = v;
-      logAudit('update', 'produksi', id, 'Biaya operasional diubah menjadi ' + rupiah(v));
+      // Recalculate HPP di semua batchItems & penjualan
+      recalcBatchHpp(id);
+      logAudit('update', 'produksi', id, 'Biaya operasional ' + rupiah(oldValue) + ' → ' + rupiah(v) + ' (semua laporan disesuaikan)');
       renderAll(true);
-      alertx('Biaya operasional diperbarui dan laporan disesuaikan');
+      alertx('✅ Biaya operasional diperbarui. Laba dan HPP di semua laporan disesuaikan.');
     }
   );
 }
@@ -2542,21 +2676,23 @@ function renderAudit() {
 
 function tambahModal() {
   if (userRole !== 'admin-full') return;
-  modal('Tambah Modal',
+  modal('Tambah Investasi',
     '<div class="form-group"><label>Nama Pemberi Modal</label><input id="mPemberi"></div>' +
     '<div class="form-group"><label>Jumlah</label><input id="mJumlah" type="number" min="1"></div>' +
-    '<div class="form-group"><label>Tanggal</label><input id="mTanggal" type="date" value="' + todayStr() + '"></div>',
+    '<div class="form-group"><label>Tanggal</label><input id="mTanggal" type="date" value="' + todayStr() + '"></div>' +
+    '<div class="form-group"><label>Keterangan (opsional)</label><input id="mKet" placeholder="Misal: investasi awal, tambahan modal, dll."></div>',
     function() {
       var pemberi = document.getElementById('mPemberi').value.trim();
       var q = Number(document.getElementById('mJumlah').value) || 0;
       var tgl = document.getElementById('mTanggal').value || todayStr();
+      var ket = document.getElementById('mKet').value.trim();
       if (!pemberi || q <= 0) return alertx('Nama pemberi dan jumlah modal wajib diisi', 'error');
       var id = genId();
       if (!data.modalTambahan) data.modalTambahan = [];
-      data.modalTambahan.push({ id: id, pemberi: pemberi, jumlah: q, tanggal: tgl });
+      data.modalTambahan.push({ id: id, pemberi: pemberi, jumlah: q, tanggal: tgl, keterangan: ket });
       data.keuangan.pemasukan.push({ id: genId(), sourceId: id, sumber: 'Modal dari ' + pemberi, jumlah: q, tanggal: tgl });
       renderAll(true);
-      alertx('Modal berhasil dicatat');
+      alertx('Investasi berhasil dicatat');
     }
   );
 }
@@ -2609,14 +2745,13 @@ function resetTransaksi() {
 }
 
 // ============================================================
-// MODAL DENGAN TOTAL HARGA
+// MODAL
 // ============================================================
 function modalWithTotal(title, html, cb) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('open');
   modalCallback = cb;
-  // Tampilkan total harga
   document.getElementById('modalTotalPrice').style.display = 'block';
   updateModalTotal();
   document.getElementById('modalConfirmBtn').onclick = function() {
@@ -2630,7 +2765,6 @@ function modal(title, html, cb) {
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('open');
   modalCallback = cb;
-  // Sembunyikan total harga untuk modal biasa
   document.getElementById('modalTotalPrice').style.display = 'none';
   document.getElementById('modalConfirmBtn').onclick = function() {
     if (modalCallback) modalCallback();
@@ -2665,58 +2799,10 @@ document.getElementById('fontDec').onclick = function() {
   localStorage.setItem('sibersih-font', fs);
 };
 
-// Set default tanggal
 document.getElementById('produksiTanggal').value = todayStr();
 document.getElementById('kemasanTanggal').value = todayStr();
 document.getElementById('jualTanggal').value = todayStr();
 
-// ============================================================
-// AUTO SORT TABLE BY DATE
-// ============================================================
-(function() {
-  function dateValue(v) {
-    v = String(v || '').trim();
-    var m = v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
-    if (m) return new Date(+m[3], +m[2] - 1, +m[1]).getTime();
-    m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-    if (m) return new Date(+m[1], +m[2] - 1, +m[3]).getTime();
-    return 0;
-  }
-  window.sortDatedTables = function() {
-    var tables = document.querySelectorAll('table');
-    for (var t = 0; t < tables.length; t++) {
-      var table = tables[t];
-      if (!table.tBodies || !table.tBodies.length) continue;
-      var heads = [...table.querySelectorAll('thead th')];
-      var idx = -1;
-      for (var h = 0; h < heads.length; h++) {
-        if (/tanggal|tgl|date|waktu/i.test(heads[h].textContent.trim())) {
-          idx = h;
-          break;
-        }
-      }
-      if (idx < 0) continue;
-      var body = table.tBodies[0];
-      var rows = [...body.rows];
-      var dated = [];
-      for (var r = 0; r < rows.length; r++) {
-        var time = dateValue(rows[r].cells[idx]?.textContent);
-        dated.push({ row: rows[r], n: r, time: time });
-      }
-      var hasTime = false;
-      for (var d = 0; d < dated.length; d++) {
-        if (dated[d].time) { hasTime = true; break; }
-      }
-      if (!hasTime) continue;
-      dated.sort(function(a, b) { return b.time - a.time || a.n - b.n; });
-      for (var s = 0; s < dated.length; s++) {
-        body.appendChild(dated[s].row);
-      }
-    }
-  };
-})();
-
-setTimeout(sortDatedTables, 500);
 console.log('✅ SI.BERSIH siap digunakan!');
 </script>
 </body>
