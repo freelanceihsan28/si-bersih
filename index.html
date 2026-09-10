@@ -382,21 +382,12 @@ function computeHppPerUnit(item) {
 
 // ============================================================
 // ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS TERPADU (REAL-TIME) ⭐⭐⭐
-// Saldo kas dihitung dari SUMBER TUNGGAL (single source of truth):
-// - Saldo awal
-// - Modal masuk (dari modalTambahan)
-// - Penjualan Lunas
-// - Pelunasan piutang (status berubah jadi Lunas)
-// - Pembelian bahan baku (pembelianBahan)
-// - Pembelian kemasan (pembelianKemasan)
-// - Pembelian peralatan (peralatan)
-// 
-// Semua dihitung ulang setiap render — bukan dari data statis
+// Sekarang termasuk biaya operasional produksi!
 // ============================================================
 function hitungSaldoKas() {
   var saldo = Number(data.keuangan?.saldoAwal) || 0;
   
-  // Pemasukan dari modal (dari modalTambahan, bukan keuangan.pemasukan)
+  // Pemasukan dari modal
   var tambahan = data.modalTambahan || [];
   for (var i = 0; i < tambahan.length; i++) {
     saldo += Number(tambahan[i].jumlah) || 0;
@@ -408,6 +399,12 @@ function hitungSaldoKas() {
     if (penjualan[j].status === 'Lunas') {
       saldo += Number(penjualan[j].total) || 0;
     }
+  }
+  
+  // ⭐ PENGELUARAN: biaya operasional produksi
+  var produksi = data.produksi || [];
+  for (var p = 0; p < produksi.length; p++) {
+    saldo -= Number(produksi[p].biayaOperasional) || 0;
   }
   
   // Pengeluaran dari pembelian bahan baku
@@ -456,6 +453,21 @@ function getArusKasDetail() {
         tipe: 'Masuk',
         sumber: '🛒 Penjualan ' + p.jenisSabun + ' x' + p.jumlahTerjual,
         jumlah: Number(p.total) || 0
+      });
+    }
+  }
+  
+  // ⭐ Biaya operasional produksi
+  var produksi = data.produksi || [];
+  for (var pr = 0; pr < produksi.length; pr++) {
+    var pd = produksi[pr];
+    var ops = Number(pd.biayaOperasional) || 0;
+    if (ops > 0) {
+      rows.push({
+        tanggal: pd.tanggalPembuatan,
+        tipe: 'Keluar',
+        sumber: '⚙️ Biaya ops batch ' + pd.batchNo,
+        jumlah: ops
       });
     }
   }
@@ -722,7 +734,7 @@ function renderAll(shouldSave) {
 }
 
 // ============================================================
-// DASHBOARD — pakai hitungSaldoKas() real-time
+// DASHBOARD
 // ============================================================
 function renderDashboard() {
   var g = {};
@@ -750,7 +762,6 @@ function renderDashboard() {
   }
   document.getElementById('dashStokKemasanTbody').innerHTML = html;
 
-  // ⭐ Semua dihitung real-time dari sumber
   var modal = 0;
   var tambahan = data.modalTambahan || [];
   for (var m = 0; m < tambahan.length; m++) {
@@ -768,6 +779,8 @@ function renderDashboard() {
   for (var bk = 0; bk < beliKem.length; bk++) kasKeluar += Number(beliKem[bk].total) || 0;
   var peralatan = data.peralatan || [];
   for (var pr = 0; pr < peralatan.length; pr++) kasKeluar += Number(peralatan[pr].total) || 0;
+  var produksi = data.produksi || [];
+  for (var po = 0; po < produksi.length; po++) kasKeluar += Number(produksi[po].biayaOperasional) || 0;
   
   var kas = hitungSaldoKas();
 
@@ -1773,7 +1786,7 @@ function buatProduksi() {
     createdAt: new Date().toISOString(),
     createdBy: currentUser.email
   });
-  logAudit('create', 'produksi', id, 'Batch ' + batchNo);
+  logAudit('create', 'produksi', id, 'Batch ' + batchNo + ' dengan biaya ops ' + rupiah(ops));
 
   renderCaraKerjaProduksi(f, l, c);
 
@@ -1783,7 +1796,7 @@ function buatProduksi() {
   toggleOpsManual();
 
   renderAll(true);
-  alertx('✅ Batch berhasil dibuat: ' + batchNo);
+  alertx('✅ Batch ' + batchNo + ' dibuat. Saldo kas berkurang ' + rupiah(ops) + ' (biaya ops).');
 }
 
 function renderProduksi() {
@@ -1824,7 +1837,7 @@ function hapusProduksi(id) {
     alertx('Batch sudah pernah dikemas. Hapus pengemasan terkait terlebih dahulu.', 'error');
     return;
   }
-  if (!confirm('Hapus batch dan kembalikan bahan sesuai snapshot batch?')) return;
+  if (!confirm('Hapus batch ' + p.batchNo + '?\n\nStok bahan akan dikembalikan dan biaya ops ' + rupiah(p.biayaOperasional || 0) + ' akan dikembalikan ke kas.')) return;
   var snap = p.formulasiSnapshot;
   if (snap && Array.isArray(snap.items)) {
     for (var k = 0; k < snap.items.length; k++) {
@@ -1846,9 +1859,9 @@ function hapusProduksi(id) {
     if (data.produksi[n].id !== id) newProd.push(data.produksi[n]);
   }
   data.produksi = newProd;
-  logAudit('delete', 'produksi', id, 'Batch dihapus dan stok bahan dikembalikan');
+  logAudit('delete', 'produksi', id, 'Batch ' + p.batchNo + ' dihapus. Stok bahan & biaya ops dikembalikan.');
   renderAll(true);
-  alertx('Batch dihapus dan bahan dikembalikan');
+  alertx('Batch dihapus. Stok bahan & biaya ops ' + rupiah(p.biayaOperasional || 0) + ' dikembalikan ke kas.');
 }
 
 // ============================================================
@@ -2378,7 +2391,7 @@ function bayarHutang(id) {
 }
 
 // ============================================================
-// LAPORAN KEUANGAN — semua real-time
+// LAPORAN KEUANGAN
 // ============================================================
 function renderLaporan() {
   var penjualan = data.penjualan || [];
@@ -2398,7 +2411,7 @@ function renderLaporan() {
     modal += Number(tambahan[m].jumlah) || 0;
   }
   
-  var kas = hitungSaldoKas(); // ⭐ REAL-TIME
+  var kas = hitungSaldoKas();
 
   var invHtml = renderInvestorTable();
 
@@ -2411,9 +2424,10 @@ function renderLaporan() {
       '<div class="stat-card"><div class="num">' + rupiah(piutang) + '</div><div class="lbl">Piutang</div></div>' +
     '</div>' +
     '<div class="financial-note">' +
-      '<b>ℹ️ Cara perhitungan Saldo Kas (real-time):</b><br>' +
-      '💰 Modal masuk + Penjualan Lunas − Pembelian bahan − Pembelian kemasan − Pembelian peralatan.<br>' +
-      'Biaya operasional produksi <b>tidak</b> mengurangi kas (hanya alokasi HPP).' +
+      '<b>ℹ️ Saldo Kas (real-time):</b><br>' +
+      '💰 Modal + Penjualan Lunas<br>' +
+      '− Pembelian bahan − Pembelian kemasan − Pembelian peralatan<br>' +
+      '<b>− Biaya operasional produksi</b> (listrik, tenaga kerja, dll.)' +
     '</div>' +
     invHtml;
   
@@ -2572,15 +2586,26 @@ function editBiayaOperasionalProduksi(id) {
   modal('Edit Biaya Operasional',
     '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
     '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>' +
-    '<div class="small">✅ Perubahan biaya ops akan <b>otomatis meng-update</b> HPP/unit, HPP terjual, laba di SEMUA laporan (Ringkasan, Produksi, Penjualan, Laba Rugi) secara real-time. <b>Saldo kas TIDAK berubah</b> karena biaya ops bukan kas aktual.</div>',
+    '<div class="small">✅ Perubahan biaya ops akan <b>otomatis meng-update</b>:<br>' +
+    '• HPP/unit & HPP terjual<br>' +
+    '• Laba di semua laporan<br>' +
+    '• <b>Saldo kas</b> (karena biaya ops adalah pengeluaran kas aktual)</div>',
     function() {
       var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
-      var oldValue = p.biayaOperasional || 0;
+      var oldValue = Number(p.biayaOperasional) || 0;
+      var selisih = v - oldValue;
       p.biayaOperasional = v;
-      logAudit('update', 'produksi', id, 'Biaya operasional ' + rupiah(oldValue) + ' → ' + rupiah(v));
+      logAudit('update', 'produksi', id, 'Biaya ops ' + rupiah(oldValue) + ' → ' + rupiah(v) + ' (selisih ' + rupiah(selisih) + ')');
       renderAll(true);
-      alertx('✅ Biaya ops diperbarui. Semua laporan (HPP, Laba) sudah disesuaikan otomatis.');
+      var pesan = '✅ Biaya ops diperbarui. ';
+      if (selisih > 0) {
+        pesan += 'Saldo kas berkurang ' + rupiah(selisih) + '. ';
+      } else if (selisih < 0) {
+        pesan += 'Saldo kas bertambah ' + rupiah(Math.abs(selisih)) + '. ';
+      }
+      pesan += 'Semua laporan (HPP, Laba) sudah disesuaikan.';
+      alertx(pesan);
     }
   );
 }
