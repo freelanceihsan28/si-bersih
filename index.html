@@ -334,6 +334,57 @@ function formatAngkaID(n) {
 }
 
 // ============================================================
+// ⭐ FUNGSI KUNCI: HITUNG HPP PER BATCH SECARA REAL-TIME
+// Semua laporan dan perhitungan HARUS pakai fungsi ini
+// agar perubahan biaya operasional langsung tercermin
+// ============================================================
+function getBatchHppPerLiter(batchId) {
+  var p = getProd(batchId);
+  if (!p) return 0;
+  var total = (Number(p.biayaBahan) || 0) + (Number(p.biayaOperasional) || 0);
+  var liter = Math.max(Number(p.jumlahLiter) || 1, 1e-9);
+  return total / liter;
+}
+
+function getBatchHppForUnit(batchId, beratPerUnit) {
+  var hppPerLiter = getBatchHppPerLiter(batchId);
+  var p = getProd(batchId);
+  if (!p) return 0;
+  var bj = Number(p.bj) || 1.025;
+  var literPerUnit = (Number(beratPerUnit) / 1000) / bj;
+  return hppPerLiter * literPerUnit;
+}
+
+// Hitung total HPP terjual dari batchDetails (real-time, dari data produksi)
+function computeHppFromDetails(batchDetails) {
+  var total = 0;
+  var details = batchDetails || [];
+  for (var i = 0; i < details.length; i++) {
+    var d = details[i];
+    var p = getProd(d.produksiId);
+    if (!p) continue;
+    var hppPerLiter = getBatchHppPerLiter(d.produksiId);
+    var bj = Number(p.bj) || 1.025;
+    var berat = Number(d.beratPerUnit) || 0;
+    var literPerUnit = (berat / 1000) / bj;
+    var hppUnit = hppPerLiter * literPerUnit + (Number(d.biayaKemasan) || 0);
+    total += d.jumlah * hppUnit;
+  }
+  return total;
+}
+
+// Hitung HPP/unit untuk 1 batchItem (dipakai di stok barang jadi)
+function computeHppPerUnit(item) {
+  var p = getProd(item.produksiId);
+  if (!p) return Number(item.hppUnit) || 0; // fallback ke data lama
+  var hppPerLiter = getBatchHppPerLiter(item.produksiId);
+  var bj = Number(p.bj) || 1.025;
+  var berat = Number(item.beratPerUnit) || 0;
+  var literPerUnit = (berat / 1000) / bj;
+  return hppPerLiter * literPerUnit + (Number(item.biayaKemasanPerUnit) || 0);
+}
+
+// ============================================================
 // SAVE & LOAD DATA
 // ============================================================
 async function saveData() {
@@ -1823,8 +1874,7 @@ function tambahKemasan() {
     pb.sisaLiter -= volume;
     remainingUnits -= units;
     remainingL -= volume;
-    var hppProdPerL = ((pb.biayaBahan || 0) + (pb.biayaOperasional || 0)) / Math.max(Number(pb.jumlahLiter) || 1, 1e-9);
-    var hppUnit = hppProdPerL * litersPerUnit + (k.hargaPerUnit || 0);
+    // ⚠️ TIDAK lagi menyimpan hppUnit — dihitung real-time
     allocations.push({
       packagingId: null,
       produksiId: pb.id,
@@ -1832,7 +1882,6 @@ function tambahKemasan() {
       jumlahUnit: units,
       volumeLiter: volume,
       beratPerUnit: w,
-      hppUnit: hppUnit,
       biayaKemasan: k.hargaPerUnit || 0
     });
   }
@@ -1851,13 +1900,13 @@ function tambahKemasan() {
   for (var aIdx = 0; aIdx < allocations.length; aIdx++) {
     var a = allocations[aIdx];
     a.packagingId = packagingId;
+    // ⚠️ TIDAK menyimpan hppUnit statis — dihitung real-time
     entry.batchItems.push({
       produksiId: a.produksiId,
       batchNo: a.batchNo,
       jumlahUnit: a.jumlahUnit,
       hargaJual: harga,
       beratPerUnit: a.beratPerUnit,
-      hppUnit: a.hppUnit,
       tanggal: tgl,
       biayaKemasanPerUnit: a.biayaKemasan || 0,
       packagingId: packagingId
@@ -1897,7 +1946,8 @@ function renderPengemasan() {
     for (var j = 0; j < items.length; j++) {
       g[key].stok += Number(items[j].jumlahUnit) || 0;
       g[key].harga = items[j].hargaJual || g[key].harga;
-      g[key].hpp = items[j].hppUnit || g[key].hpp;
+      // ⚠️ HPP dihitung real-time dari data produksi
+      g[key].hpp = computeHppPerUnit(items[j]);
     }
   }
   var html = '';
@@ -2081,11 +2131,14 @@ function renderPenjualan() {
       var jual = rows[r];
       var kem = getKemasan(jual.kemasanId);
       var badge = jual.status === 'Lunas' ? 'badge-success' : 'badge-warning';
+      // ⚠️ Hitung HPP & laba real-time dari batchDetails
+      var hppRealTime = computeHppFromDetails(jual.batchDetails);
+      var labaRealTime = jual.total - hppRealTime;
       var aksi = '<button class="btn btn-danger btn-sm" onclick="hapusJual(\'' + jual.id + '\')">🗑</button>';
       if (jual.status === 'Hutang') {
         aksi = '<button class="btn btn-success btn-sm" onclick="bayarHutang(\'' + jual.id + '\')">💰</button> ' + aksi;
       }
-      html += '<tr><td>' + jual.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + jual.jumlahTerjual + '</td><td>' + rupiah(jual.total) + '</td><td>' + rupiah(jual.hppTotal || 0) + '</td><td class="' + (jual.laba >= 0 ? 'green' : 'red') + '">' + rupiah(jual.laba || 0) + '</td><td><span class="badge ' + badge + '">' + jual.status + '</span></td><td>' + fmtDate(jual.tanggal) + '</td><td>' + aksi + '</td></tr>';
+      html += '<tr><td>' + jual.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + jual.jumlahTerjual + '</td><td>' + rupiah(jual.total) + '</td><td>' + rupiah(hppRealTime) + '</td><td class="' + (labaRealTime >= 0 ? 'green' : 'red') + '">' + rupiah(labaRealTime) + '</td><td><span class="badge ' + badge + '">' + jual.status + '</span></td><td>' + fmtDate(jual.tanggal) + '</td><td>' + aksi + '</td></tr>';
     }
   }
   document.getElementById('jualTbody').innerHTML = html;
@@ -2114,15 +2167,12 @@ function catatJual() {
   batchItems.sort(function(a, b) { return (a.tanggal || '').localeCompare(b.tanggal || ''); });
   var remain = j;
   var details = [];
-  var hppTotal = 0;
   for (var idx = 0; idx < batchItems.length; idx++) {
     if (remain <= 0) break;
     var item = batchItems[idx];
     var take = Math.min(item.jumlahUnit, remain);
     item.jumlahUnit -= take;
     remain -= take;
-    var hpp = (item.hppUnit || 0);
-    hppTotal += take * hpp;
     details.push({
       produksiId: item.produksiId,
       batchNo: item.batchNo,
@@ -2130,7 +2180,6 @@ function catatJual() {
       beratPerUnit: item.beratPerUnit,
       hargaJual: h,
       biayaKemasan: item.biayaKemasanPerUnit || 0,
-      hppUnit: hpp,
       tanggal: item.tanggal || tgl,
       packagingId: item.packagingId || null
     });
@@ -2144,6 +2193,7 @@ function catatJual() {
     data.stokBarangJadi = newStok;
   }
   var total = j * h;
+  var hppTotal = computeHppFromDetails(details); // hitung real-time
   var laba = total - hppTotal;
   var id = genId();
   data.penjualan.push({
@@ -2155,8 +2205,6 @@ function catatJual() {
     total: total,
     status: status,
     tanggal: tgl,
-    hppTotal: hppTotal,
-    laba: laba,
     batchDetails: details
   });
   if (status === 'Lunas') {
@@ -2194,7 +2242,6 @@ function hapusJual(id) {
         jumlahUnit: b.jumlah,
         beratPerUnit: b.beratPerUnit || 0,
         hargaJual: b.hargaJual,
-        hppUnit: b.hppUnit || 0,
         biayaKemasanPerUnit: b.biayaKemasan || 0,
         tanggal: b.tanggal,
         packagingId: b.packagingId || null
@@ -2232,58 +2279,8 @@ function bayarHutang(id) {
 }
 
 // ============================================================
-// LAPORAN KEUANGAN
+// LAPORAN KEUANGAN — semua HPP dihitung REAL-TIME
 // ============================================================
-
-// Helper: hitung ulang HPP per batch (untuk memastikan perubahan biaya operasional tercermin)
-function recalcBatchHpp(batchId) {
-  // Karena HPP di batchItems disimpan saat pengemasan, kita perlu recalculate
-  // HPP/unit berdasarkan biaya bahan + biaya operasional terbaru
-  var p = getProd(batchId);
-  if (!p) return;
-  var totalBiaya = (p.biayaBahan || 0) + (p.biayaOperasional || 0);
-  var hargaPerLiter = totalBiaya / Math.max(Number(p.jumlahLiter) || 1, 1e-9);
-  
-  // Update semua batchItems yang berasal dari batch ini
-  for (var i = 0; i < data.stokBarangJadi.length; i++) {
-    var e = data.stokBarangJadi[i];
-    var items = e.batchItems || [];
-    for (var j = 0; j < items.length; j++) {
-      if (items[j].produksiId === batchId) {
-        // Hitung ulang HPP/unit berdasarkan berat per unit
-        var beratPerUnit = Number(items[j].beratPerUnit) || 0;
-        var bj = Number(p.bj) || 1.025;
-        var literPerUnit = (beratPerUnit / 1000) / bj;
-        var biayaKemasan = Number(items[j].biayaKemasanPerUnit) || 0;
-        items[j].hppUnit = hargaPerLiter * literPerUnit + biayaKemasan;
-      }
-    }
-  }
-  
-  // Update juga HPP di penjualan yang sudah terjadi (untuk kalkulasi ulang laba)
-  for (var k = 0; k < data.penjualan.length; k++) {
-    var penjualan = data.penjualan[k];
-    var details = penjualan.batchDetails || [];
-    var hppTotalBaru = 0;
-    for (var l = 0; l < details.length; l++) {
-      var d = details[l];
-      if (d.produksiId === batchId) {
-        var beratPerUnitD = Number(d.beratPerUnit) || 0;
-        var bjD = Number(p.bj) || 1.025;
-        var literPerUnitD = (beratPerUnitD / 1000) / bjD;
-        var biayaKemasanD = Number(d.biayaKemasan) || 0;
-        var hppUnitBaru = hargaPerLiter * literPerUnitD + biayaKemasanD;
-        d.hppUnit = hppUnitBaru;
-        hppTotalBaru += d.jumlah * hppUnitBaru;
-      } else {
-        hppTotalBaru += d.jumlah * (Number(d.hppUnit) || 0);
-      }
-    }
-    penjualan.hppTotal = hppTotalBaru;
-    penjualan.laba = penjualan.total - hppTotalBaru;
-  }
-}
-
 function renderLaporan() {
   var penjualan = data.penjualan || [];
   var totalJ = 0, lunas = 0, hpp = 0, laba = 0;
@@ -2291,8 +2288,10 @@ function renderLaporan() {
     var j = penjualan[i];
     totalJ += j.total;
     if (j.status === 'Lunas') lunas += j.total;
-    hpp += j.hppTotal || 0;
-    laba += j.laba || 0;
+    // ⚠️ Hitung HPP real-time
+    var hppRealTime = computeHppFromDetails(j.batchDetails);
+    hpp += hppRealTime;
+    laba += (j.total - hppRealTime);
   }
   var piutang = totalJ - lunas;
   var modal = 0;
@@ -2312,7 +2311,6 @@ function renderLaporan() {
   }
   var kas = (data.keuangan.saldoAwal || 0) + masuk - keluar;
 
-  // Tabel investor dengan edit/hapus
   var invHtml = renderInvestorTable();
 
   document.getElementById('laporanRingkasan').innerHTML = 
@@ -2398,7 +2396,6 @@ function editInvestasi(id) {
       item.tanggal = tgl;
       item.keterangan = ket;
       
-      // Update di keuangan.pemasukan juga
       var pemasukanRef = null;
       for (var j = 0; j < data.keuangan.pemasukan.length; j++) {
         if (data.keuangan.pemasukan[j].sourceId === id) {
@@ -2430,14 +2427,12 @@ function hapusInvestasi(id) {
   if (!item) return;
   if (!confirm('Hapus investasi dari ' + item.pemberi + ' sebesar ' + rupiah(item.jumlah) + '?\n\nData kas masuk terkait juga akan dihapus.')) return;
   
-  // Hapus dari modalTambahan
   var newModal = [];
   for (var j = 0; j < data.modalTambahan.length; j++) {
     if (data.modalTambahan[j].id !== id) newModal.push(data.modalTambahan[j]);
   }
   data.modalTambahan = newModal;
   
-  // Hapus dari keuangan.pemasukan
   var newPemasukan = [];
   for (var k = 0; k < data.keuangan.pemasukan.length; k++) {
     if (data.keuangan.pemasukan[k].sourceId !== id) newPemasukan.push(data.keuangan.pemasukan[k]);
@@ -2468,7 +2463,9 @@ function renderLaporanProduksi() {
           if (batchDetails[b].produksiId === p.id) {
             terjual += batchDetails[b].jumlah;
             omzet += batchDetails[b].jumlah * batchDetails[b].hargaJual;
-            hppTerjual += batchDetails[b].jumlah * (batchDetails[b].hppUnit || 0);
+            // ⚠️ HPP per unit dihitung real-time
+            var hppUnitRT = getBatchHppForUnit(p.id, batchDetails[b].beratPerUnit) + (Number(batchDetails[b].biayaKemasan) || 0);
+            hppTerjual += batchDetails[b].jumlah * hppUnitRT;
           }
         }
       }
@@ -2491,7 +2488,10 @@ function renderLaporanPenjualan() {
     for (var i = 0; i < rows.length; i++) {
       var j = rows[i];
       var kem = getKemasan(j.kemasanId);
-      html += '<tr><td>' + fmtDate(j.tanggal) + '</td><td>' + j.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + j.jumlahTerjual + '</td><td>' + rupiah(j.total) + '</td><td>' + rupiah(j.hppTotal) + '</td><td>' + rupiah(j.laba) + '</td><td>' + j.status + '</td></tr>';
+      // ⚠️ HPP real-time
+      var hppRT = computeHppFromDetails(j.batchDetails);
+      var labaRT = j.total - hppRT;
+      html += '<tr><td>' + fmtDate(j.tanggal) + '</td><td>' + j.jenisSabun + '</td><td>' + (kem?.nama || '-') + '</td><td>' + j.jumlahTerjual + '</td><td>' + rupiah(j.total) + '</td><td>' + rupiah(hppRT) + '</td><td>' + rupiah(labaRT) + '</td><td>' + j.status + '</td></tr>';
     }
   }
   document.getElementById('laporanPenjualan').innerHTML = '<div class="history-table-scroll"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Kemasan</th><th>Qty</th><th>Omzet</th><th>HPP</th><th>Laba</th><th>Status</th></tr></thead><tbody>' + html + '</tbody></table></div>';
@@ -2503,17 +2503,15 @@ function editBiayaOperasionalProduksi(id) {
   modal('Edit Biaya Operasional',
     '<div class="form-group"><label>Batch</label><input value="' + p.batchNo + '" disabled></div>' +
     '<div class="form-group"><label>Biaya Operasional (Rp)</label><input id="mOps" type="number" min="0" value="' + (p.biayaOperasional || 0) + '"></div>' +
-    '<div class="small">Perubahan biaya ops akan otomatis meng-update HPP/unit, HPP terjual, dan laba di semua laporan.</div>',
+    '<div class="small">✅ Perubahan biaya ops akan <b>otomatis meng-update</b> HPP/unit, HPP terjual, laba di SEMUA laporan (Ringkasan, Produksi, Penjualan, Laba Rugi) secara real-time.</div>',
     function() {
       var v = +document.getElementById('mOps').value;
       if (v < 0) return alertx('Biaya operasional tidak boleh negatif', 'error');
       var oldValue = p.biayaOperasional || 0;
       p.biayaOperasional = v;
-      // Recalculate HPP di semua batchItems & penjualan
-      recalcBatchHpp(id);
-      logAudit('update', 'produksi', id, 'Biaya operasional ' + rupiah(oldValue) + ' → ' + rupiah(v) + ' (semua laporan disesuaikan)');
+      logAudit('update', 'produksi', id, 'Biaya operasional ' + rupiah(oldValue) + ' → ' + rupiah(v));
       renderAll(true);
-      alertx('✅ Biaya operasional diperbarui. Laba dan HPP di semua laporan disesuaikan.');
+      alertx('✅ Biaya ops diperbarui. Semua laporan (HPP, Laba, Margin) sudah disesuaikan otomatis.');
     }
   );
 }
@@ -2547,7 +2545,8 @@ function renderLabaRugi() {
   var penjualan = data.penjualan || [];
   for (var i = 0; i < penjualan.length; i++) {
     omzet += penjualan[i].total;
-    hpp += penjualan[i].hppTotal || 0;
+    // ⚠️ HPP real-time
+    hpp += computeHppFromDetails(penjualan[i].batchDetails);
   }
   var laba = omzet - hpp;
   var margin = omzet ? laba / omzet * 100 : 0;
@@ -2558,7 +2557,7 @@ function renderLabaRugi() {
       '<div class="stat-card"><div class="num ' + (laba >= 0 ? 'green' : 'red') + '">' + rupiah(laba) + '</div><div class="lbl">Laba</div></div>' +
       '<div class="stat-card"><div class="num">' + margin.toFixed(1) + '%</div><div class="lbl">Margin</div></div>' +
     '</div>' +
-    '<div class="financial-note">Margin = Laba ÷ Penjualan × 100%. Sistem tidak menggunakan markup.</div>';
+    '<div class="financial-note">Margin = Laba ÷ Penjualan × 100%. HPP dihitung real-time dari biaya bahan + biaya ops batch terkait.</div>';
 }
 
 // ============================================================
