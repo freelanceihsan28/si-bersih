@@ -70,7 +70,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="app" id="appContainer" style="display:none">
 <nav class="navbar">
   <div style="display:flex;align-items:center;gap:9px">
-    <button class="menu-toggle" id="menuToggle">☰</button><span class="brand">🧼 SI.BERSIH <small>v5.0</small></span><span id="stokNotifBadge"></span>
+    <button class="menu-toggle" id="menuToggle">☰</button><span class="brand">🧼 SI.BERSIH <small>v5.1</small></span><span id="stokNotifBadge"></span>
   </div>
   <div class="user-info"><span id="userEmail"></span><span class="badge" style="background:rgba(255,255,255,.2);color:#fff" id="userRoleBadge"></span><button class="btn" onclick="logout()">Logout</button></div>
   <div class="menu-dropdown" id="menuDropdown">
@@ -81,6 +81,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
     <a data-page="pengemasan">📦 Pengemasan</a>
     <a data-page="penjualan">💰 Penjualan</a>
     <a class="menu-section-title">Menu Keuangan</a>
+    <a data-page="keuangan">💵 Pemasukan & Pengeluaran</a>
     <a data-page="laporan">📊 Laporan Keuangan</a>
     <a class="menu-section-title">Menu Tambahan</a>
     <a data-page="simulasi">🧮 Simulasi</a>
@@ -176,6 +177,32 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 </div>
 <div class="search-box"><input id="searchPenjualan" placeholder="🔍 Cari..." oninput="filterTable('jualTbody','searchPenjualan')"></div>
 <div class="table-wrap"><table><thead><tr><th>Jenis Sabun</th><th>Kemasan</th><th>Qty</th><th>Total</th><th>HPP</th><th>Laba</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody id="jualTbody"></tbody></table></div>
+</div>
+
+<div class="page" id="page-keuangan">
+<h2>💵 Pemasukan & Pengeluaran</h2>
+<p class="small">Input transaksi kas manual sesuai struktur Excel. Transaksi di sini otomatis memengaruhi saldo kas dan arus kas. Modal/investasi tetap dicatat melalui menu Tambah Modal.</p>
+<div class="tab-bar"><button class="active" data-tab="keu-pemasukan">📥 Pemasukan</button><button data-tab="keu-pengeluaran">📤 Pengeluaran</button></div>
+<div class="tab-content active" id="tab-keu-pemasukan">
+  <div class="form-row">
+    <div class="form-group"><label>Tanggal</label><input id="keuMasukTanggal" type="date"></div>
+    <div class="form-group"><label>Keterangan</label><input id="keuMasukKet" placeholder="Contoh: pemasukan lain"></div>
+    <div class="form-group"><label>Kategori</label><input id="keuMasukKategori" placeholder="Contoh: Lainnya"></div>
+    <div class="form-group"><label>Jumlah (Rp)</label><input id="keuMasukJumlah" type="number" min="1"></div>
+    <div class="form-group"><button class="btn btn-success admin-only" style="margin-top:19px;width:100%" onclick="tambahPemasukanManual()">➕ Simpan Pemasukan</button></div>
+  </div>
+  <div id="keuPemasukanTable"></div>
+</div>
+<div class="tab-content" id="tab-keu-pengeluaran">
+  <div class="form-row">
+    <div class="form-group"><label>Tanggal</label><input id="keuKeluarTanggal" type="date"></div>
+    <div class="form-group"><label>Keterangan</label><input id="keuKeluarKet" placeholder="Contoh: listrik, transport, dll."></div>
+    <div class="form-group"><label>Kategori</label><input id="keuKeluarKategori" placeholder="Contoh: Operasional"></div>
+    <div class="form-group"><label>Jumlah (Rp)</label><input id="keuKeluarJumlah" type="number" min="1"></div>
+    <div class="form-group"><button class="btn btn-warning admin-only" style="margin-top:19px;width:100%" onclick="tambahPengeluaranManual()">➕ Simpan Pengeluaran</button></div>
+  </div>
+  <div id="keuPengeluaranTable"></div>
+</div>
 </div>
 
 <div class="page" id="page-laporan">
@@ -399,8 +426,8 @@ function computeHppPerUnit(item) {
 // ============================================================
 // ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS (AUDITED) ⭐⭐⭐
 // ============================================================
-// INPUT:  + Invest + Penjualan LUNAS
-// OUTPUT: − Beli Bahan − Beli Kemasan − Peralatan − Biaya Ops
+// INPUT:  + Invest + Penjualan LUNAS + Pemasukan Manual
+// OUTPUT: − Beli Bahan − Beli Kemasan − Peralatan − Biaya Ops − Pengeluaran Manual
 // ============================================================
 function hitungSaldoKas() {
   var saldo = Number(data.keuangan && data.keuangan.saldoAwal) || 0;
@@ -419,6 +446,12 @@ function hitungSaldoKas() {
     if (penjualan[j].status === 'Lunas') {
       saldo += Number(penjualan[j].total) || 0;
     }
+  }
+
+  // Pemasukan manual dari tab Keuangan / struktur Excel
+  var pemasukanManual = (data.keuangan && data.keuangan.pemasukan) || [];
+  for (var pm = 0; pm < pemasukanManual.length; pm++) {
+    saldo += Number(pemasukanManual[pm].jumlah) || 0;
   }
   
   // ================ OUTPUT ================
@@ -449,6 +482,12 @@ function hitungSaldoKas() {
   var produksi = data.produksi || [];
   for (var p = 0; p < produksi.length; p++) {
     saldo -= Number(produksi[p].biayaOperasional) || 0;
+  }
+
+  // Pengeluaran manual dari tab Keuangan / struktur Excel
+  var pengeluaranManual = (data.keuangan && data.keuangan.pengeluaran) || [];
+  for (var pk = 0; pk < pengeluaranManual.length; pk++) {
+    saldo -= Number(pengeluaranManual[pk].jumlah) || 0;
   }
   
   return saldo;
@@ -535,6 +574,30 @@ function getArusKasDetail() {
       tipe: 'Keluar',
       sumber: '🔧 Beli peralatan: ' + peralatan[m].nama,
       jumlah: Number(peralatan[m].total) || 0
+    });
+  }
+
+  // 7. Pemasukan manual
+  var pemasukanManual = (data.keuangan && data.keuangan.pemasukan) || [];
+  for (var mi = 0; mi < pemasukanManual.length; mi++) {
+    var pmx = pemasukanManual[mi];
+    rows.push({
+      tanggal: pmx.tanggal,
+      tipe: 'Masuk',
+      sumber: '📥 ' + (pmx.kategori ? pmx.kategori + ': ' : '') + (pmx.keterangan || 'Pemasukan manual'),
+      jumlah: Number(pmx.jumlah) || 0
+    });
+  }
+
+  // 8. Pengeluaran manual
+  var pengeluaranManual = (data.keuangan && data.keuangan.pengeluaran) || [];
+  for (var mo = 0; mo < pengeluaranManual.length; mo++) {
+    var pkx = pengeluaranManual[mo];
+    rows.push({
+      tanggal: pkx.tanggal,
+      tipe: 'Keluar',
+      sumber: '📤 ' + (pkx.kategori ? pkx.kategori + ': ' : '') + (pkx.keterangan || 'Pengeluaran manual'),
+      jumlah: Number(pkx.jumlah) || 0
     });
   }
   
@@ -763,6 +826,7 @@ function renderAll(shouldSave) {
   renderProduksi();
   renderPengemasan();
   renderPenjualan();
+  renderKeuanganManual();
   renderLaporan();
   renderSimDropdown();
   renderPeralatan();
@@ -808,6 +872,8 @@ function renderDashboard() {
   }
   var penjualanStats = computeTotalPenjualan();
   var kasMasuk = penjualanStats.lunas;
+  var pemasukanManual = (data.keuangan && data.keuangan.pemasukan) || [];
+  for (var pmi = 0; pmi < pemasukanManual.length; pmi++) kasMasuk += Number(pemasukanManual[pmi].jumlah) || 0;
   
   var kasKeluar = 0;
   var beliBahan = data.pembelianBahan || [];
@@ -818,6 +884,8 @@ function renderDashboard() {
   for (var pr = 0; pr < peralatan.length; pr++) kasKeluar += Number(peralatan[pr].total) || 0;
   var produksiArr = data.produksi || [];
   for (var po = 0; po < produksiArr.length; po++) kasKeluar += Number(produksiArr[po].biayaOperasional) || 0;
+  var pengeluaranManual = (data.keuangan && data.keuangan.pengeluaran) || [];
+  for (var pko = 0; pko < pengeluaranManual.length; pko++) kasKeluar += Number(pengeluaranManual[pko].jumlah) || 0;
   
   // ✅ Saldo kas dihitung ulang dari sumber (real-time)
   var kas = hitungSaldoKas();
@@ -826,7 +894,7 @@ function renderDashboard() {
     '<div class="stat-grid">' +
       '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
       '<div class="stat-card"><div class="num">' + rupiah(modal) + '</div><div class="lbl">Invest Masuk</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(kasMasuk) + '</div><div class="lbl">Penjualan Lunas</div></div>' +
+      '<div class="stat-card"><div class="num">' + rupiah(kasMasuk) + '</div><div class="lbl">Total Kas Masuk</div></div>' +
       '<div class="stat-card"><div class="num">' + rupiah(kasKeluar) + '</div><div class="lbl">Kas Keluar</div></div>' +
     '</div>';
   renderInvestorSummary();
@@ -2437,6 +2505,86 @@ function bayarHutang(id) {
 }
 
 // ============================================================
+// KEUANGAN MANUAL (SESUAI STRUKTUR EXCEL)
+// ============================================================
+function renderKeuanganManual() {
+  if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
+  if (!data.keuangan.pemasukan) data.keuangan.pemasukan = [];
+  if (!data.keuangan.pengeluaran) data.keuangan.pengeluaran = [];
+
+  var masuk = data.keuangan.pemasukan.slice().sort(function(a,b){ return String(b.tanggal||'').localeCompare(String(a.tanggal||'')); });
+  var htmlMasuk = '';
+  var totalMasuk = 0;
+  for (var i=0;i<masuk.length;i++) {
+    var x=masuk[i]; totalMasuk += Number(x.jumlah)||0;
+    htmlMasuk += '<tr><td>'+fmtDate(x.tanggal)+'</td><td>'+escapeHtml(x.keterangan||'-')+'</td><td>'+escapeHtml(x.kategori||'-')+'</td><td class="money green">'+rupiah(x.jumlah)+'</td><td>' + (userRole==='admin-full' ? '<button class="btn btn-danger btn-sm" onclick="hapusPemasukanManual(\''+x.id+'\')">🗑</button>' : '-') + '</td></tr>';
+  }
+  if (!htmlMasuk) htmlMasuk='<tr><td colspan="5">Belum ada pemasukan manual.</td></tr>';
+  document.getElementById('keuPemasukanTable').innerHTML='<div class="flex-between"><b>📥 Riwayat Pemasukan</b><span class="small">Total: <b>'+rupiah(totalMasuk)+'</b></span></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>'+htmlMasuk+'</tbody></table></div>';
+
+  var keluar = data.keuangan.pengeluaran.slice().sort(function(a,b){ return String(b.tanggal||'').localeCompare(String(a.tanggal||'')); });
+  var htmlKeluar = '';
+  var totalKeluar = 0;
+  for (var j=0;j<keluar.length;j++) {
+    var y=keluar[j]; totalKeluar += Number(y.jumlah)||0;
+    htmlKeluar += '<tr><td>'+fmtDate(y.tanggal)+'</td><td>'+escapeHtml(y.keterangan||'-')+'</td><td>'+escapeHtml(y.kategori||'-')+'</td><td class="money red">'+rupiah(y.jumlah)+'</td><td>' + (userRole==='admin-full' ? '<button class="btn btn-danger btn-sm" onclick="hapusPengeluaranManual(\''+y.id+'\')">🗑</button>' : '-') + '</td></tr>';
+  }
+  if (!htmlKeluar) htmlKeluar='<tr><td colspan="5">Belum ada pengeluaran manual.</td></tr>';
+  document.getElementById('keuPengeluaranTable').innerHTML='<div class="flex-between"><b>📤 Riwayat Pengeluaran</b><span class="small">Total: <b>'+rupiah(totalKeluar)+'</b></span></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>'+htmlKeluar+'</tbody></table></div>';
+
+  var a=document.getElementById('keuMasukTanggal'); if(a && !a.value) a.value=todayStr();
+  var b=document.getElementById('keuKeluarTanggal'); if(b && !b.value) b.value=todayStr();
+}
+
+function tambahPemasukanManual() {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
+  var tgl=document.getElementById('keuMasukTanggal').value || todayStr();
+  var ket=document.getElementById('keuMasukKet').value.trim();
+  var kat=document.getElementById('keuMasukKategori').value.trim();
+  var jml=Number(document.getElementById('keuMasukJumlah').value)||0;
+  if (!ket || jml<=0) return alertx('Keterangan dan jumlah wajib diisi','error');
+  if (!data.keuangan) data.keuangan={pemasukan:[],pengeluaran:[],saldoAwal:0};
+  if (!data.keuangan.pemasukan) data.keuangan.pemasukan=[];
+  data.keuangan.pemasukan.push({id:genId(),tanggal:tgl,keterangan:ket,kategori:kat,jumlah:jml});
+  document.getElementById('keuMasukKet').value=''; document.getElementById('keuMasukKategori').value=''; document.getElementById('keuMasukJumlah').value='';
+  renderAll(true); alertx('Pemasukan dicatat. Saldo kas bertambah '+rupiah(jml)+'.');
+}
+
+function tambahPengeluaranManual() {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
+  var tgl=document.getElementById('keuKeluarTanggal').value || todayStr();
+  var ket=document.getElementById('keuKeluarKet').value.trim();
+  var kat=document.getElementById('keuKeluarKategori').value.trim();
+  var jml=Number(document.getElementById('keuKeluarJumlah').value)||0;
+  if (!ket || jml<=0) return alertx('Keterangan dan jumlah wajib diisi','error');
+  if (!data.keuangan) data.keuangan={pemasukan:[],pengeluaran:[],saldoAwal:0};
+  if (!data.keuangan.pengeluaran) data.keuangan.pengeluaran=[];
+  data.keuangan.pengeluaran.push({id:genId(),tanggal:tgl,keterangan:ket,kategori:kat,jumlah:jml});
+  document.getElementById('keuKeluarKet').value=''; document.getElementById('keuKeluarKategori').value=''; document.getElementById('keuKeluarJumlah').value='';
+  renderAll(true); alertx('Pengeluaran dicatat. Saldo kas berkurang '+rupiah(jml)+'.');
+}
+
+function hapusPemasukanManual(id) {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak','error');
+  var arr=data.keuangan && data.keuangan.pemasukan || []; var item=null;
+  for(var i=0;i<arr.length;i++){if(arr[i].id===id){item=arr[i];break;}}
+  if(!item || !confirm('Hapus pemasukan '+rupiah(item.jumlah)+'?\nSaldo kas akan otomatis berkurang.')) return;
+  data.keuangan.pemasukan=arr.filter(function(x){return x.id!==id;});
+  logAudit('delete','keuangan.pemasukan',id,'Pemasukan dihapus: '+rupiah(item.jumlah)+' '+(item.keterangan||''));
+  renderAll(true); alertx('Pemasukan dihapus. Saldo kas otomatis disesuaikan.');
+}
+
+function hapusPengeluaranManual(id) {
+  if (userRole !== 'admin-full') return alertx('Akses ditolak','error');
+  var arr=data.keuangan && data.keuangan.pengeluaran || []; var item=null;
+  for(var i=0;i<arr.length;i++){if(arr[i].id===id){item=arr[i];break;}}
+  if(!item || !confirm('Hapus pengeluaran '+rupiah(item.jumlah)+'?\nSaldo kas akan otomatis bertambah.')) return;
+  data.keuangan.pengeluaran=arr.filter(function(x){return x.id!==id;});
+  logAudit('delete','keuangan.pengeluaran',id,'Pengeluaran dihapus: '+rupiah(item.jumlah)+' '+(item.keterangan||''));
+  renderAll(true); alertx('Pengeluaran dihapus. Saldo kas otomatis disesuaikan.');
+}
+
+// ============================================================
 // LAPORAN KEUANGAN
 // ============================================================
 function renderLaporan() {
@@ -2471,8 +2619,8 @@ function renderLaporan() {
     '</div>' +
     '<div class="financial-note">' +
       '<b>ℹ️ Saldo Kas (real-time):</b><br>' +
-      '💰 Invest + Penjualan Lunas<br>' +
-      '− Beli Bahan − Beli Kemasan − Beli Peralatan − Biaya Ops Produksi' +
+      '💰 Saldo Awal + Invest + Penjualan Lunas + Pemasukan Manual<br>' +
+      '− Beli Bahan − Beli Kemasan − Beli Peralatan − Biaya Ops Produksi − Pengeluaran Manual' +
     '</div>' +
     invHtml;
   
@@ -2922,6 +3070,8 @@ document.getElementById('fontDec').onclick = function() {
 document.getElementById('produksiTanggal').value = todayStr();
 document.getElementById('kemasanTanggal').value = todayStr();
 document.getElementById('jualTanggal').value = todayStr();
+if (document.getElementById('keuMasukTanggal')) document.getElementById('keuMasukTanggal').value = todayStr();
+if (document.getElementById('keuKeluarTanggal')) document.getElementById('keuKeluarTanggal').value = todayStr();
 
 console.log('✅ SI.BERSIH siap digunakan!');
 </script>
