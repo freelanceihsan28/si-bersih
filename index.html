@@ -70,7 +70,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="app" id="appContainer" style="display:none">
 <nav class="navbar">
   <div style="display:flex;align-items:center;gap:9px">
-    <button class="menu-toggle" id="menuToggle">☰</button><span class="brand">🧼 SI.BERSIH <small>v5.1</small></span><span id="stokNotifBadge"></span>
+    <button class="menu-toggle" id="menuToggle">☰</button><span class="brand">🧼 SI.BERSIH <small>v5.2</small></span><span id="stokNotifBadge"></span>
   </div>
   <div class="user-info"><span id="userEmail"></span><span class="badge" style="background:rgba(255,255,255,.2);color:#fff" id="userRoleBadge"></span><button class="btn" onclick="logout()">Logout</button></div>
   <div class="menu-dropdown" id="menuDropdown">
@@ -81,7 +81,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
     <a data-page="pengemasan">📦 Pengemasan</a>
     <a data-page="penjualan">💰 Penjualan</a>
     <a class="menu-section-title">Menu Keuangan</a>
-    <a data-page="keuangan">💵 Pemasukan & Pengeluaran</a>
+    <a data-page="keuangan">💵 Pemasukan & Pengeluaran Lainnya</a>
     <a data-page="laporan">📊 Laporan Keuangan</a>
     <a class="menu-section-title">Menu Tambahan</a>
     <a data-page="simulasi">🧮 Simulasi</a>
@@ -93,13 +93,10 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="page active" id="page-dashboard">
 <h2>▦ Dashboard</h2>
 <div style="margin:12px 0;display:flex;gap:8px;flex-wrap:wrap">
-<button class="btn btn-info admin-only" onclick="tambahModal()">➕ Tambah Modal</button>
 <button class="btn btn-success admin-only" onclick="backupData()">⬇ Backup</button>
 <button class="btn btn-warning admin-only" onclick="document.getElementById('restoreInput').click()">⬆ Restore</button>
 <input id="restoreInput" type="file" accept=".json" style="display:none" onchange="restoreData(event)">
 </div>
-<div id="modalSummary"></div>
-<div id="investorSummary"></div>
 <div id="stokWarningList"></div>
 <h3 style="margin-top:18px">Stok Sabun Jadi per Kemasan</h3>
 <div class="table-wrap"><table><thead><tr><th>Kemasan</th><th>Jenis Sabun</th><th>Stok</th><th>Harga Jual</th></tr></thead><tbody id="dashStokKemasanTbody"></tbody></table></div>
@@ -180,14 +177,14 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 </div>
 
 <div class="page" id="page-keuangan">
-<h2>💵 Pemasukan & Pengeluaran</h2>
-<p class="small">Input transaksi kas manual sesuai struktur Excel. Transaksi di sini otomatis memengaruhi saldo kas dan arus kas. Modal/investasi tetap dicatat melalui menu Tambah Modal.</p>
+<h2>💵 Pemasukan & Pengeluaran Lainnya</h2>
+<p class="small">Input transaksi kas yang belum memiliki menu khusus. Penjualan tetap dicatat melalui tab Penjualan. Untuk investasi, pilih kategori Investasi agar otomatis masuk Laporan Kas sebagai Investasi.</p>
 <div class="tab-bar"><button class="active" data-tab="keu-pemasukan">📥 Pemasukan</button><button data-tab="keu-pengeluaran">📤 Pengeluaran</button></div>
 <div class="tab-content active" id="tab-keu-pemasukan">
   <div class="form-row">
     <div class="form-group"><label>Tanggal</label><input id="keuMasukTanggal" type="date"></div>
     <div class="form-group"><label>Keterangan</label><input id="keuMasukKet" placeholder="Contoh: pemasukan lain"></div>
-    <div class="form-group"><label>Kategori</label><input id="keuMasukKategori" placeholder="Contoh: Lainnya"></div>
+    <div class="form-group"><label>Kategori</label><select id="keuMasukKategori"><option value="Investasi">Investasi</option><option value="Lainnya" selected>Lainnya</option></select></div>
     <div class="form-group"><label>Jumlah (Rp)</label><input id="keuMasukJumlah" type="number" min="1"></div>
     <div class="form-group"><button class="btn btn-success admin-only" style="margin-top:19px;width:100%" onclick="tambahPemasukanManual()">➕ Simpan Pemasukan</button></div>
   </div>
@@ -426,19 +423,13 @@ function computeHppPerUnit(item) {
 // ============================================================
 // ⭐⭐⭐ FUNGSI KUNCI: SALDO KAS (AUDITED) ⭐⭐⭐
 // ============================================================
-// INPUT:  + Invest + Penjualan LUNAS + Pemasukan Manual
+// INPUT: Penjualan LUNAS + Investasi/Pemasukan Lainnya
 // OUTPUT: − Beli Bahan − Beli Kemasan − Peralatan − Biaya Ops − Pengeluaran Manual
 // ============================================================
 function hitungSaldoKas() {
   var saldo = Number(data.keuangan && data.keuangan.saldoAwal) || 0;
   
   // ================ INPUT ================
-  
-  // ✅ Invest (modal) — ambil dari modalTambahan, BUKAN dari keuangan.pemasukan
-  var tambahan = data.modalTambahan || [];
-  for (var i = 0; i < tambahan.length; i++) {
-    saldo += Number(tambahan[i].jumlah) || 0;
-  }
   
   // ✅ Penjualan LUNAS saja
   var penjualan = data.penjualan || [];
@@ -497,18 +488,7 @@ function hitungSaldoKas() {
 function getArusKasDetail() {
   var rows = [];
   
-  // 1. Invest masuk
-  var tambahan = data.modalTambahan || [];
-  for (var i = 0; i < tambahan.length; i++) {
-    rows.push({
-      tanggal: tambahan[i].tanggal,
-      tipe: 'Masuk',
-      sumber: '💰 Invest dari ' + tambahan[i].pemberi,
-      jumlah: Number(tambahan[i].jumlah) || 0
-    });
-  }
-  
-  // 2. Penjualan Lunas
+  // 1. Penjualan Lunas
   var penjualan = data.penjualan || [];
   for (var j = 0; j < penjualan.length; j++) {
     var p = penjualan[j];
@@ -584,7 +564,7 @@ function getArusKasDetail() {
     rows.push({
       tanggal: pmx.tanggal,
       tipe: 'Masuk',
-      sumber: '📥 ' + (pmx.kategori ? pmx.kategori + ': ' : '') + (pmx.keterangan || 'Pemasukan manual'),
+      sumber: (String(pmx.kategori || '').trim().toLowerCase() === 'investasi' ? '💰 Investasi: ' : '📥 ') + (pmx.keterangan || 'Pemasukan lainnya'),
       jumlah: Number(pmx.jumlah) || 0
     });
   }
@@ -735,6 +715,32 @@ function showApp() {
   document.getElementById('auditMenu').style.display = userRole === 'admin-full' ? 'block' : 'none';
   navigateTo('dashboard');
 }
+function migrateOldInvestmentsToKeuangan() {
+  var old = data.modalTambahan || [];
+  if (!old.length) return false;
+  if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
+  if (!data.keuangan.pemasukan) data.keuangan.pemasukan = [];
+  var existing = {};
+  for (var i = 0; i < data.keuangan.pemasukan.length; i++) {
+    var e = data.keuangan.pemasukan[i];
+    if (e && e._migratedFromModalId) existing[e._migratedFromModalId] = true;
+  }
+  for (var j = 0; j < old.length; j++) {
+    var x = old[j];
+    if (!x || !x.id || existing[x.id]) continue;
+    data.keuangan.pemasukan.push({
+      id: genId(),
+      tanggal: x.tanggal || todayStr(),
+      keterangan: x.keterangan || ('Investasi dari ' + (x.pemberi || 'Investor')),
+      kategori: 'Investasi',
+      jumlah: Number(x.jumlah) || 0,
+      _migratedFromModalId: x.id
+    });
+  }
+  data.modalTambahan = [];
+  return true;
+}
+
 function loadData() {
   if (unsubscribeSnapshot) unsubscribeSnapshot();
   unsubscribeSnapshot = db.collection('si_bersih_data').limit(1).onSnapshot(function(s) {
@@ -753,7 +759,8 @@ function loadData() {
       if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
       if (!data.keuangan.pemasukan) data.keuangan.pemasukan = [];
       if (!data.keuangan.pengeluaran) data.keuangan.pengeluaran = [];
-      renderAll(false);
+      var migrated = migrateOldInvestmentsToKeuangan();
+      renderAll(migrated);
     }
   }, function(e) { alertx('Firestore: ' + e.message, 'error'); });
 }
@@ -864,75 +871,7 @@ function renderDashboard() {
   }
   document.getElementById('dashStokKemasanTbody').innerHTML = html;
 
-  // ✅ Hitung total untuk dashboard (untuk tampilan saja, tidak mempengaruhi saldo)
-  var modal = 0;
-  var tambahan = data.modalTambahan || [];
-  for (var m = 0; m < tambahan.length; m++) {
-    modal += Number(tambahan[m].jumlah) || 0;
-  }
-  var penjualanStats = computeTotalPenjualan();
-  var kasMasuk = penjualanStats.lunas;
-  var pemasukanManual = (data.keuangan && data.keuangan.pemasukan) || [];
-  for (var pmi = 0; pmi < pemasukanManual.length; pmi++) kasMasuk += Number(pemasukanManual[pmi].jumlah) || 0;
-  
-  var kasKeluar = 0;
-  var beliBahan = data.pembelianBahan || [];
-  for (var b = 0; b < beliBahan.length; b++) kasKeluar += Number(beliBahan[b].total) || 0;
-  var beliKem = data.pembelianKemasan || [];
-  for (var bk = 0; bk < beliKem.length; bk++) kasKeluar += Number(beliKem[bk].total) || 0;
-  var peralatan = data.peralatan || [];
-  for (var pr = 0; pr < peralatan.length; pr++) kasKeluar += Number(peralatan[pr].total) || 0;
-  var produksiArr = data.produksi || [];
-  for (var po = 0; po < produksiArr.length; po++) kasKeluar += Number(produksiArr[po].biayaOperasional) || 0;
-  var pengeluaranManual = (data.keuangan && data.keuangan.pengeluaran) || [];
-  for (var pko = 0; pko < pengeluaranManual.length; pko++) kasKeluar += Number(pengeluaranManual[pko].jumlah) || 0;
-  
-  // ✅ Saldo kas dihitung ulang dari sumber (real-time)
-  var kas = hitungSaldoKas();
-
-  document.getElementById('modalSummary').innerHTML = 
-    '<div class="stat-grid">' +
-      '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">Saldo Kas</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(modal) + '</div><div class="lbl">Invest Masuk</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(kasMasuk) + '</div><div class="lbl">Total Kas Masuk</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(kasKeluar) + '</div><div class="lbl">Kas Keluar</div></div>' +
-    '</div>';
-  renderInvestorSummary();
-}
-
-function renderInvestorSummary() {
-  var groups = {};
-  var tambahan = data.modalTambahan || [];
-  for (var i = 0; i < tambahan.length; i++) {
-    var name = String(tambahan[i].pemberi || '').trim();
-    if (!name) continue;
-    var key = name.toLocaleLowerCase('id-ID');
-    if (!groups[key]) groups[key] = { nama: name, total: 0, jumlahTransaksi: 0 };
-    groups[key].total += (Number(tambahan[i].jumlah) || 0);
-    groups[key].jumlahTransaksi++;
-  }
-  var arr = Object.values(groups).sort(function(a, b) { return b.total - a.total; });
-  var total = 0;
-  for (var a = 0; a < arr.length; a++) {
-    total += arr[a].total;
-  }
-  var html = '';
-  if (arr.length === 0) {
-    html = '<tr><td colspan="3">Belum ada modal investor.</td></tr>';
-  } else {
-    for (var x = 0; x < arr.length; x++) {
-      html += '<tr><td><b>' + arr[x].nama + '</b></td><td>' + arr[x].jumlahTransaksi + '</td><td class="money">' + rupiah(arr[x].total) + '</td></tr>';
-    }
-  }
-  document.getElementById('investorSummary').innerHTML = 
-    '<div class="stat-grid">' +
-      '<div class="stat-card"><div class="num">' + arr.length + '</div><div class="lbl">Jumlah Investor</div></div>' +
-      '<div class="stat-card"><div class="num">' + rupiah(total) + '</div><div class="lbl">Total Modal Investor</div></div>' +
-    '</div>' +
-    '<div class="info-card">' +
-      '<div class="flex-between"><b>👤 Ringkasan Investor</b><span class="small">Nama yang sama digabung otomatis</span></div>' +
-      '<div class="table-wrap"><table><thead><tr><th>Investor</th><th>Jumlah Transaksi</th><th>Total Modal</th></tr></thead><tbody>' + html + '</tbody></table></div>' +
-    '</div>';
+  // Ringkasan dashboard tidak lagi memakai tabel/modal investasi lama.
 }
 
 function checkWarnings() {
@@ -2505,7 +2444,7 @@ function bayarHutang(id) {
 }
 
 // ============================================================
-// KEUANGAN MANUAL (SESUAI STRUKTUR EXCEL)
+// PEMASUKAN & PENGELUARAN LAINNYA
 // ============================================================
 function renderKeuanganManual() {
   if (!data.keuangan) data.keuangan = { pemasukan: [], pengeluaran: [], saldoAwal: 0 };
@@ -2546,7 +2485,7 @@ function tambahPemasukanManual() {
   if (!data.keuangan) data.keuangan={pemasukan:[],pengeluaran:[],saldoAwal:0};
   if (!data.keuangan.pemasukan) data.keuangan.pemasukan=[];
   data.keuangan.pemasukan.push({id:genId(),tanggal:tgl,keterangan:ket,kategori:kat,jumlah:jml});
-  document.getElementById('keuMasukKet').value=''; document.getElementById('keuMasukKategori').value=''; document.getElementById('keuMasukJumlah').value='';
+  document.getElementById('keuMasukKet').value=''; document.getElementById('keuMasukKategori').value='Lainnya'; document.getElementById('keuMasukJumlah').value='';
   renderAll(true); alertx('Pemasukan dicatat. Saldo kas bertambah '+rupiah(jml)+'.');
 }
 
@@ -2599,15 +2538,8 @@ function renderLaporan() {
     laba += (j.total - hppRealTime);
   }
   var piutang = totalJ - lunas;
-  var modal = 0;
-  var tambahan = data.modalTambahan || [];
-  for (var m = 0; m < tambahan.length; m++) {
-    modal += Number(tambahan[m].jumlah) || 0;
-  }
-  
   var kas = hitungSaldoKas();
 
-  var invHtml = renderInvestorTable();
 
   document.getElementById('laporanRingkasan').innerHTML = 
     '<div class="stat-grid">' +
@@ -2619,107 +2551,14 @@ function renderLaporan() {
     '</div>' +
     '<div class="financial-note">' +
       '<b>ℹ️ Saldo Kas (real-time):</b><br>' +
-      '💰 Saldo Awal + Invest + Penjualan Lunas + Pemasukan Manual<br>' +
+      '💰 Saldo Awal + Investasi + Penjualan Lunas + Pemasukan Lainnya<br>' +
       '− Beli Bahan − Beli Kemasan − Beli Peralatan − Biaya Ops Produksi − Pengeluaran Manual' +
-    '</div>' +
-    invHtml;
+    '</div>';
   
   renderLaporanProduksi();
   renderLaporanPenjualan();
   renderArusKas();
   renderLabaRugi();
-}
-
-function renderInvestorTable() {
-  var arr = (data.modalTambahan || []).slice().sort(function(a, b) {
-    return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
-  });
-  var total = 0;
-  for (var t = 0; t < arr.length; t++) {
-    total += Number(arr[t].jumlah) || 0;
-  }
-  var rowsHtml = '';
-  if (arr.length === 0) {
-    rowsHtml = '<tr><td colspan="5">Belum ada data investasi.</td></tr>';
-  } else {
-    for (var i = 0; i < arr.length; i++) {
-      var x = arr[i];
-      rowsHtml += '<tr>' +
-        '<td><b>' + escapeHtml(x.pemberi) + '</b></td>' +
-        '<td class="money">' + rupiah(x.jumlah) + '</td>' +
-        '<td>' + fmtDate(x.tanggal) + '</td>' +
-        '<td>' + (x.keterangan ? escapeHtml(x.keterangan) : '-') + '</td>' +
-        '<td>' +
-          '<button class="btn btn-warning btn-sm" onclick="editInvestasi(\'' + x.id + '\')">✏ Edit</button> ' +
-          '<button class="btn btn-danger btn-sm" onclick="hapusInvestasi(\'' + x.id + '\')">🗑 Hapus</button>' +
-        '</td>' +
-      '</tr>';
-    }
-  }
-  return '<div class="info-card" style="margin-top:16px">' +
-    '<div class="flex-between" style="margin-bottom:10px">' +
-      '<b>💰 Tabel Investasi / Modal Masuk</b>' +
-      '<span class="small">Total: <b>' + rupiah(total) + '</b> dari ' + arr.length + ' transaksi</span>' +
-    '</div>' +
-    '<div class="table-wrap">' +
-      '<table>' +
-        '<thead><tr><th>Investor</th><th>Jumlah</th><th>Tanggal</th><th>Keterangan</th><th>Aksi</th></tr></thead>' +
-        '<tbody>' + rowsHtml + '</tbody>' +
-      '</table>' +
-    '</div>' +
-    '<button class="btn btn-info btn-sm" style="margin-top:8px" onclick="tambahModal()">➕ Tambah Investasi</button>' +
-  '</div>';
-}
-
-function editInvestasi(id) {
-  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
-  var item = null;
-  for (var i = 0; i < data.modalTambahan.length; i++) {
-    if (data.modalTambahan[i].id === id) { item = data.modalTambahan[i]; break; }
-  }
-  if (!item) return;
-  modal('Edit Investasi',
-    '<div class="form-group"><label>Nama Investor</label><input id="eInvNama" value="' + escapeHtml(item.pemberi) + '"></div>' +
-    '<div class="form-group"><label>Jumlah (Rp)</label><input id="eInvJumlah" type="number" min="1" value="' + (Number(item.jumlah) || 0) + '"></div>' +
-    '<div class="form-group"><label>Tanggal</label><input id="eInvTanggal" type="date" value="' + (item.tanggal || todayStr()) + '"></div>' +
-    '<div class="form-group"><label>Keterangan (opsional)</label><input id="eInvKet" value="' + escapeHtml(item.keterangan || '') + '"></div>',
-    function() {
-      var nama = document.getElementById('eInvNama').value.trim();
-      var jml = Number(document.getElementById('eInvJumlah').value) || 0;
-      var tgl = document.getElementById('eInvTanggal').value || todayStr();
-      var ket = document.getElementById('eInvKet').value.trim();
-      if (!nama || jml <= 0) return alertx('Nama dan jumlah wajib diisi', 'error');
-      var oldJumlah = Number(item.jumlah) || 0;
-      var oldNama = item.pemberi;
-      item.pemberi = nama;
-      item.jumlah = jml;
-      item.tanggal = tgl;
-      item.keterangan = ket;
-      logAudit('edit', 'modalTambahan', id, 'Investasi ' + oldNama + ' (' + oldJumlah + ') → ' + nama + ' (' + jml + ')');
-      renderAll(true);
-      alertx('Investasi diperbarui. Saldo kas otomatis disesuaikan.');
-    }
-  );
-}
-
-function hapusInvestasi(id) {
-  if (userRole !== 'admin-full') return alertx('Akses ditolak', 'error');
-  var item = null;
-  for (var i = 0; i < data.modalTambahan.length; i++) {
-    if (data.modalTambahan[i].id === id) { item = data.modalTambahan[i]; break; }
-  }
-  if (!item) return;
-  if (!confirm('Hapus investasi dari ' + item.pemberi + ' sebesar ' + rupiah(item.jumlah) + '?\n\nSaldo kas akan otomatis berkurang.')) return;
-  
-  var newModal = [];
-  for (var j = 0; j < data.modalTambahan.length; j++) {
-    if (data.modalTambahan[j].id !== id) newModal.push(data.modalTambahan[j]);
-  }
-  data.modalTambahan = newModal;
-  
-  logAudit('delete', 'modalTambahan', id, 'Investasi dihapus: ' + item.pemberi + ' ' + rupiah(item.jumlah));
-  renderAll(true);
-  alertx('Investasi dihapus. Saldo kas otomatis disesuaikan.');
 }
 
 function renderLaporanProduksi() {
@@ -2943,28 +2782,6 @@ function renderAudit() {
   c.innerHTML = html;
 }
 
-function tambahModal() {
-  if (userRole !== 'admin-full') return;
-  modal('Tambah Investasi',
-    '<div class="form-group"><label>Nama Pemberi Modal</label><input id="mPemberi"></div>' +
-    '<div class="form-group"><label>Jumlah</label><input id="mJumlah" type="number" min="1"></div>' +
-    '<div class="form-group"><label>Tanggal</label><input id="mTanggal" type="date" value="' + todayStr() + '"></div>' +
-    '<div class="form-group"><label>Keterangan (opsional)</label><input id="mKet" placeholder="Misal: investasi awal, tambahan modal, dll."></div>',
-    function() {
-      var pemberi = document.getElementById('mPemberi').value.trim();
-      var q = Number(document.getElementById('mJumlah').value) || 0;
-      var tgl = document.getElementById('mTanggal').value || todayStr();
-      var ket = document.getElementById('mKet').value.trim();
-      if (!pemberi || q <= 0) return alertx('Nama pemberi dan jumlah modal wajib diisi', 'error');
-      var id = genId();
-      if (!data.modalTambahan) data.modalTambahan = [];
-      data.modalTambahan.push({ id: id, pemberi: pemberi, jumlah: q, tanggal: tgl, keterangan: ket });
-      renderAll(true);
-      alertx('Investasi dicatat. Saldo kas bertambah ' + rupiah(q) + '.');
-    }
-  );
-}
-
 function backupData() {
   var a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
@@ -2988,6 +2805,7 @@ function restoreData(e) {
         for (var i = 0; i < keys.length; i++) {
           if (data[keys[i]] === undefined) data[keys[i]] = d[keys[i]];
         }
+        migrateOldInvestmentsToKeuangan();
         logAudit('restore', 'backup', '-', 'Restore data');
         renderAll(true);
         alertx('Restore berhasil');
