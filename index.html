@@ -97,8 +97,12 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <button class="btn btn-warning admin-only" onclick="document.getElementById('restoreInput').click()">⬆ Restore</button>
 <input id="restoreInput" type="file" accept=".json" style="display:none" onchange="restoreData(event)">
 </div>
+
+<div id="dashRingkasan" class="stat-grid"></div>
+<div id="dashKeuanganInfo"></div>
+
 <div id="stokWarningList"></div>
-<h3 style="margin-top:18px">Stok Sabun Jadi per Kemasan</h3>
+<h3 style="margin-top:18px">📦 Stok Sabun Jadi per Kemasan</h3>
 <div class="table-wrap"><table><thead><tr><th>Kemasan</th><th>Jenis Sabun</th><th>Stok</th><th>Harga Jual</th></tr></thead><tbody id="dashStokKemasanTbody"></tbody></table></div>
 </div>
 
@@ -846,16 +850,82 @@ function renderAll(shouldSave) {
 // DASHBOARD
 // ============================================================
 function renderDashboard() {
+  // ==================== RINGKASAN KEUANGAN ====================
+  // Penjualan hanya dihitung dari tab Penjualan.
+  // Pemasukan & Pengeluaran Lainnya hanya untuk transaksi manual.
+  var penjualan = data.penjualan || [];
+  var omzet = 0, kasMasukPenjualan = 0, piutang = 0, hpp = 0, laba = 0;
+  for (var i = 0; i < penjualan.length; i++) {
+    var pj = penjualan[i];
+    var total = Number(pj.total) || 0;
+    omzet += total;
+    if (pj.status === 'Lunas') kasMasukPenjualan += total;
+    else piutang += total;
+    var hppJual = computeHppFromDetails(pj.batchDetails);
+    hpp += hppJual;
+    laba += total - hppJual;
+  }
+
+  var pemasukan = data.keuangan && data.keuangan.pemasukan || [];
+  var pengeluaran = data.keuangan && data.keuangan.pengeluaran || [];
+  var investasi = 0, pemasukanLainnya = 0, pengeluaranManual = 0;
+  for (var m = 0; m < pemasukan.length; m++) {
+    var pm = Number(pemasukan[m].jumlah) || 0;
+    if (String(pemasukan[m].kategori || '').toLowerCase() === 'investasi') investasi += pm;
+    else pemasukanLainnya += pm;
+  }
+  for (var n = 0; n < pengeluaran.length; n++) {
+    pengeluaranManual += Number(pengeluaran[n].jumlah) || 0;
+  }
+
+  var totalKasMasuk = kasMasukPenjualan + investasi + pemasukanLainnya;
+  var totalKasKeluar = 0;
+  var pb = data.pembelianBahan || [];
+  var pk = data.pembelianKemasan || [];
+  var alat = data.peralatan || [];
+  var prod = data.produksi || [];
+  for (var b = 0; b < pb.length; b++) totalKasKeluar += Number(pb[b].total) || 0;
+  for (var c = 0; c < pk.length; c++) totalKasKeluar += Number(pk[c].total) || 0;
+  for (var d = 0; d < alat.length; d++) totalKasKeluar += Number(alat[d].total) || 0;
+  for (var e = 0; e < prod.length; e++) totalKasKeluar += Number(prod[e].biayaOperasional) || 0;
+  totalKasKeluar += pengeluaranManual;
+
+  var kas = hitungSaldoKas();
+  var labaKotor = laba;
+  var margin = omzet > 0 ? (labaKotor / omzet) * 100 : 0;
+
+  document.getElementById('dashRingkasan').innerHTML =
+    '<div class="stat-card"><div class="num">' + rupiah(kas) + '</div><div class="lbl">💰 Saldo Kas</div></div>' +
+    '<div class="stat-card"><div class="num green">' + rupiah(totalKasMasuk) + '</div><div class="lbl">📥 Total Kas Masuk</div></div>' +
+    '<div class="stat-card"><div class="num red">' + rupiah(totalKasKeluar) + '</div><div class="lbl">📤 Total Kas Keluar</div></div>' +
+    '<div class="stat-card"><div class="num">' + rupiah(omzet) + '</div><div class="lbl">🛒 Omzet Penjualan</div></div>' +
+    '<div class="stat-card"><div class="num">' + rupiah(piutang) + '</div><div class="lbl">📋 Piutang</div></div>' +
+    '<div class="stat-card"><div class="num ' + (labaKotor >= 0 ? 'green' : 'red') + '">' + rupiah(labaKotor) + '</div><div class="lbl">📈 Laba Kotor</div></div>' +
+    '<div class="stat-card"><div class="num">' + rupiah(investasi) + '</div><div class="lbl">💼 Investasi</div></div>';
+
+  document.getElementById('dashKeuanganInfo').innerHTML =
+    '<div class="info-card" style="margin-top:0">' +
+      '<b>Ringkasan Keuangan</b>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:8px">' +
+        '<div>Penjualan Lunas: <b>' + rupiah(kasMasukPenjualan) + '</b></div>' +
+        '<div>Investasi: <b>' + rupiah(investasi) + '</b></div>' +
+        '<div>Pemasukan Lainnya: <b>' + rupiah(pemasukanLainnya) + '</b></div>' +
+        '<div>HPP Terjual: <b>' + rupiah(hpp) + '</b></div>' +
+        '<div>Margin Kotor: <b>' + margin.toFixed(1) + '%</b></div>' +
+      '</div>' +
+    '</div>';
+
+  // ==================== STOK SABUN JADI ====================
   var g = {};
   var stokJadi = data.stokBarangJadi || [];
-  for (var i = 0; i < stokJadi.length; i++) {
-    var e = stokJadi[i];
-    var key = e.jenisSabun + '|' + e.kemasanId;
-    if (!g[key]) g[key] = { jenisSabun: e.jenisSabun, kemasanId: e.kemasanId, stok: 0, harga: 0 };
-    var items = e.batchItems || [];
-    for (var j = 0; j < items.length; j++) {
-      g[key].stok += Number(items[j].jumlahUnit) || 0;
-      g[key].harga = items[j].hargaJual || g[key].harga;
+  for (var s = 0; s < stokJadi.length; s++) {
+    var item = stokJadi[s];
+    var key = item.jenisSabun + '|' + item.kemasanId;
+    if (!g[key]) g[key] = { jenisSabun: item.jenisSabun, kemasanId: item.kemasanId, stok: 0, harga: 0 };
+    var batchItems = item.batchItems || [];
+    for (var t = 0; t < batchItems.length; t++) {
+      g[key].stok += Number(batchItems[t].jumlahUnit) || 0;
+      g[key].harga = batchItems[t].hargaJual || g[key].harga;
     }
   }
   var html = '';
@@ -870,8 +940,6 @@ function renderDashboard() {
     }
   }
   document.getElementById('dashStokKemasanTbody').innerHTML = html;
-
-  // Ringkasan dashboard tidak lagi memakai tabel/modal investasi lama.
 }
 
 function checkWarnings() {
