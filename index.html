@@ -1393,6 +1393,33 @@ function editPembelianBahan(id) {
       if (!rowsNow.length) return alertx('Minimal satu bahan harus memiliki Qty > 0', 'error');
       var ongkir = Math.max(0, Number(document.getElementById('pOngkir')?.value) || 0);
       var newItems = allocatePurchaseShipping(rowsNow, ongkir);
+
+      // Jika yang diedit hanya tanggal, stok dan HPP rata-rata TIDAK boleh disentuh.
+      // Tanggal adalah atribut riwayat pembelian, bukan transaksi stok baru.
+      var oldDate = String(p.tanggal || '');
+      var newDate = String(document.getElementById('ept').value || todayStr());
+      var oldItemsJson = JSON.stringify((p.items || []).map(function(x) {
+        return { bahanId: x.bahanId, qty: Number(x.qty) || 0, harga: Number(x.harga) || 0, ongkirAllocated: Number(x.ongkirAllocated) || 0, keterangan: x.keterangan || '' };
+      }));
+      var newItemsJson = JSON.stringify((newItems || []).map(function(x) {
+        return { bahanId: x.bahanId, qty: Number(x.qty) || 0, harga: Number(x.harga) || 0, ongkirAllocated: Number(x.ongkirAllocated) || 0, keterangan: x.keterangan || '' };
+      }));
+      var onlyDateChanged = oldDate !== newDate && oldItemsJson === newItemsJson && (Number(p.ongkosKirim) || 0) === ongkir;
+      if (onlyDateChanged) {
+        var dateTotal = 0;
+        for (var dateI = 0; dateI < newItems.length; dateI++) {
+          dateTotal += (Number(newItems[dateI].harga) || 0) + (Number(newItems[dateI].ongkirAllocated) || 0);
+        }
+        p.items = newItems;
+        p.total = dateTotal;
+        p.ongkosKirim = ongkir;
+        p.tanggal = newDate;
+        logAudit('edit', 'pembelianBahan', id, 'Tanggal pembelian diperbarui dari ' + oldDate + ' menjadi ' + newDate + ' tanpa mengubah stok');
+        renderAll(true);
+        alertx('Tanggal pembelian berhasil diubah. Stok tidak berubah.');
+        return;
+      }
+
       var groupedOld = {};
       var oldItems = p.items || [];
       for (var a = 0; a < oldItems.length; a++) {
