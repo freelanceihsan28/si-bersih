@@ -1702,17 +1702,25 @@ function calcNeeds(f, liter) {
     var it = effectiveItems[m];
     var bMat = getBahan(it.bahanId);
     if (!bMat) continue;
-    var qty = totalBerat * (Number(it.persen) || 0) / 100;
-    var costItem = qty * (Number(bMat.hargaRataRata) || 0);
+    // Persentase formulasi selalu menghitung BERAT LARUTAN yang ditambahkan ke batch.
+    // Jika bahan ditandai sebagai larutan, hanya bagian aktifnya yang mengurangi stok
+    // bahan baku dan menjadi biaya bahan. Contoh: 1,5 kg larutan NaOH 20% = 0,30 kg NaOH.
+    var qtyLarutan = totalBerat * (Number(it.persen) || 0) / 100;
+    var konsentrasiLarutan = it.isLarutan ? Number(it.konsentrasiLarutan) || 0 : 0;
+    if (it.isLarutan && (konsentrasiLarutan <= 0 || konsentrasiLarutan > 100)) {
+      konsentrasiLarutan = 100;
+    }
+    var qtyAktif = it.isLarutan ? qtyLarutan * konsentrasiLarutan / 100 : qtyLarutan;
+    var costItem = qtyAktif * (Number(bMat.hargaRataRata) || 0);
     cost += costItem;
     items.push({
       ...it,
       bahan: bMat,
-      qty: qty,
-      qtyLarutan: qty,
-      qtyAktif: qty,
+      qty: qtyAktif,
+      qtyLarutan: qtyLarutan,
+      qtyAktif: qtyAktif,
       cost: costItem,
-      konsentrasiLarutan: it.isLarutan ? Number(it.konsentrasiLarutan) || 0 : 0
+      konsentrasiLarutan: konsentrasiLarutan
     });
   }
   return { totalBerat: totalBerat, items: items, cost: cost, totalPersen: totalPersen, declaredPersen: declaredPersen, autoAdjustedWater: totalPersen > declaredPersen };
