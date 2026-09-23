@@ -51,6 +51,49 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 .font-control{position:fixed;right:14px;bottom:14px;z-index:1000;background:#fff;padding:5px;border-radius:30px;box-shadow:0 4px 18px rgba(0,0,0,.12)}.font-control button{border:0;background:var(--teal);color:#fff;width:34px;height:34px;border-radius:50%;margin:2px;font-weight:800}
 @media(max-width:650px){body{padding:6px}.app{padding:8px;border-radius:18px}.user-info #userEmail{display:none}.form-group{flex-basis:100%}.tab-bar button{flex-basis:45%}.table-wrap{max-height:460px}table{font-size:.74rem}.menu-dropdown{min-width:210px}.stat-grid{grid-template-columns:1fr 1fr}}
 .compact-table td,.compact-table th{padding:6px 8px!important;font-size:.75rem!important}.compact-table th{background:#e7f6f3;font-weight:700}
+
+<style>
+/* Detail bahan pada tab Simulasi — tambahan, tidak mengubah komponen lama */
+.simulasi-detail-card {
+  margin-top: 14px;
+}
+.simulasi-detail-card h3 {
+  margin-bottom: 10px;
+}
+.simulasi-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+.simulasi-detail-table th,
+.simulasi-detail-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #dceceb;
+  text-align: left;
+  vertical-align: middle;
+}
+.simulasi-detail-table th {
+  font-weight: 700;
+}
+.simulasi-detail-table td.num,
+.simulasi-detail-table th.num {
+  text-align: right;
+}
+.simulasi-detail-table .sub-note {
+  display: block;
+  margin-top: 2px;
+  font-size: .78rem;
+  opacity: .72;
+}
+.simulasi-detail-total {
+  font-weight: 700;
+}
+.simulasi-detail-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+</style>
+
 </style>
 </head>
 <body>
@@ -228,6 +271,7 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
 <div class="form-group"><label>Manual Ops (Rp)</label><input id="simulasiOpsManual" type="number" oninput="hitungSimulasi()"></div>
 </div>
 <div id="simulasiHasil"></div>
+<div id="simulasiDetailBahan"></div>
 </div>
 
 <div class="page" id="page-peralatan">
@@ -2803,16 +2847,119 @@ function hitungSimulasi() {
   var j = +document.getElementById('simulasiJmlUnit').value || 0;
   var h = +document.getElementById('simulasiHargaJual').value || 0;
   var hasil = document.getElementById('simulasiHasil');
-  if (!f || !k || l <= 0 || j <= 0 || h <= 0) { hasil.innerHTML = ''; return; }
+  var detail = document.getElementById('simulasiDetailBahan');
+
+  if (!f || !k || l <= 0 || j <= 0 || h <= 0) {
+    hasil.innerHTML = '';
+    if (detail) detail.innerHTML = '';
+    return;
+  }
+
   var c = calcNeeds(f, l);
   var opsMode = document.getElementById('simulasiOps').value;
-  var ops = opsMode === 'manual' ? (+document.getElementById('simulasiOpsManual').value || 0) : c.cost * (Number(opsMode) / 100);
+  var ops = opsMode === 'manual'
+    ? (+document.getElementById('simulasiOpsManual').value || 0)
+    : c.cost * (Number(opsMode) / 100);
+
   var hppProd = c.cost + ops;
   var totalHpp = hppProd + (k.hargaPerUnit || 0) * j;
   var omzet = h * j;
   var laba = omzet - totalHpp;
   var margin = laba / omzet * 100;
-  hasil.innerHTML = '<div class="info-card"><h3>📊 Hasil Simulasi</h3><p>Bahan: <b>' + rupiah(c.cost) + '</b></p><p>Operasional: <b>' + rupiah(ops) + '</b></p><p>Kemasan: <b>' + rupiah((k.hargaPerUnit || 0) * j) + '</b></p><p>Total HPP: <b>' + rupiah(totalHpp) + '</b></p><p>HPP/unit: <b>' + rupiah(totalHpp / j) + '</b></p><p>Omzet: <b>' + rupiah(omzet) + '</b></p><p class="' + (laba >= 0 ? 'green' : 'red') + '">Laba: <b>' + rupiah(laba) + '</b></p><p>Margin: <b>' + margin.toFixed(1) + '%</b></p></div>';
+
+  /* HASIL SIMULASI LAMA — tetap dipertahankan */
+  hasil.innerHTML =
+    '<div class="info-card"><h3>📊 Hasil Simulasi</h3>' +
+    '<p>Bahan: <b>' + rupiah(c.cost) + '</b></p>' +
+    '<p>Operasional: <b>' + rupiah(ops) + '</b></p>' +
+    '<p>Kemasan: <b>' + rupiah((k.hargaPerUnit || 0) * j) + '</b></p>' +
+    '<p>Total HPP: <b>' + rupiah(totalHpp) + '</b></p>' +
+    '<p>HPP/unit: <b>' + rupiah(totalHpp / j) + '</b></p>' +
+    '<p>Omzet: <b>' + rupiah(omzet) + '</b></p>' +
+    '<p class="' + (laba >= 0 ? 'green' : 'red') + '">Laba: <b>' + rupiah(laba) + '</b></p>' +
+    '<p>Margin: <b>' + margin.toFixed(1) + '%</b></p></div>';
+
+  /* DETAIL BAHAN — fitur baru */
+  if (!detail) return;
+
+  var rows = '';
+  var items = (c.items || []).slice();
+
+  /* Urutan mengikuti step formulasi */
+  items.sort(function(a, b) {
+    return (Number(a.step) || 0) - (Number(b.step) || 0);
+  });
+
+  for (var i = 0; i < items.length; i++) {
+    var x = items[i];
+    var nama = x.bahan ? x.bahan.nama : '-';
+    var unit = x.bahan ? String(x.bahan.satuanDasar || '').toLowerCase() : '';
+    var persen = Number(x.persen) || 0;
+    var harga = x.bahan ? (Number(x.bahan.hargaRataRata) || 0) : 0;
+    var qtyAktif = Number(x.qty) || 0;
+    var qtyLarutan = Number(x.qtyLarutan) || qtyAktif;
+    var isLarutan = !!x.isLarutan;
+    var kons = Number(x.konsentrasiLarutan) || 0;
+
+    var kebutuhanText;
+    if (unit === 'kg') {
+      kebutuhanText = formatAngkaID(qtyAktif * 1000) + ' gram';
+    } else if (unit === 'l') {
+      kebutuhanText = formatAngkaID(qtyAktif * 1000) + ' mL';
+    } else {
+      kebutuhanText = formatAngkaID(qtyAktif) + ' ' + (unit || '');
+    }
+
+    var kadarText = formatAngkaID(persen) + '%';
+    if (isLarutan && kons > 0 && kons < 100) {
+      kadarText += '<span class="sub-note">larutan ' + formatAngkaID(kons) + '%</span>';
+    }
+
+    var larutanNote = '';
+    if (isLarutan && Math.abs(qtyLarutan - qtyAktif) > 0.000001) {
+      if (unit === 'kg') {
+        larutanNote = '<span class="sub-note">ditambahkan sebagai larutan ' +
+          formatAngkaID(qtyLarutan * 1000) + ' gram</span>';
+      } else if (unit === 'l') {
+        larutanNote = '<span class="sub-note">ditambahkan sebagai larutan ' +
+          formatAngkaID(qtyLarutan * 1000) + ' mL</span>';
+      }
+    }
+
+    rows +=
+      '<tr>' +
+      '<td><b>' + escapeHtml(nama) + '</b>' + larutanNote + '</td>' +
+      '<td class="num">' + kadarText + '</td>' +
+      '<td class="num">' + kebutuhanText + '</td>' +
+      '<td class="num">' + rupiah(harga) + '<span class="sub-note">/' + escapeHtml(unit || 'unit') + '</span></td>' +
+      '<td class="num">' + rupiah(Number(x.cost) || 0) + '</td>' +
+      '</tr>';
+  }
+
+  detail.innerHTML =
+    '<div class="info-card simulasi-detail-card">' +
+      '<h3>🧪 Rincian Bahan Baku</h3>' +
+      '<div class="small" style="margin-bottom:10px">' +
+        'Untuk simulasi <b>' + formatAngkaID(l) + ' L</b>, berdasarkan BJ <b>' +
+        formatAngkaID(Number(f.bj) || 1.025) + '</b>. Harga mengikuti harga rata-rata bahan yang tersimpan di SI.BERSIH.' +
+      '</div>' +
+      '<div class="simulasi-detail-scroll">' +
+        '<table class="simulasi-detail-table">' +
+          '<thead><tr>' +
+            '<th>Bahan</th>' +
+            '<th class="num">Kadar</th>' +
+            '<th class="num">Kebutuhan</th>' +
+            '<th class="num">Harga Bahan</th>' +
+            '<th class="num">Biaya Sesuai Kebutuhan</th>' +
+          '</tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+          '<tfoot><tr class="simulasi-detail-total">' +
+            '<td colspan="4">Total Biaya Bahan</td>' +
+            '<td class="num">' + rupiah(c.cost) + '</td>' +
+          '</tr></tfoot>' +
+        '</table>' +
+      '</div>' +
+    '</div>';
 }
 
 function renderPeralatan() {
