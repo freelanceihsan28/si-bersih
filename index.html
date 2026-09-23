@@ -92,6 +92,22 @@ td{padding:10px 12px;border-bottom:1px solid #e6f0ef;vertical-align:middle;backg
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+<style>
+.simulasi-stok-card { margin-top: 14px; }
+.simulasi-stok-table { width:100%; border-collapse:collapse; min-width:700px; }
+.simulasi-stok-table th, .simulasi-stok-table td {
+  padding:9px 10px; border-bottom:1px solid #dceceb;
+  text-align:left; vertical-align:middle;
+}
+.simulasi-stok-table th { font-weight:700; }
+.simulasi-stok-table td.num, .simulasi-stok-table th.num { text-align:right; }
+.simulasi-stok-table .status-cukup, .simulasi-stok-table .status-kurang { font-weight:700; }
+.simulasi-stok-table .stock-note {
+  display:block; margin-top:2px; font-size:.78rem; opacity:.72;
+}
+</style>
+
 </style>
 
 </style>
@@ -2957,6 +2973,77 @@ function hitungSimulasi() {
             '<td colspan="4">Total Biaya Bahan</td>' +
             '<td class="num">' + rupiah(c.cost) + '</td>' +
           '</tr></tfoot>' +
+        '</table>' +
+      '</div>' +
+    '</div>';
+
+  /* STATUS STOK — tabel terpisah dari rincian biaya */
+  var stokRows = '';
+  var adaKurang = false;
+
+  for (var s = 0; s < items.length; s++) {
+    var sx = items[s];
+    var sbahan = sx.bahan;
+    if (!sbahan) continue;
+
+    var stokSekarang = Number(sbahan.stok) || 0;
+    var kebutuhanStok = Number(sx.qty) || 0;
+    var selisihStok = stokSekarang - kebutuhanStok;
+    var unitStok = String(sbahan.satuanDasar || '').toLowerCase();
+
+    var stokSekarangText, kebutuhanStokText, selisihText;
+    if (unitStok === 'kg') {
+      stokSekarangText = formatAngkaID(stokSekarang * 1000) + ' gram';
+      kebutuhanStokText = formatAngkaID(kebutuhanStok * 1000) + ' gram';
+      selisihText = formatAngkaID(Math.abs(selisihStok) * 1000) + ' gram';
+    } else if (unitStok === 'l') {
+      stokSekarangText = formatAngkaID(stokSekarang * 1000) + ' mL';
+      kebutuhanStokText = formatAngkaID(kebutuhanStok * 1000) + ' mL';
+      selisihText = formatAngkaID(Math.abs(selisihStok) * 1000) + ' mL';
+    } else {
+      stokSekarangText = formatAngkaID(stokSekarang) + ' ' + (unitStok || '');
+      kebutuhanStokText = formatAngkaID(kebutuhanStok) + ' ' + (unitStok || '');
+      selisihText = formatAngkaID(Math.abs(selisihStok)) + ' ' + (unitStok || '');
+    }
+
+    var statusHtml;
+    if (selisihStok >= -0.000000001) {
+      statusHtml =
+        '<span class="green status-cukup">✓ CUKUP</span>' +
+        '<span class="stock-note">Sisa setelah simulasi: ' + selisihText + '</span>';
+    } else {
+      adaKurang = true;
+      statusHtml =
+        '<span class="red status-kurang">⚠ KURANG</span>' +
+        '<span class="stock-note">Kekurangan: ' + selisihText + '</span>';
+    }
+
+    stokRows +=
+      '<tr>' +
+        '<td><b>' + escapeHtml(sbahan.nama) + '</b></td>' +
+        '<td class="num">' + stokSekarangText + '</td>' +
+        '<td class="num">' + kebutuhanStokText + '</td>' +
+        '<td>' + statusHtml + '</td>' +
+      '</tr>';
+  }
+
+  detail.innerHTML +=
+    '<div class="info-card simulasi-stok-card">' +
+      '<h3>📦 Keterangan Ketersediaan Stok</h3>' +
+      '<div class="small" style="margin-bottom:10px">' +
+        (adaKurang
+          ? '⚠️ Ada bahan yang stoknya belum mencukupi untuk simulasi ini.'
+          : '✓ Semua bahan yang dibutuhkan mencukupi untuk simulasi ini.') +
+      '</div>' +
+      '<div class="simulasi-detail-scroll">' +
+        '<table class="simulasi-stok-table">' +
+          '<thead><tr>' +
+            '<th>Bahan</th>' +
+            '<th class="num">Stok Saat Ini</th>' +
+            '<th class="num">Kebutuhan</th>' +
+            '<th>Status</th>' +
+          '</tr></thead>' +
+          '<tbody>' + stokRows + '</tbody>' +
         '</table>' +
       '</div>' +
     '</div>';
